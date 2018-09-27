@@ -1,8 +1,8 @@
 # Futura
 
 [![Build Status](https://api.travis-ci.org/miquido/futura.svg?branch=master)](https://travis-ci.org/miquido/futura)
-[![Platforms](https://img.shields.io/badge/platform-iOS%20|%20macOS-gray.svg?style=flat)](iOS | macOS)
-[![SwiftVersion](https://img.shields.io/badge/Swift-4.2-brightgreen.svg)](Swift 4.2)
+[![Platforms](https://img.shields.io/badge/platform-iOS%20|%20macOS-gray.svg?style=flat)]()
+[![SwiftVersion](https://img.shields.io/badge/Swift-4.2-brightgreen.svg)]()
 
 Futura is a small library that provides simple yet powerful implementation of promises for iOS and macOS.
 
