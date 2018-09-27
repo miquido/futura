@@ -1,0 +1,5 @@
+language: swift
+osx_image: xcode10
+
+script:
+- xcodebuild test -workspace Futura.xcworkspace -scheme Futura -destination "platform=iOS Simulator,name=iPhone X" ONLY_ACTIVE_ARCH=NO
