@@ -53,10 +53,10 @@ public extension Future {
         #if FUTURA_DEBUG
         os_log("Handling value on %{public}@", log: logger, type: .debug, debugDescriptionSynchronized)
         #endif
-        handle { (res) in
-            switch res {
-            case let .success(val):
-                handler(val)
+        handle { result in
+            switch result {
+            case let .success(value):
+                handler(value)
             case .error: break
             }
         }
@@ -69,11 +69,11 @@ public extension Future {
         #if FUTURA_DEBUG
         os_log("Handling error on %{public}@", log: logger, type: .debug, debugDescriptionSynchronized)
         #endif
-        handle { (res) in
-            switch res {
+        handle { result in
+            switch result {
             case .success: break
-            case let .error(err):
-                handler(err)
+            case let .error(reason):
+                handler(reason)
             }
         }
         return self
@@ -89,17 +89,14 @@ public extension Future {
         #endif
         observe { state in
             switch state {
-            case let .resulted(result):
-                switch result {
-                case let .success(val):
-                    future.become(.resulted(with: .success(val)))
-                case let .error(val):
-                    do {
-                        try handler(val)
-                        future.become(.canceled)
-                    } catch {
-                        future.become(.resulted(with: .error(error)))
-                    }
+            case let .resulted(.success(value)):
+                future.become(.resulted(with: .success(value)))
+            case let .resulted(.error(reason)):
+                do {
+                    try handler(reason)
+                    future.become(.canceled)
+                } catch {
+                    future.become(.resulted(with: .error(error)))
                 }
             case .canceled:
                 future.become(.canceled)
@@ -117,16 +114,13 @@ public extension Future {
         #endif
         observe { state in
             switch state {
-            case let .resulted(result):
-                switch result {
-                case let .success(val):
-                    future.become(.resulted(with: .success(val)))
-                case let .error(val):
-                    do {
-                        try future.become(.resulted(with: .success(transformation(val))))
-                    } catch {
-                        future.become(.resulted(with: .error(error)))
-                    }
+            case let .resulted(.success(value)):
+                future.become(.resulted(with: .success(value)))
+            case let .resulted(.error(reason)):
+                do {
+                    try future.become(.resulted(with: .success(transformation(reason))))
+                } catch {
+                    future.become(.resulted(with: .error(error)))
                 }
             case .canceled:
                 future.become(.canceled)
@@ -169,17 +163,14 @@ public extension Future {
         #endif
         observe { state in
             switch state {
-            case let .resulted(result):
-                switch result {
-                case let .success(val):
-                    do {
-                        try future.become(.resulted(with: .success(transformation(val))))
-                    } catch {
-                        future.become(.resulted(with: .error(error)))
-                    }
-                case let .error(err):
-                    future.become(.resulted(with: .error(err)))
+            case let .resulted(.success(value)):
+                do {
+                    try future.become(.resulted(with: .success(transformation(value))))
+                } catch {
+                    future.become(.resulted(with: .error(error)))
                 }
+            case let .resulted(.error(reason)):
+                future.become(.resulted(with: .error(reason)))
             case .canceled:
                 future.become(.canceled)
             case .waiting: break
@@ -197,19 +188,16 @@ public extension Future {
         #endif
         observe { state in
             switch state {
-            case let .resulted(result):
-                switch result {
-                case let .success(val):
-                    do {
-                        try transformation(val).handle {
-                            future.become(.resulted(with: $0))
-                        }
-                    } catch {
-                        future.become(.resulted(with: .error(error)))
+            case let .resulted(.success(value)):
+                do {
+                    try transformation(value).observe {
+                        future.become($0)
                     }
-                case let .error(err):
-                    future.become(.resulted(with: .error(err)))
+                } catch {
+                    future.become(.resulted(with: .error(error)))
                 }
+            case let .resulted(.error(reason)):
+                future.become(.resulted(with: .error(reason)))
             case .canceled:
                 future.become(.canceled)
             case .waiting: break
@@ -269,8 +257,8 @@ internal extension Future {
 
 fileprivate extension Future {
     
-    @discardableResult @inline(__always)
-    func observe(with observer: @escaping (State) -> Void) -> Self {
+    @inline(__always)
+    func observe(with observer: @escaping (State) -> Void) {
         lock.synchronized {
             switch state {
             case .waiting:
@@ -278,19 +266,17 @@ fileprivate extension Future {
             case let .resulted(result):
                 executionContext.execute { observer(.resulted(with: result)) }
             case .canceled:
-                observer(.canceled)
+                executionContext.execute { observer(.canceled) }
             }
         }
-        return self
     }
     
-    @discardableResult @inline(__always)
-    func handle(with handler: @escaping (Result<Value>) -> ()) -> Self {
+    @inline(__always)
+    func handle(with handler: @escaping (Result<Value>) -> ()) {
         observe { state in
             guard case let .resulted(result) = state else { return }
             handler(result)
         }
-        return self
     }
 }
 

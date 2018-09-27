@@ -273,6 +273,47 @@ class FutureTests: XCTestCase {
         XCTAssert(called, "No handlers were called")
     }
     
+    func testFutureFlatMapCancel() {
+        let future: Future<Int> = .init()
+        future.cancel()
+        
+        var called: Bool = false
+        
+        future
+            .flatMap {
+                .init(with: .success($0 + 1))
+            }
+            .then { _ in
+                XCTFail("Should not be called")
+            }
+            .always {
+                called = true
+            }
+        
+        XCTAssert(called, "No handlers were called")
+    }
+    
+    func testFutureFlatMapInnerCancel() {
+        let future: Future<Int> = .init(with: .success(0))
+        
+        var called: Bool = false
+        
+        future
+            .flatMap { _ -> Future<Int> in
+                let inner: Future<Int> = .init()
+                inner.cancel()
+                return inner
+            }
+            .then { _ in
+                XCTFail("Should not be called")
+            }
+            .always {
+                called = true
+            }
+        
+        XCTAssert(called, "No handlers were called")
+    }
+    
     func testFutureRecoverSuccess() {
         let expectedResult: Int = 0
         let future: Future<Int> = .init(with: .error(TestError()))
@@ -315,6 +356,23 @@ class FutureTests: XCTestCase {
         })
         { complete in
             let future: Future<Int> = .init(with: .success(0))
+            
+            future
+                .switch(to: DispatchWorker.custom(markedQueue))
+                .always {
+                    XCTAssert(DispatchQueue.isOnMarkedQueue, "Execution on incorrect DispatchQueue")
+                    complete()
+                }
+        }
+    }
+    
+    func testFutureExecutionContextSwitchOnCancel() {
+        asyncTest(timeoutBody: {
+            XCTFail("Not in time - possible deadlock or fail")
+        })
+        { complete in
+            let future: Future<Int> = .init()
+            future.cancel()
             
             future
                 .switch(to: DispatchWorker.custom(markedQueue))
