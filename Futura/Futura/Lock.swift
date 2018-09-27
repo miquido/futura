@@ -14,9 +14,6 @@
 
 import Darwin
 
-fileprivate let nSecMsec: __darwin_time_t = 1_000_000
-fileprivate let mSecSec: __darwin_time_t = 1_000 * nSecMsec
-
 /// Lock is a simple pthread_mutex wrapper with basic lock functionality
 public final class Lock {
     private let mtx = UnsafeMutablePointer<pthread_mutex_t>.allocate(capacity: 1)
