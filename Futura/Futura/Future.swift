@@ -12,12 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License. */
 
-#if FUTURA_DEBUG
-import os.log
-
-let logger = OSLog(subsystem: "Futura", category: "Async")
-#endif
-
 /// Read only container for async value. Future will remain in memory until its parent (Promise or other Future) completes.
 /// Cancels automatically on deinit when not completed before.
 public final class Future<Value> {
@@ -216,7 +210,7 @@ public extension Future {
         return future
     }
     
-    /// Cancels future without triggering any handlers (except always and canceled). Cancellation is propagated.
+    /// Cancels future without triggering any handlers (except always). Cancellation is propagated.
     func cancel() {
         become(.canceled)
     }
@@ -281,6 +275,11 @@ fileprivate extension Future {
 }
 
 #if FUTURA_DEBUG
+
+import os.log
+
+let logger = OSLog(subsystem: "Futura", category: "Async")
+
 fileprivate extension Future {
     
     var debugDescription: CVarArg {
@@ -310,4 +309,5 @@ fileprivate extension Future {
         return String(describing: Value.self)
     }
 }
+
 #endif
