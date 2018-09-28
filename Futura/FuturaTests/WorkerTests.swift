@@ -13,7 +13,7 @@
  limitations under the License. */
 
 import XCTest
-@testable import Futura
+import Futura
 
 class WorkerTests: XCTestCase {
     

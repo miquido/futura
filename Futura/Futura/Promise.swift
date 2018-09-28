@@ -20,10 +20,16 @@ public final class Promise<Value> {
     /// Creates promise that can be completed
     public init() {}
     
-    /// Creates already completed promise with given result
-    public convenience init(with result: Result<Value>) {
+    /// Creates already succeeded promise with given value
+    public convenience init(succeededWith value: Value) {
         self.init()
-        future.become(.resulted(with: result))
+        future.become(.resulted(with: .success(value)))
+    }
+    
+    /// Creates already failed promise with given error
+    public convenience init(failedWith reason: Error) {
+        self.init()
+        future.become(.resulted(with: .error(reason)))
     }
     
     /// Completes Promise with value. Will be ignored when already completed or canceled.

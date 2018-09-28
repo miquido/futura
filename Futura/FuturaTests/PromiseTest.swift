@@ -13,7 +13,7 @@
  limitations under the License. */
 
 import XCTest
-@testable import Futura
+import Futura
 
 class PromiseTest: XCTestCase {
     
@@ -89,7 +89,7 @@ class PromiseTest: XCTestCase {
                 $0 + 2
             }
             .flatMap {
-                .init(with: .success($0 * $0))
+                .init(succeededWith: $0 * $0)
             }
             .map {
                 String($0)
@@ -118,7 +118,7 @@ class PromiseTest: XCTestCase {
                 $0 + 2
             }
             .flatMap {
-                .init(with: .success($0 * $0))
+                .init(succeededWith: $0 * $0)
             }
             .map {
                 String($0)
@@ -146,7 +146,7 @@ class PromiseTest: XCTestCase {
                 $0 + 2
             }
             .flatMap {
-                .init(with: .success($0 * $0))
+                .init(succeededWith: $0 * $0)
             }
             .map {
                 String($0)
@@ -171,7 +171,7 @@ class PromiseTest: XCTestCase {
     
     func testSuccededPromise() {
         let expectedResult: Int = 0
-        let promise: Promise<Int> = .init(with: .success(expectedResult))
+        let promise: Promise<Int> = .init(succeededWith: expectedResult)
         
         var called: Bool = false
         
@@ -189,7 +189,7 @@ class PromiseTest: XCTestCase {
     
     func testFailedPromise() {
         let expectedResult: TestError = .init()
-        let promise: Promise<Int> = .init(with: .error(expectedResult))
+        let promise: Promise<Int> = .init(failedWith: expectedResult)
         
         var called: Bool = false
         

@@ -21,7 +21,15 @@ public final class Future<Value> {
     private var observers: [(State) -> Void] = []
     private var state: State
     
-    public init(with result: Result<Value>? = nil, executionContext: ExecutionContext = .inheritWorker) {
+    public convenience init(succeededWith result: Value, executionContext: ExecutionContext = .inheritWorker) {
+        self.init(with: .success(result), executionContext: executionContext)
+    }
+    
+    public convenience init(failedWith reason: Error, executionContext: ExecutionContext = .inheritWorker) {
+        self.init(with: .error(reason), executionContext: executionContext)
+    }
+    
+    internal init(with result: Result<Value>? = nil, executionContext: ExecutionContext = .inheritWorker) {
         self.executionContext = executionContext
         if let result = result {
             self.state = .resulted(with: result)

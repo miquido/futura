@@ -13,13 +13,13 @@
  limitations under the License. */
 
 import XCTest
-@testable import Futura
+import Futura
 
 class FutureTests: XCTestCase {
 
     func testFutureThen() {
         let expectedResult: Int = 0
-        let future: Future<Int> = .init(with: .success(expectedResult))
+        let future: Future<Int> = .init(succeededWith: expectedResult)
         
         var called: Bool = false
         
@@ -36,7 +36,7 @@ class FutureTests: XCTestCase {
     }
     
     func testFutureThenIgnoreOnFailure() {
-        let future: Future<Int> = .init(with: .error(TestError()))
+        let future: Future<Int> = .init(failedWith: TestError())
         
         future
             .then { _ in
@@ -45,7 +45,7 @@ class FutureTests: XCTestCase {
     }
     
     func testFutureThenIgnoreOnCancel() {
-        let future: Future<Int> = .init()
+        let future: Future<Int> = Promise<Int>().future
         future.cancel()
         
         future
@@ -56,7 +56,7 @@ class FutureTests: XCTestCase {
     
     func testFutureError() {
         let expectedResult: TestError = .init()
-        let future: Future<Int> = .init(with: .error(expectedResult))
+        let future: Future<Int> = .init(failedWith: expectedResult)
         
         var called: Bool = false
         
@@ -73,7 +73,7 @@ class FutureTests: XCTestCase {
     }
     
     func testFutureErrorIgnoreOnSuccess() {
-        let future: Future<Int> = .init(with: .success(0))
+        let future: Future<Int> = .init(succeededWith: 0)
         
         future
             .fail { _ in
@@ -82,7 +82,7 @@ class FutureTests: XCTestCase {
     }
     
     func testFutureErrorIgnoreOnCancel() {
-        let future: Future<Int> = .init()
+        let future: Future<Int> = Promise<Int>().future
         future.cancel()
         
         future
@@ -92,7 +92,7 @@ class FutureTests: XCTestCase {
     }
     
     func testFutureCanceled() {
-        let future: Future<Int> = .init()
+        let future: Future<Int> = Promise<Int>().future
         future.cancel()
         
         var called: Bool = false
@@ -113,9 +113,9 @@ class FutureTests: XCTestCase {
     }
     
     func testFutureResulted() {
-        let futureSuccess: Future<Int> = .init(with: .success(0))
-        let futureError: Future<Int> = .init(with: .error(TestError()))
-        let futureCancel: Future<Int> = .init()
+        let futureSuccess: Future<Int> = .init(succeededWith: 0)
+        let futureError: Future<Int> = .init(failedWith: TestError())
+        let futureCancel: Future<Int> = Promise<Int>().future
         futureCancel.cancel()
         
         var called: Bool = false
@@ -143,9 +143,9 @@ class FutureTests: XCTestCase {
     }
     
     func testFutureAlways() {
-        let futureSuccess: Future<Int> = .init(with: .success(0))
-        let futureError: Future<Int> = .init(with: .error(TestError()))
-        let futureCancel: Future<Int> = .init()
+        let futureSuccess: Future<Int> = .init(succeededWith: 0)
+        let futureError: Future<Int> = .init(failedWith: TestError())
+        let futureCancel: Future<Int> = Promise<Int>().future
         futureCancel.cancel()
         
         var called: Bool = false
@@ -174,7 +174,7 @@ class FutureTests: XCTestCase {
     }
     
     func testFutureCatch() {
-        let future: Future<Int> = .init(with: .error(TestError()))
+        let future: Future<Int> = .init(failedWith: TestError())
         
         var called: Bool = false
         
@@ -203,7 +203,7 @@ class FutureTests: XCTestCase {
     
     func testFutureMap() {
         let expectedResult: Int = 1
-        let future: Future<Int> = .init(with: .success(0))
+        let future: Future<Int> = .init(succeededWith: 0)
         
         var called: Bool = false
         
@@ -221,7 +221,7 @@ class FutureTests: XCTestCase {
     
     func testFutureThrowingMap() {
         let expectedResult: TestError = .init()
-        let future: Future<Int> = .init(with: .success(0))
+        let future: Future<Int> = .init(succeededWith: 0)
         
         var called: Bool = false
         
@@ -239,13 +239,13 @@ class FutureTests: XCTestCase {
     
     func testFutureFlatMap() {
         let expectedResult: Int = 1
-        let future: Future<Int> = .init(with: .success(0))
+        let future: Future<Int> = .init(succeededWith: 0)
         
         var called: Bool = false
         
         future
             .flatMap {
-                .init(with: .success($0 + 1))
+                .init(succeededWith: $0 + 1)
             }
             .then {
                 called = true
@@ -257,7 +257,7 @@ class FutureTests: XCTestCase {
     
     func testFutureThrowingFlatMap() {
         let expectedResult: TestError = .init()
-        let future: Future<Int> = .init(with: .success(0))
+        let future: Future<Int> = .init(succeededWith: 0)
         
         var called: Bool = false
         
@@ -274,14 +274,14 @@ class FutureTests: XCTestCase {
     }
     
     func testFutureFlatMapCancel() {
-        let future: Future<Int> = .init()
+        let future: Future<Int> = Promise<Int>().future
         future.cancel()
         
         var called: Bool = false
         
         future
             .flatMap {
-                .init(with: .success($0 + 1))
+                .init(succeededWith: $0 + 1)
             }
             .then { _ in
                 XCTFail("Should not be called")
@@ -294,13 +294,13 @@ class FutureTests: XCTestCase {
     }
     
     func testFutureFlatMapInnerCancel() {
-        let future: Future<Int> = .init(with: .success(0))
+        let future: Future<Int> = .init(succeededWith: 0)
         
         var called: Bool = false
         
         future
             .flatMap { _ -> Future<Int> in
-                let inner: Future<Int> = .init()
+                let inner: Future<Int> = Promise<Int>().future
                 inner.cancel()
                 return inner
             }
@@ -316,7 +316,7 @@ class FutureTests: XCTestCase {
     
     func testFutureRecoverSuccess() {
         let expectedResult: Int = 0
-        let future: Future<Int> = .init(with: .error(TestError()))
+        let future: Future<Int> = .init(failedWith: TestError())
         
         var called: Bool = false
         
@@ -334,7 +334,7 @@ class FutureTests: XCTestCase {
     
     func testFutureRecoverFailure() {
         let expectedResult: TestError = .init()
-        let future: Future<Int> = .init(with: .error(expectedResult))
+        let future: Future<Int> = .init(failedWith: expectedResult)
         
         var called: Bool = false
         
@@ -355,7 +355,7 @@ class FutureTests: XCTestCase {
             XCTFail("Not in time - possible deadlock or fail")
         })
         { complete in
-            let future: Future<Int> = .init(with: .success(0))
+            let future: Future<Int> = .init(succeededWith: 0)
             
             future
                 .switch(to: DispatchWorker.custom(markedQueue))
@@ -366,12 +366,40 @@ class FutureTests: XCTestCase {
         }
     }
     
+    func testFutureRecursiveHandlerOnCompleted() {
+        let future: Future<Int> = .init(succeededWith: 0)
+        
+        future.always {
+            future.always {
+                future.always {
+                    future.always {
+                        return Void()
+                    }
+                }
+            }
+        }
+    }
+    
+    func testFutureRecursiveHandlerOnWaiting() {
+        let future: Future<Int> = Promise<Int>().future
+        
+        future.always {
+            future.always {
+                future.always {
+                    future.always {
+                        return Void()
+                    }
+                }
+            }
+        }
+    }
+    
     func testFutureExecutionContextSwitchOnCancel() {
         asyncTest(timeoutBody: {
             XCTFail("Not in time - possible deadlock or fail")
         })
         { complete in
-            let future: Future<Int> = .init()
+            let future: Future<Int> = Promise<Int>().future
             future.cancel()
             
             future
@@ -385,7 +413,7 @@ class FutureTests: XCTestCase {
     
     func testFutureLongChainSuccess() {
         let expectedResult: String = "4"
-        let future: Future<Int> = .init(with: .success(0))
+        let future: Future<Int> = .init(succeededWith: 0)
         
         var called: Bool = false
         
@@ -394,7 +422,7 @@ class FutureTests: XCTestCase {
                 $0 + 2
             }
             .flatMap {
-                .init(with: .success($0 * $0))
+                .init(succeededWith: $0 * $0)
             }
             .map {
                 String($0)
@@ -415,7 +443,7 @@ class FutureTests: XCTestCase {
     
     func testFutureLongChainFailure() {
         let expectedResult: TestError = .init()
-        let future: Future<Int> = .init(with: .error(expectedResult))
+        let future: Future<Int> = .init(failedWith: expectedResult)
         
         var called: Bool = false
         
@@ -424,7 +452,7 @@ class FutureTests: XCTestCase {
                 $0 + 2
             }
             .flatMap {
-                .init(with: .success($0 * $0))
+                .init(succeededWith: $0 * $0)
             }
             .map {
                 String($0)
@@ -444,7 +472,7 @@ class FutureTests: XCTestCase {
     }
     
     func testFutureLongChainCancel() {
-        let future: Future<Int> = .init()
+        let future: Future<Int> = Promise<Int>().future
         future.cancel()
         
         var called: Bool = false
@@ -454,7 +482,7 @@ class FutureTests: XCTestCase {
                 $0 + 2
             }
             .flatMap {
-                .init(with: .success($0 * $0))
+                .init(succeededWith: $0 * $0)
             }
             .map {
                 String($0)
@@ -473,7 +501,7 @@ class FutureTests: XCTestCase {
     }
     
     func testFutureDealocationOnPromiseDealocation() {
-        var promise: Promise<Int>? = .init(with: .success(0))
+        var promise: Promise<Int>? = Promise<Int>(succeededWith: 0)
         weak var future = promise?.future
         XCTAssert(future != nil, "Future deallocated while responsible Promise still available")
         promise = nil
@@ -481,7 +509,7 @@ class FutureTests: XCTestCase {
     }
     
     func testFutureCancelationOnDealocation() {
-        var future_1: Future<Int>? = .init()
+        var future_1: Future<Int>? = Promise<Int>().future
         let future_2 = future_1!.map { $0 }
         
         var called: Bool = false
@@ -499,14 +527,14 @@ class FutureTests: XCTestCase {
     }
     
     func testCompletedFutureLongChainDealocationOnPromiseDealocation() {
-        var promise: Promise<Int>? = .init(with: .success(0))
+        var promise: Promise<Int>? = .init(succeededWith: 0)
         weak var future_0 = promise?.future
         weak var future_1 = future_0?.map {
             $0 + 2
         }
         weak var future_2 = future_1?
             .flatMap {
-                .init(with: .success($0 * $0))
+                .init(succeededWith: $0 * $0)
         }
         weak var future_3 = future_2?
             .map {
@@ -536,7 +564,7 @@ class FutureTests: XCTestCase {
         }
         weak var future_2 = future_1?
             .flatMap {
-                .init(with: .success($0 * $0))
+                .init(succeededWith: $0 * $0)
         }
         weak var future_3 = future_2?
             .map {

@@ -22,7 +22,7 @@ public final class Lock {
     public init() {
         let attr = UnsafeMutablePointer<pthread_mutexattr_t>.allocate(capacity: 1)
         guard pthread_mutexattr_init(attr) == 0 else { preconditionFailure() }
-        pthread_mutexattr_settype(attr, PTHREAD_MUTEX_NORMAL)
+        pthread_mutexattr_settype(attr, PTHREAD_MUTEX_RECURSIVE)
         pthread_mutexattr_setpshared(attr, PTHREAD_PROCESS_PRIVATE)
         guard pthread_mutex_init(mtx, attr) == 0 else { preconditionFailure() }
         pthread_mutexattr_destroy(attr)

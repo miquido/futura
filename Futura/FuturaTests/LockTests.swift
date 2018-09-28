@@ -13,7 +13,7 @@
  limitations under the License. */
 
 import XCTest
-@testable import Futura
+import Futura
 
 class LockTests: XCTestCase {
     
@@ -26,13 +26,17 @@ class LockTests: XCTestCase {
             XCTFail("Not in time - possible deadlock or fail")
         })
         { complete in
+            var completed: Bool = false
             let lock = Lock()
             lock.lock()
-            DispatchWorker.default.schedule {
+            DispatchQueue.global().async {
+                lock.lock()
+                XCTAssert(completed, "Lock unlocked while should be locked")
                 complete()
             }
-            lock.lock()
-            XCTFail("Lock unlocked while should be locked")
+            sleep(1)
+            completed = true
+            lock.unlock()
         }
     }
     
@@ -61,12 +65,107 @@ class LockTests: XCTestCase {
     }
     
     func testLockTryLockFail() {
-        let lock = Lock()
-        lock.lock()
-        if lock.tryLock() {
-            XCTFail("Lock not failed to lock")
-        } else {
-            // expected
+        asyncTest(timeoutBody: {
+            XCTFail("Not in time - possible deadlock or fail")
+        })
+        { complete in
+            let lock = Lock()
+            lock.lock()
+            
+            DispatchQueue.global().async {
+                if lock.tryLock() {
+                    XCTFail("Lock not failed to lock")
+                } else {
+                    // expected
+                }
+                complete()
+            }
+        }
+    }
+    
+    func testLockRecursive() {
+        asyncTest(timeoutBody: {
+                    XCTFail("Not in time - possible deadlock or fail")
+        })
+        { complete in
+            let lock = Lock()
+            lock.lock()
+            lock.lock()
+            lock.lock()
+            lock.unlock()
+            lock.unlock()
+            lock.unlock()
+            complete()
+        }
+    }
+    
+    func testLockRecursiveWithSleeps() {
+        asyncTest(iterationTimeout: 6,
+            timeoutBody: {
+            XCTFail("Not in time - possible deadlock or fail")
+        })
+        { complete in
+            let lock = Lock()
+            lock.lock()
+            sleep(1)
+            lock.lock()
+            sleep(1)
+            lock.lock()
+            sleep(1)
+            lock.unlock()
+            sleep(1)
+            lock.unlock()
+            sleep(1)
+            lock.unlock()
+            complete()
+        }
+    }
+    
+    func testLockSynchronizedRecursive() {
+        asyncTest(iterationTimeout: 6,
+                  timeoutBody: {
+                    XCTFail("Not in time - possible deadlock or fail")
+        })
+        { complete in
+            let lock = Lock()
+            lock.synchronized {
+                lock.synchronized {
+                    lock.synchronized {
+                        lock.synchronized {
+                            lock.synchronized {
+                                return Void()
+                            }
+                        }
+                    }
+                }
+            }
+            complete()
+        }
+    }
+    
+    func testLockSynchronizedRecursiveWithSleeps() {
+        asyncTest(iterationTimeout: 6,
+            timeoutBody: {
+            XCTFail("Not in time - possible deadlock or fail")
+        })
+        { complete in
+            let lock = Lock()
+            lock.synchronized {
+                sleep(1)
+                lock.synchronized {
+                    sleep(1)
+                    lock.synchronized {
+                        sleep(1)
+                        lock.synchronized {
+                            sleep(1)
+                            lock.synchronized {
+                                _ = sleep(1)
+                            }
+                        }
+                    }
+                }
+            }
+            complete()
         }
     }
     

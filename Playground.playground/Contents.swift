@@ -39,6 +39,6 @@ make(request: githubRequest)
     .then { _ in
         print("Github is here!")
     }
-    .error { error in
-        print("There was an error: \(error)")
+    .fail { reason in
+        print("There was an error: \(reason)")
     }
