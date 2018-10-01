@@ -357,109 +357,24 @@ class FutureTests: XCTestCase {
         { complete in
             let future: Future<Int> = .init(succeededWith: 0)
             
-            future
-                .switch(to: DispatchWorker.custom(markedQueue))
-                .always {
-                    XCTAssert(DispatchQueue.isOnMarkedQueue, "Execution on incorrect DispatchQueue")
-                }
-                .map { $0 }
-                .always {
-                    XCTAssert(DispatchQueue.isOnMarkedQueue, "Execution on incorrect DispatchQueue")
-                }
-                .switch(to: DispatchWorker.default)
-                .always {
-                    XCTAssert(!DispatchQueue.isOnMarkedQueue, "Execution on incorrect DispatchQueue")
-                }
-                .map { $0 }
+            let onMarked = future
                 .always {
                     XCTAssert(!DispatchQueue.isOnMarkedQueue, "Execution on incorrect DispatchQueue")
                 }
                 .switch(to: DispatchWorker.custom(markedQueue))
-                .always {
-                    XCTAssert(DispatchQueue.isOnMarkedQueue, "Execution on incorrect DispatchQueue")
+            DispatchWorker.default.schedule {
+                let mapped = onMarked
+                    .always {
+                        XCTAssert(DispatchQueue.isOnMarkedQueue, "Execution on incorrect DispatchQueue")
+                    }
+                    .map { $0 }
+                DispatchWorker.default.schedule {
+                    mapped
+                        .always {
+                            XCTAssert(DispatchQueue.isOnMarkedQueue, "Execution on incorrect DispatchQueue")
+                            complete()
+                        }
                 }
-                .map { $0 }
-                .always {
-                    XCTAssert(DispatchQueue.isOnMarkedQueue, "Execution on incorrect DispatchQueue")
-                    complete()
-                }
-        }
-    }
-    
-    func testFutureExecutionContextSwitch2() {
-        asyncTest(timeoutBody: {
-                    XCTFail("Not in time - possible deadlock or fail")
-        })
-        { complete in
-            let initialFuture: Future<Int> = .init(succeededWith: 0)
-            var future = initialFuture
-            
-            let lock = NSConditionLock(condition: 0)
-            lock.lock()
-            future = future
-                .always {
-                    dispatchPrecondition(condition: .notOnQueue(markedQueue))
-                    XCTAssert(!DispatchQueue.isOnMarkedQueue, "Execution on incorrect DispatchQueue")
-                    lock.unlock()
-            }
-            lock.lock()
-            future = future
-                .always {
-                    dispatchPrecondition(condition: .notOnQueue(markedQueue))
-                    XCTAssert(!DispatchQueue.isOnMarkedQueue, "Execution on incorrect DispatchQueue")
-                    lock.unlock()
-            }
-            
-            future = future
-                .switch(to: DispatchWorker.custom(markedQueue))
-            lock.lock()
-            future = future
-                .always {
-                    dispatchPrecondition(condition: .onQueue(markedQueue))
-                    XCTAssert(DispatchQueue.isOnMarkedQueue, "Execution on incorrect DispatchQueue")
-                    lock.unlock()
-            }
-            lock.lock()
-            future = future
-                .always {
-                    dispatchPrecondition(condition: .onQueue(markedQueue))
-                    XCTAssert(DispatchQueue.isOnMarkedQueue, "Execution on incorrect DispatchQueue")
-                    lock.unlock()
-            }
-            
-            future = future
-                .switch(to: DispatchWorker.default)
-            lock.lock()
-            future = future
-                .always {
-                    dispatchPrecondition(condition: .notOnQueue(markedQueue))
-                    XCTAssert(!DispatchQueue.isOnMarkedQueue, "Execution on incorrect DispatchQueue")
-                    lock.unlock()
-            }
-            lock.lock()
-            future = future
-                .always {
-                    dispatchPrecondition(condition: .notOnQueue(markedQueue))
-                    XCTAssert(!DispatchQueue.isOnMarkedQueue, "Execution on incorrect DispatchQueue")
-                    lock.unlock()
-            }
-            
-            future = future
-                .switch(to: DispatchWorker.custom(markedQueue))
-            lock.lock()
-            future = future
-                .always {
-                    dispatchPrecondition(condition: .onQueue(markedQueue))
-                    XCTAssert(DispatchQueue.isOnMarkedQueue, "Execution on incorrect DispatchQueue")
-                    lock.unlock()
-            }
-            lock.lock()
-            future = future
-                .always {
-                    dispatchPrecondition(condition: .onQueue(markedQueue))
-                    XCTAssert(DispatchQueue.isOnMarkedQueue, "Execution on incorrect DispatchQueue")
-                    lock.unlock()
-                    complete()
             }
         }
     }
