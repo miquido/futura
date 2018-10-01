@@ -26,9 +26,9 @@ extension XCTestCase {
         timeoutBody: @escaping ()->(),
         testBody: @escaping (@escaping ()->())->())
     {
-        let lock = NSConditionLock()
         let testQueue = DispatchQueue(label: "AsyncTestQueue")
         (0..<iterations).forEach { iteration in
+            let lock = NSConditionLock()
             lock.lock()
             testQueue.async {
                 testBody() { lock.unlock() }

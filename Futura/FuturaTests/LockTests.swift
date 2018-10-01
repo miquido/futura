@@ -21,7 +21,7 @@ class LockTests: XCTestCase {
         Lock().lock()
     }
     
-    func testLockLock() {
+    func testLockLockAndUnlock() {
         asyncTest(timeoutBody: {
             XCTFail("Not in time - possible deadlock or fail")
         })
@@ -29,7 +29,7 @@ class LockTests: XCTestCase {
             var completed: Bool = false
             let lock = Lock()
             lock.lock()
-            DispatchQueue.global().async {
+            DispatchWorker.default.schedule {
                 lock.lock()
                 XCTAssert(completed, "Lock unlocked while should be locked")
                 complete()
@@ -37,21 +37,6 @@ class LockTests: XCTestCase {
             sleep(1)
             completed = true
             lock.unlock()
-        }
-    }
-    
-    func testLockLockAndUnlock() {
-        asyncTest(timeoutBody: {
-            XCTFail("Not in time - possible deadlock or fail")
-        })
-        { complete in
-            let lock = Lock()
-            lock.lock()
-            DispatchWorker.default.schedule {
-                lock.unlock()
-            }
-            lock.lock()
-            complete()
         }
     }
     
@@ -72,7 +57,7 @@ class LockTests: XCTestCase {
             let lock = Lock()
             lock.lock()
             
-            DispatchQueue.global().async {
+            DispatchWorker.default.schedule {
                 if lock.tryLock() {
                     XCTFail("Lock not failed to lock")
                 } else {
@@ -80,6 +65,7 @@ class LockTests: XCTestCase {
                 }
                 complete()
             }
+            sleep(1)
         }
     }
     
