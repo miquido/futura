@@ -14,10 +14,10 @@
 
 /// ExecutionContext enables to describe how to execute things
 public enum ExecutionContext {
-    /// Context will inherit worker used to call it
-    case inheritWorker
-    /// Context will switch to provided worker as async task
-    case async(using: Worker)
+    /// Context will inherit worker from completing task or use current thread
+    case undefined
+    /// Context will switch to provided worker or continue if already on it
+    case explicit(Worker)
 }
 
 internal extension ExecutionContext {
@@ -25,10 +25,19 @@ internal extension ExecutionContext {
     @inline(__always)
     func execute(_ function: @escaping () -> Void) {
         switch self {
-        case .inheritWorker:
+        case .undefined:
             function()
-        case let .async(worker):
+        case let .explicit(worker):
             worker.schedule(function)
+        }
+    }
+    
+    var associatedWorker: Worker? {
+        switch self {
+        case .undefined:
+            return nil
+        case let .explicit(worker):
+            return worker
         }
     }
 }

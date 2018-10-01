@@ -21,15 +21,15 @@ public final class Future<Value> {
     private var observers: [(State) -> Void] = []
     private var state: State
     
-    public convenience init(succeededWith result: Value, executionContext: ExecutionContext = .inheritWorker) {
+    public convenience init(succeededWith result: Value, executionContext: ExecutionContext = .undefined) {
         self.init(with: .success(result), executionContext: executionContext)
     }
     
-    public convenience init(failedWith reason: Error, executionContext: ExecutionContext = .inheritWorker) {
+    public convenience init(failedWith reason: Error, executionContext: ExecutionContext = .undefined) {
         self.init(with: .error(reason), executionContext: executionContext)
     }
     
-    internal init(with result: Result<Value>? = nil, executionContext: ExecutionContext = .inheritWorker) {
+    internal init(with result: Result<Value>? = nil, executionContext: ExecutionContext) {
         self.executionContext = executionContext
         if let result = result {
             self.state = .resulted(with: result)
@@ -85,7 +85,7 @@ public extension Future {
     /// If it handles error without throwing it cancels all further futures preventing error propagation.
     @discardableResult
     func `catch`(_ handler: @escaping (Error) throws -> Void) -> Future<Value> {
-        let future = Future(executionContext: .inheritWorker)
+        let future = Future(executionContext: executionContext)
         #if FUTURA_DEBUG
         os_log("Catching error on %{public}@", log: logger, type: .debug, debugDescriptionSynchronized)
         #endif
@@ -110,7 +110,7 @@ public extension Future {
     
     /// Try recover from error providing valid value. Returns new Future instance.
     func recover(_ transformation: @escaping (Error) throws -> Value) -> Future {
-        let future = Future(executionContext: .inheritWorker)
+        let future = Future(executionContext: executionContext)
         #if FUTURA_DEBUG
         os_log("Recoverable on %{public}@ => %{public}@", log: logger, type: .debug, debugDescriptionSynchronized, future.debugDescriptionSynchronized)
         #endif
@@ -159,7 +159,7 @@ public extension Future {
     /// Map container to other type or do some value changes. Returns new Future instance.
     /// Transformation may throw to propagate error instad of value.
     func map<T>(_ transformation: @escaping (Value) throws -> (T)) -> Future<T> {
-        let future = Future<T>(executionContext: .inheritWorker)
+        let future = Future<T>(executionContext: executionContext)
         #if FUTURA_DEBUG
         os_log("Mapping on %{public}@ => %{public}@", log: logger, type: .debug, debugDescriptionSynchronized, future.debugDescriptionSynchronized)
         #endif
@@ -184,7 +184,7 @@ public extension Future {
     /// Map container to other type or do some value changes flattening future inside. Returns new Future instance.
     /// Transformation may throw to propagate error instad of value.
     func flatMap<T>(_ transformation: @escaping (Value) throws -> (Future<T>)) -> Future<T> {
-        let future = Future<T>(executionContext: .inheritWorker)
+        let future = Future<T>(executionContext: executionContext)
         #if FUTURA_DEBUG
         os_log("Flat mapping on %{public}@ => %{public}@", log: logger, type: .debug, debugDescriptionSynchronized, future.debugDescriptionSynchronized)
         #endif
@@ -210,7 +210,7 @@ public extension Future {
     
     /// Returns new Future instance with given execution context. Futures inherit execution context by default.
     func `switch`(to worker: Worker) -> Future<Value> {
-        let future = Future(executionContext: .async(using: worker))
+        let future = Future(executionContext: .explicit(worker))
         #if FUTURA_DEBUG
         os_log("Switching to %{public}@ on %{public}@", log: logger, type: .debug, String(describing: worker) as! CVarArg, debugDescriptionSynchronized)
         #endif

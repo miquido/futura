@@ -15,20 +15,22 @@
 /// Promise is container for future that allows to modify (fulfill or break) result of future
 public final class Promise<Value> {
     
-    public let future: Future<Value> = Future()
+    public let future: Future<Value>
     
     /// Creates promise that can be completed
-    public init() {}
+    public init(executionContext: ExecutionContext = .undefined) {
+        self.future = Future(executionContext: executionContext)
+    }
     
     /// Creates already succeeded promise with given value
-    public convenience init(succeededWith value: Value) {
-        self.init()
+    public convenience init(succeededWith value: Value, executionContext: ExecutionContext = .undefined) {
+        self.init(executionContext: executionContext)
         future.become(.resulted(with: .success(value)))
     }
     
     /// Creates already failed promise with given error
-    public convenience init(failedWith reason: Error) {
-        self.init()
+    public convenience init(failedWith reason: Error, executionContext: ExecutionContext = .undefined) {
+        self.init(executionContext: executionContext)
         future.become(.resulted(with: .error(reason)))
     }
     
