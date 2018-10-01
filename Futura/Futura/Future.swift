@@ -218,6 +218,16 @@ public extension Future {
         return future
     }
     
+    /// Returns new Future instance with same parameters as cloned future. Result future is a child of cloned future instead of child of same parent.
+    func clone() -> Future<Value> {
+        let future = Future(executionContext: executionContext)
+        #if FUTURA_DEBUG
+        os_log("Cloning on %{public}@ => %{public}@", log: logger, type: .debug, debugDescriptionSynchronized, future.debugDescriptionSynchronized)
+        #endif
+        observe { future.become($0) }
+        return future
+    }
+    
     /// Cancels future without triggering any handlers (except always). Cancellation is propagated.
     func cancel() {
         become(.canceled)

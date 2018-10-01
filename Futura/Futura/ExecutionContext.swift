@@ -31,13 +31,4 @@ internal extension ExecutionContext {
             worker.schedule(function)
         }
     }
-    
-    var associatedWorker: Worker? {
-        switch self {
-        case .undefined:
-            return nil
-        case let .explicit(worker):
-            return worker
-        }
-    }
 }

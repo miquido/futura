@@ -379,6 +379,23 @@ class FutureTests: XCTestCase {
         }
     }
     
+    func testFutureCloning() {
+        let expectedResult = 0
+        let promise: Promise<Int> = .init()
+        let futureToCancel = promise.future.clone().then { _ in
+            XCTFail("Should not be called")
+        }
+        promise.future.clone().then {
+            XCTAssert($0 == expectedResult, "Future result not matching expected. Expected: \(expectedResult) Recieved: \($0)")
+        }
+        promise.future.clone().then {
+            XCTAssert($0 == expectedResult, "Future result not matching expected. Expected: \(expectedResult) Recieved: \($0)")
+        }
+        
+        futureToCancel.cancel()
+        promise.fulfill(with: expectedResult)
+    }
+    
     func testFutureRecursiveHandlerOnCompleted() {
         let future: Future<Int> = .init(succeededWith: 0)
         
