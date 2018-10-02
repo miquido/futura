@@ -15,9 +15,9 @@
 import XCTest
 import Futura
 
-class WorkerTests: XCTestCase {
+class DispatchWorkerTests: XCTestCase {
     
-    func testWorkerClosurePerform() {
+    func testShould_PerformScheduledTask_When_WorkItemIsExecuted() {
         asyncTest(timeoutBody: {
             XCTFail("Not in time - possible deadlock or fail")
         })

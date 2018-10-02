@@ -18,28 +18,6 @@ struct TestError : Error {}
 
 let performanceTestIterations = 10_000_000
 
-extension XCTestCase {
-    
-    func asyncTest(
-        iterationTimeout: TimeInterval = 3,
-        iterations: UInt = 1,
-        timeoutBody: @escaping ()->(),
-        testBody: @escaping (@escaping ()->())->())
-    {
-        let testQueue = DispatchQueue(label: "AsyncTestQueue")
-        (0..<iterations).forEach { iteration in
-            let lock = NSConditionLock()
-            lock.lock()
-            testQueue.async {
-                testBody() { lock.unlock() }
-            }
-            guard lock.lock(before: Date.init(timeIntervalSinceNow: iterationTimeout)) else {
-                return timeoutBody()
-            }
-        }
-    }
-}
-
 let markedQueueKey = DispatchSpecificKey<Void>()
 let markedQueue: DispatchQueue = {
     let queue = DispatchQueue(label: "MarkedQueue")
@@ -51,5 +29,27 @@ extension DispatchQueue {
     
     static var isOnMarkedQueue: Bool {
         return DispatchQueue.getSpecific(key: markedQueueKey) != nil
+    }
+}
+
+extension XCTestCase {
+    
+    func asyncTest(
+        iterationTimeout: TimeInterval = 3,
+        iterations: UInt = 1,
+        timeoutBody: @escaping ()->(),
+        testBody: @escaping (@escaping ()->())->())
+    {
+        let testQueue = DispatchQueue(label: "AsyncTestQueue")
+        (0 ..< iterations).forEach { iteration in
+            let lock = NSConditionLock()
+            lock.lock()
+            testQueue.async {
+                testBody() { lock.unlock() }
+            }
+            guard lock.lock(before: Date.init(timeIntervalSinceNow: iterationTimeout)) else {
+                return timeoutBody()
+            }
+        }
     }
 }
