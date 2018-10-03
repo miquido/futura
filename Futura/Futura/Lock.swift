@@ -14,11 +14,12 @@
 
 import Darwin
 
-/// Lock is a simple pthread_mutex wrapper with basic lock functionality
+/// Lock is a simple pthread_mutex wrapper with basic recursive lock functionality.
+/// It should not be used to synchronize threads from multiple processes.
 public final class Lock {
     private let mtx = UnsafeMutablePointer<pthread_mutex_t>.allocate(capacity: 1)
     
-    /// Creates instance of basic lock
+    /// Creates instance of recursive lock.
     public init() {
         let attr = UnsafeMutablePointer<pthread_mutexattr_t>.allocate(capacity: 1)
         guard pthread_mutexattr_init(attr) == 0 else { preconditionFailure() }
@@ -36,23 +37,26 @@ public final class Lock {
         mtx.deallocate()
     }
     
-    /// Locks lock if available or waits until unlocked
+    /// Locks if available or waits until unlocked.
+    /// Since Lock is recursive it will continue when already locked on same thread.
     public func lock() -> Void {
         pthread_mutex_lock(mtx)
     }
     
-    /// Locsk lock if available and returns true or returns false otherwise without locking
+    /// Locks if available and returns true or returns false otherwise without locking.
+    /// Since Lock is recursive it will returns true when already locked on same thread.
     public func tryLock() -> Bool {
         return pthread_mutex_trylock(mtx) == 0
     }
     
     
-    /// Unlocks a lock
+    /// Unlocks a lock.
     public func unlock() -> Void {
         pthread_mutex_unlock(mtx)
     }
     
-    /// Execute closure with synchronization on self as lock
+    /// Execute closure with synchronization on self as lock.
+    /// Since Lock is recursive you can call synchronized recursively on same thread.
     public func synchronized<T>(_ block: () throws -> T) rethrows -> T {
         lock()
         defer { unlock() }
