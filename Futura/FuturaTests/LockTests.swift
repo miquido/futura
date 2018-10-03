@@ -156,7 +156,7 @@ class LockTests: XCTestCase {
             try lock.synchronized { throw expectedResult }
             XCTFail("Lock not threw")
         } catch {
-            XCTAssert(error is TestError, "Catched error does not match expected. Expected: \(expectedResult) Recieved: \(error)")
+            XCTAssert(error is TestError, "Catched error does not match expected. Expected: \(expectedResult) Received: \(error)")
         }
     }
     
