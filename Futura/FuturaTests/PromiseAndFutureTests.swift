@@ -3026,6 +3026,11 @@ class PromiseAndFutureTestsTests: XCTestCase {
             let lock_1: Lock = Lock()
             let lock_2: Lock = Lock()
             let lock_3: Lock = Lock()
+            var counter_1 = 0
+            var counter_2 = 0
+            var counter_3 = 0
+            
+            let expectedResult: Int = 300
             
             dispatchQueue.async {
                 lock_1.lock()
@@ -3036,6 +3041,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
                         .flatMap { .init(succeededWith: $0) }
                         .recover { throw $0 }
                         .catch { throw $0 }
+                        .always { counter_1 += 1 }
                 }
                 lock_1.unlock()
             }
@@ -3048,6 +3054,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
                         .flatMap { .init(succeededWith: $0) }
                         .recover { throw $0 }
                         .catch { throw $0 }
+                        .always { counter_2 += 1 }
                 }
                 lock_2.unlock()
             }
@@ -3060,6 +3067,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
                         .flatMap { .init(succeededWith: $0) }
                         .recover { throw $0 }
                         .catch { throw $0 }
+                        .always { counter_3 += 1 }
                 }
                 lock_3.unlock()
             }
@@ -3069,6 +3077,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
             lock_2.lock()
             lock_3.lock()
             
+            XCTAssert(counter_1 + counter_2 + counter_3 == expectedResult, "Handlers not called properly. Expected: \(expectedResult) Recieved: \(counter_1 + counter_2 + counter_3)")
             complete()
         }
     }
