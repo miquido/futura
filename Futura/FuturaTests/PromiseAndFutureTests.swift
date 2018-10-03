@@ -2869,7 +2869,49 @@ class PromiseAndFutureTestsTests: XCTestCase {
     }
     
     // MARK: -
-    // MARK: memory
+    // MARK: memory and init
+    
+    func testShouldInitializeSucceeded() {
+        let workLog: WorkLog = .init()
+        
+        let expectedResult: Int = 0
+        let expectedWorkLog: WorkLog = [.then, .then]
+        
+        let promise: Promise<Int> = Promise<Int>(succeededWith: expectedResult)
+        promise.future.then { value in
+            workLog.log(.then)
+            XCTAssert(value == expectedResult, "Future value not matching expected. Expected: \(expectedResult) Recieved: \(value)")
+        }
+        
+        let future: Future<Int> = Future<Int>(succeededWith: expectedResult)
+        future.then { value in
+            workLog.log(.then)
+            XCTAssert(value == expectedResult, "Future value not matching expected. Expected: \(expectedResult) Recieved: \(value)")
+        }
+        
+        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Recieved: \(workLog)")
+    }
+    
+    func testShouldInitializeFailed() {
+        let workLog: WorkLog = .init()
+        
+        let expectedResult: Error = TestError()
+        let expectedWorkLog: WorkLog = [.fail, .fail]
+        
+        let promise: Promise<Int> = Promise<Int>(failedWith: expectedResult)
+        promise.future.fail { reason in
+            workLog.log(.fail)
+            XCTAssert(reason is TestError, "Future error not matching expected. Expected: \(expectedResult) Recieved: \(reason)")
+        }
+        
+        let future: Future<Int> = Future<Int>(failedWith: expectedResult)
+        future.fail { reason in
+            workLog.log(.fail)
+            XCTAssert(reason is TestError, "Future error not matching expected. Expected: \(expectedResult) Recieved: \(reason)")
+        }
+        
+        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Recieved: \(workLog)")
+    }
     
     func testShouldDeallocate() {
         var promise: Promise<Int>? = Promise<Int>(succeededWith: 0)
@@ -2913,5 +2955,121 @@ class PromiseAndFutureTestsTests: XCTestCase {
 //        worker.executeFirst()
 //        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Recieved: \(worker.taskCount)")
 //        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Recieved: \(workLog)")
+    }
+    
+    // MARK: -
+    // MARK: thread safety
+    
+    // make sure that tests run with thread sanitizer enabled
+    func testShouldWorkProperly_WhenAccessingOnManyThreads() {
+        asyncTest(timeoutBody: {
+            XCTFail("Not in time - possible deadlock or fail")
+        })
+        { complete in
+            let future: Future<Int> = Future<Int>(succeededWith: 0)
+            
+            let dispatchQueue: DispatchQueue = DispatchQueue(label: "test", qos: .default, attributes: .concurrent)
+            let lock_1: Lock = Lock()
+            let lock_2: Lock = Lock()
+            let lock_3: Lock = Lock()
+            var counter = 0
+            
+            let expectedResult: Int = 300
+            
+            dispatchQueue.async {
+                lock_1.lock()
+                for _ in 0..<100 {
+                    future.always {
+                        counter += 1
+                    }
+                }
+                lock_1.unlock()
+            }
+            dispatchQueue.async {
+                lock_2.lock()
+                for _ in 0..<100 {
+                    future.always {
+                        counter += 1
+                    }
+                }
+                lock_2.unlock()
+            }
+            dispatchQueue.async {
+                lock_3.lock()
+                for _ in 0..<100 {
+                    future.always {
+                        counter += 1
+                    }
+                }
+                lock_3.unlock()
+            }
+            
+            sleep(1)
+            lock_1.lock()
+            lock_2.lock()
+            lock_3.lock()
+            
+            XCTAssert(counter == expectedResult, "Handlers not called properly. Expected: \(expectedResult) Recieved: \(counter)")
+            complete()
+        }
+    }
+    
+    // make sure that tests run with thread sanitizer enabled
+    func testShouldWorkProperly_WhenTransformingOnManyThreads() {
+        asyncTest(timeoutBody: {
+            XCTFail("Not in time - possible deadlock or fail")
+        })
+        { complete in
+            let future: Future<Int> = Future<Int>(succeededWith: 0)
+            
+            let dispatchQueue: DispatchQueue = DispatchQueue(label: "test", qos: .default, attributes: .concurrent)
+            let lock_1: Lock = Lock()
+            let lock_2: Lock = Lock()
+            let lock_3: Lock = Lock()
+            
+            dispatchQueue.async {
+                lock_1.lock()
+                for _ in 0..<100 {
+                    future
+                        .clone()
+                        .map { $0 }
+                        .flatMap { .init(succeededWith: $0) }
+                        .recover { throw $0 }
+                        .catch { throw $0 }
+                }
+                lock_1.unlock()
+            }
+            dispatchQueue.async {
+                lock_2.lock()
+                for _ in 0..<100 {
+                    future
+                        .clone()
+                        .map { $0 }
+                        .flatMap { .init(succeededWith: $0) }
+                        .recover { throw $0 }
+                        .catch { throw $0 }
+                }
+                lock_2.unlock()
+            }
+            dispatchQueue.async {
+                lock_3.lock()
+                for _ in 0..<100 {
+                    future
+                        .clone()
+                        .map { $0 }
+                        .flatMap { .init(succeededWith: $0) }
+                        .recover { throw $0 }
+                        .catch { throw $0 }
+                }
+                lock_3.unlock()
+            }
+            
+            sleep(1)
+            lock_1.lock()
+            lock_2.lock()
+            lock_3.lock()
+            
+            complete()
+        }
     }
 }

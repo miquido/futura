@@ -21,6 +21,7 @@ class LockTests: XCTestCase {
         Lock().lock()
     }
     
+    // make sure that tests run with thread sanitizer enabled
     func testShould_LockAndUnlock_When_CalledOnDistinctThreads() {
         asyncTest(timeoutBody: {
             XCTFail("Not in time - possible deadlock or fail")
@@ -30,7 +31,7 @@ class LockTests: XCTestCase {
             var completed: Bool = false
             
             lock.lock()
-            DispatchWorker.default.schedule {
+            DispatchQueue.global().async {
                 lock.lock()
                 XCTAssert(completed, "Lock unlocked while should be locked")
                 complete()
@@ -76,6 +77,7 @@ class LockTests: XCTestCase {
         }
     }
     
+    // make sure that tests run with thread sanitizer enabled
     func testShould_FailTryLock_When_LockedOnOtherThread() {
         asyncTest(timeoutBody: {
             XCTFail("Not in time - possible deadlock or fail")
@@ -84,7 +86,7 @@ class LockTests: XCTestCase {
             let lock = Lock()
             lock.lock()
             
-            DispatchWorker.default.schedule {
+            DispatchQueue.global().async {
                 defer { complete() }
                 guard !lock.tryLock() else {
                     return XCTFail("Lock not failed to lock")
@@ -94,6 +96,7 @@ class LockTests: XCTestCase {
         }
     }
     
+    // make sure that tests run with thread sanitizer enabled
     func testShould_SynchronizeBlock_When_CalledOnDistinctThreads() {
         asyncTest(timeoutBody: {
             XCTFail("Not in time - possible deadlock or fail")
@@ -102,7 +105,7 @@ class LockTests: XCTestCase {
             let lock = Lock()
             var testValue = 0
             
-            DispatchWorker.default.schedule {
+            DispatchQueue.global().async {
                 lock.synchronized {
                     sleep(2) // ensure that claims lock longer
                     XCTAssert(testValue == 0, "Test value changed without synchronization")
@@ -118,6 +121,7 @@ class LockTests: XCTestCase {
         }
     }
     
+    // make sure that tests run with thread sanitizer enabled
     func testShould_NotCauseDeadlock_When_SynchronizedCalledRecursively() {
         asyncTest(iterationTimeout: 6,
                   timeoutBody: {
