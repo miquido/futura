@@ -18,7 +18,7 @@ class TestWorker : Worker {
     
     private let lock: Lock = .init()
     private var scheduled: [() -> Void] = []
-    
+
     func schedule(_ work: @escaping () -> Void) {
         lock.synchronized {
             scheduled.append(work)
@@ -44,6 +44,17 @@ class TestWorker : Worker {
             scheduled.forEach { $0() }
             scheduled.removeAll()
         }
+    }
+    
+    func executeAllAndReturnExecutedCount() -> Int {
+        var executedCount = 0
+        
+        while(!scheduled.isEmpty) {
+            executeFirst()
+            executedCount+=1
+        }
+        
+        return executedCount
     }
     
     var taskCount: Int {

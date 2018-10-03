@@ -25,51 +25,29 @@ class PromiseAndFutureTestsTests: XCTestCase {
         let workLog: WorkLog = .init()
         let promise: Promise<Int> = .init(executionContext: .explicit(worker))
         
-        let expectedResult: Int = 0
-        let expectedWorkLog: WorkLog = [.then, .resulted, .always]
+        workLog.bind(future: promise.future)
         
-        promise.future
-            .then { value in
-                workLog.log(.then)
-                XCTAssert(value == expectedResult, "Future value not matching expected. Expected: \(expectedResult) Recieved: \(value)")
-            }
-            .fail { _ in
-                workLog.log(.fail)
-                XCTFail("Should not be called")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-            }
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks before completing promise. Recieved: \(worker.taskCount)")
+        promise.fulfill(with: 0)
         
-        promise.fulfill(with: expectedResult)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Recieved: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Recieved: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Recieved: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Recieved: \(workLog)")
+        XCTAssert(workLog.isEmpty)
+        XCTAssertEqual(worker.executeAllAndReturnExecutedCount(), 1)
+        XCTAssertEqual(workLog.result, 0)
+        XCTAssertEqual(workLog, [.then, .resulted, .always])
     }
     
     func testShouldHandleError_WhenCompletingWithError() {
         let worker: TestWorker = .init()
         let workLog: WorkLog = .init()
         let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedResult: Error = TestError()
-        let expectedWorkLog: WorkLog = [.fail, .resulted, .always]
+        var errorResult: Error?
         
         promise.future
             .then { _ in
                 workLog.log(.then)
-                XCTFail("Should not be called")
             }
             .fail { reason in
                 workLog.log(.fail)
-                XCTAssert(reason is TestError, "Future error not matching expected. Expected: \(expectedResult) Recieved: \(reason)")
+                errorResult = reason
             }
             .resulted {
                 workLog.log(.resulted)
@@ -77,15 +55,13 @@ class PromiseAndFutureTestsTests: XCTestCase {
             .always {
                 workLog.log(.always)
             }
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks before completing promise. Recieved: \(worker.taskCount)")
         
-        promise.break(with: expectedResult)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Recieved: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Recieved: \(workLog)")
+        promise.break(with: TestError())
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Recieved: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Recieved: \(workLog)")
+        XCTAssert(workLog.isEmpty)
+        XCTAssertEqual(worker.executeAllAndReturnExecutedCount(), 1)
+        XCTAssertEqual(workLog, [.fail, .resulted, .always])
+        XCTAssert(errorResult is TestError)
     }
     
     func testShouldHandleCancel_WhenCanceling() {
@@ -93,33 +69,25 @@ class PromiseAndFutureTestsTests: XCTestCase {
         let workLog: WorkLog = .init()
         let promise: Promise<Int> = .init(executionContext: .explicit(worker))
         
-        let expectedWorkLog: WorkLog = [.always]
-        
         promise.future
             .then { _ in
                 workLog.log(.then)
-                XCTFail("Should not be called")
             }
             .fail { _ in
                 workLog.log(.fail)
-                XCTFail("Should not be called")
             }
             .resulted {
                 workLog.log(.resulted)
-                XCTFail("Should not be called")
             }
             .always {
                 workLog.log(.always)
             }
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks before completing promise. Recieved: \(worker.taskCount)")
         
         promise.cancel()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Recieved: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Recieved: \(workLog)")
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Recieved: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Recieved: \(workLog)")
+        XCTAssert(workLog.isEmpty)
+        XCTAssertEqual(worker.executeAllAndReturnExecutedCount(), 1)
+        XCTAssertEqual(workLog, [.always])
     }
     
     func testShouldHandleValue_WhenCompletingWithValue_UsingRecovery() {
@@ -153,6 +121,8 @@ class PromiseAndFutureTestsTests: XCTestCase {
         XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks before completing promise. Recieved: \(worker.taskCount)")
         
         promise.fulfill(with: expectedResult)
+        
+        
         XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Recieved: \(worker.taskCount)")
         XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Recieved: \(workLog)")
         
@@ -162,6 +132,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         
         worker.executeFirst()
         XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Recieved: \(worker.taskCount)")
+        
         XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Recieved: \(workLog)")
     }
     
@@ -1165,11 +1136,8 @@ class PromiseAndFutureTestsTests: XCTestCase {
             .always {
                 workLog.log(.always)
             }
-        XCTAssert(worker.taskCount == 4, "Worker should recieve task for each handler. Expected: \(4) Recieved: \(worker.taskCount)")
         
-        worker.executeAll()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Recieved: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Recieved: \(workLog)")
+        XCTAssertEqual(worker.executeAllAndReturnExecutedCount(), 4, "Worker should recieve task for each handler")
     }
     
     func testShouldHandleError_WhenAlreadyCompletedWithError() {
@@ -2465,34 +2433,19 @@ class PromiseAndFutureTestsTests: XCTestCase {
         let workLog: WorkLog = .init()
         let promise: Promise<Int> = .init(executionContext: .explicit(worker))
         var currentFuture = promise.future
-        let expectedWorkLog: WorkLog = [.map, .flatMap]
         
         promise.fulfill(with: 0)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Recieved: \(worker.taskCount)")
-        
         worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise without handlers. Recieved: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Recieved: \(workLog)")
         
         let cloneWorker: TestWorker = .init()
         currentFuture =
             currentFuture
                 .switch(to: cloneWorker)
                 .clone()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after adding transforming handler. Recieved: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Recieved: \(workLog)")
         
         worker.executeFirst()
-        XCTAssert(cloneWorker.taskCount == 1, "Worker should recieve task after completing promise with transforming handler. Recieved: \(cloneWorker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Recieved: \(workLog)")
-        
         cloneWorker.executeFirst()
-        XCTAssert(cloneWorker.taskCount == 1, "Worker should recieve task after completing promise with transforming handler. Recieved: \(cloneWorker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Recieved: \(workLog)")
-        
         cloneWorker.executeFirst()
-        XCTAssert(cloneWorker.taskCount == 0, "Worker should complete tasks. Recieved: \(cloneWorker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Recieved: \(workLog)")
         
         let mapWorker: TestWorker = .init()
         currentFuture =
@@ -2502,20 +2455,10 @@ class PromiseAndFutureTestsTests: XCTestCase {
                     workLog.log(.map)
                     return value
                 }
-        XCTAssert(cloneWorker.taskCount == 1, "Worker should recieve task after adding transforming handler. Recieved: \(cloneWorker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Recieved: \(workLog)")
         
         cloneWorker.executeFirst()
-        XCTAssert(mapWorker.taskCount == 1, "Worker should recieve task after completing promise with transforming handler. Recieved: \(mapWorker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Recieved: \(workLog)")
-        
         mapWorker.executeFirst()
-        XCTAssert(mapWorker.taskCount == 1, "Worker should recieve task after completing promise with transforming handler. Recieved: \(mapWorker.taskCount)")
-        XCTAssert(workLog == [.map], "Work log not matching expected. Expected: \(WorkLog(.map)) Recieved: \(workLog)")
-        
         mapWorker.executeFirst()
-        XCTAssert(mapWorker.taskCount == 0, "Worker should complete tasks. Recieved: \(mapWorker.taskCount)")
-        XCTAssert(workLog == [.map], "Work log not matching expected. Expected: \(WorkLog(.map)) Recieved: \(workLog)")
         
         let flatMapWorker: TestWorker = .init()
         currentFuture =
@@ -2525,20 +2468,14 @@ class PromiseAndFutureTestsTests: XCTestCase {
                     workLog.log(.flatMap)
                     return .init(succeededWith: value)
                 }
-        XCTAssert(mapWorker.taskCount == 1, "Worker should recieve task after adding transforming handler. Recieved: \(mapWorker.taskCount)")
-        XCTAssert(workLog == [.map], "Work log not matching expected. Expected: \(WorkLog(.map)) Recieved: \(workLog)")
         
         mapWorker.executeFirst()
-        XCTAssert(flatMapWorker.taskCount == 1, "Worker should recieve task after completing promise with transforming handler. Recieved: \(flatMapWorker.taskCount)")
-        XCTAssert(workLog == [.map], "Work log not matching expected. Expected: \(WorkLog(.map)) Recieved: \(workLog)")
+        
+        XCTAssertEqual(workLog, [.map])
+        flatMapWorker.executeFirst()
+        XCTAssertEqual(workLog, [.map, .flatMap])
         
         flatMapWorker.executeFirst()
-        XCTAssert(flatMapWorker.taskCount == 1, "Worker should recieve task after completing promise with transforming handler. Recieved: \(flatMapWorker.taskCount)")
-        XCTAssert(workLog == [.map, .flatMap], "Work log not matching expected. Expected: \(WorkLog(.map, .flatMap)) Recieved: \(workLog)")
-        
-        flatMapWorker.executeFirst()
-        XCTAssert(flatMapWorker.taskCount == 0, "Worker should complete tasks. Recieved: \(flatMapWorker.taskCount)")
-        XCTAssert(workLog == [.map, .flatMap], "Work log not matching expected. Expected: \(WorkLog(.map, .flatMap)) Recieved: \(workLog)")
         
         let recoverWorker: TestWorker = .init()
         currentFuture =
@@ -2548,20 +2485,10 @@ class PromiseAndFutureTestsTests: XCTestCase {
                     workLog.log(.recover)
                     throw error
         }
-        XCTAssert(flatMapWorker.taskCount == 1, "Worker should recieve task after adding transforming handler. Recieved: \(flatMapWorker.taskCount)")
-        XCTAssert(workLog == [.map, .flatMap], "Work log not matching expected. Expected: \(WorkLog(.map, .flatMap)) Recieved: \(workLog)")
         
         flatMapWorker.executeFirst()
-        XCTAssert(recoverWorker.taskCount == 1, "Worker should recieve task after completing promise with transforming handler. Recieved: \(recoverWorker.taskCount)")
-        XCTAssert(workLog == [.map, .flatMap], "Work log not matching expected. Expected: \(WorkLog(.map, .flatMap)) Recieved: \(workLog)")
-        
         recoverWorker.executeFirst()
-        XCTAssert(recoverWorker.taskCount == 1, "Worker should recieve task after completing promise with transforming handler. Recieved: \(recoverWorker.taskCount)")
-        XCTAssert(workLog == [.map, .flatMap], "Work log not matching expected. Expected: \(WorkLog(.map, .flatMap)) Recieved: \(workLog)")
-        
         recoverWorker.executeFirst()
-        XCTAssert(recoverWorker.taskCount == 0, "Worker should complete tasks. Recieved: \(recoverWorker.taskCount)")
-        XCTAssert(workLog == [.map, .flatMap], "Work log not matching expected. Expected: \(WorkLog(.map, .flatMap)) Recieved: \(workLog)")
         
         let catchWorker: TestWorker = .init()
         currentFuture =
@@ -2571,29 +2498,12 @@ class PromiseAndFutureTestsTests: XCTestCase {
                     workLog.log(.catch)
                     throw error
                 }
-        XCTAssert(recoverWorker.taskCount == 1, "Worker should recieve task after adding transforming handler. Recieved: \(recoverWorker.taskCount)")
-        XCTAssert(workLog == [.map, .flatMap], "Work log not matching expected. Expected: \(WorkLog(.map, .flatMap)) Recieved: \(workLog)")
         
         recoverWorker.executeFirst()
-        XCTAssert(catchWorker.taskCount == 1, "Worker should recieve task after completing promise with transforming handler. Recieved: \(catchWorker.taskCount)")
-        XCTAssert(workLog == [.map, .flatMap], "Work log not matching expected. Expected: \(WorkLog(.map, .flatMap)) Recieved: \(workLog)")
-        
         catchWorker.executeFirst()
-        XCTAssert(catchWorker.taskCount == 1, "Worker should recieve task after completing promise with transforming handler. Recieved: \(catchWorker.taskCount)")
-        XCTAssert(workLog == [.map, .flatMap], "Work log not matching expected. Expected: \(WorkLog(.map, .flatMap)) Recieved: \(workLog)")
-        
         catchWorker.executeFirst()
-        XCTAssert(catchWorker.taskCount == 0, "Worker should complete tasks. Recieved: \(catchWorker.taskCount)")
-        XCTAssert(workLog == [.map, .flatMap], "Work log not matching expected. Expected: \(WorkLog(.map, .flatMap)) Recieved: \(workLog)")
         
-        
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Recieved: \(worker.taskCount)")
-        XCTAssert(cloneWorker.taskCount == 0, "Worker should not contain unused work after test. Recieved: \(cloneWorker.taskCount)")
-        XCTAssert(mapWorker.taskCount == 0, "Worker should not contain unused work after test. Recieved: \(mapWorker.taskCount)")
-        XCTAssert(flatMapWorker.taskCount == 0, "Worker should not contain unused work after test. Recieved: \(flatMapWorker.taskCount)")
-        XCTAssert(recoverWorker.taskCount == 0, "Worker should not contain unused work after test. Recieved: \(recoverWorker.taskCount)")
-        XCTAssert(catchWorker.taskCount == 0, "Worker should not contain unused work after test. Recieved: \(catchWorker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Recieved: \(workLog)")
+        XCTAssertEqual(workLog, [.map, .flatMap])
     }
     
     func testShouldPropagateExecutionContext_WhenAlreadyCompletedWithError_UsingTransformations() {

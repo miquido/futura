@@ -12,9 +12,14 @@
  See the License for the specific language governing permissions and
  limitations under the License. */
 
+import Futura
+
 final class WorkLog : Equatable {
     
     var log: [Event]
+    
+    var result: Int?
+    var reason: Error?
     
     enum Event : String {
         case then
@@ -43,6 +48,28 @@ final class WorkLog : Equatable {
     
     static func == (lhs: WorkLog, rhs: WorkLog) -> Bool {
         return lhs.log == rhs.log
+    }
+    
+    var isEmpty: Bool {
+        return log.isEmpty
+    }
+    
+    func bind(future: Future<Int>) {
+        future
+            .then { value in
+                self.log(.then)
+                self.result = value
+            }
+            .fail { reason in
+                self.log(.fail)
+                self.reason = reason
+            }
+            .resulted {
+                self.log(.resulted)
+            }
+            .always {
+                self.log(.always)
+            }
     }
 }
 
