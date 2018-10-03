@@ -43,7 +43,10 @@ public final class Future<Value> {
         #if FUTURA_DEBUG
         os_log("Deallocating %{public}@", log: logger, type: .debug, debugDescription)
         #endif
-        cancel()
+        let observers = self.observers
+        executionContext.execute {
+            observers.forEach { $0(.canceled) }
+        }
     }
 }
 
@@ -83,7 +86,6 @@ public extension Future {
     
     /// Access error when future completes with error. Returns new Future instance.
     /// If it handles error without throwing it cancels all further futures preventing error propagation.
-    @discardableResult
     func `catch`(_ handler: @escaping (Error) throws -> Void) -> Future<Value> {
         let future = Future(executionContext: executionContext)
         #if FUTURA_DEBUG
