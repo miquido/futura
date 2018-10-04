@@ -13,19 +13,18 @@
  limitations under the License. */
 
 final class WorkLog : Equatable {
+
+    private var log: [Event]
     
-    var log: [Event]
-    
-    enum Event : String {
-        case then
-        case fail
+    enum Event {
+        case then(String)
+        case fail(String)
         case resulted
         case always
         case recover
         case `catch`
         case map
         case flatMap
-        case clone
         case `switch`
     }
 
@@ -41,20 +40,61 @@ final class WorkLog : Equatable {
         log.append(event)
     }
     
+    var isEmpty: Bool {
+        return log.isEmpty
+    }
+    
     static func == (lhs: WorkLog, rhs: WorkLog) -> Bool {
         return lhs.log == rhs.log
     }
 }
 
+extension WorkLog.Event : CustomStringConvertible {
+    var description: String {
+        return debugDescription
+    }
+}
+
+extension WorkLog.Event : CustomDebugStringConvertible {
+    var debugDescription: String {
+        switch self {
+        case let .then(value):
+            return "then(\(value))"
+        case let .fail(error):
+            return "fail(\(error))"
+        case .resulted:
+            return "resulted"
+        case .always:
+            return "always"
+        case .recover:
+            return "recover"
+        case .catch:
+            return "catch"
+        case .map:
+            return "map"
+        case .flatMap:
+            return "flatMap"
+        case .switch:
+            return "switch"
+        }
+    }
+}
+
+extension WorkLog.Event : Equatable {
+    static func == (lhs: WorkLog.Event, rhs: WorkLog.Event) -> Bool {
+        return lhs.debugDescription == rhs.debugDescription
+    }
+}
+
 extension WorkLog : CustomStringConvertible {
     var description: String {
-        return "[\(log.map { $0.rawValue }.joined(separator: "-"))]"
+        return debugDescription
     }
 }
 
 extension WorkLog : CustomDebugStringConvertible {
     var debugDescription: String {
-        return "[\(log.map { $0.rawValue }.joined(separator: "-"))]"
+        return "WorkLog[\(log.map { $0.debugDescription }.joined(separator: "-"))]"
     }
 }
 

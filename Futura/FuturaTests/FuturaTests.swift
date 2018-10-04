@@ -13,8 +13,12 @@
  limitations under the License. */
 
 import XCTest
+import Futura
 
 struct TestError : Error {}
+
+let testError: TestError = TestError()
+let testErrorDescription: String = testDescription(of: testError)
 
 let performanceTestIterations = 10_000_000
 
@@ -52,4 +56,28 @@ extension XCTestCase {
             }
         }
     }
+}
+
+extension Future {
+    @discardableResult
+    func logResults(with workLog: WorkLog) -> Self {
+        self
+            .then { value in
+                workLog.log(.then(testDescription(of: value)))
+            }
+            .fail { reason in
+                workLog.log(.fail(testDescription(of: reason)))
+            }
+            .resulted {
+                workLog.log(.resulted)
+            }
+            .always {
+                workLog.log(.always)
+            }
+        return self
+    }
+}
+
+func testDescription(of any: Any) -> String {
+    return "\(any):\(type(of: any))"
 }

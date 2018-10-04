@@ -25,30 +25,37 @@ class TestWorker : Worker {
         }
     }
     
-    func executeFirst() {
-        lock.synchronized {
-            guard scheduled.count > 0 else { return }
+    @discardableResult
+    func executeFirst() -> Bool {
+        return lock.synchronized {
+            guard scheduled.count > 0 else { return false }
             scheduled.removeFirst()()
+            return true
         }
     }
     
-    func executeLast() {
-        lock.synchronized {
-            guard scheduled.count > 0 else { return }
+    @discardableResult
+    func executeLast() -> Bool {
+        return lock.synchronized {
+            guard scheduled.count > 0 else { return false }
             scheduled.removeLast()()
+            return true
         }
     }
     
-    func executeAll() {
-        lock.synchronized {
-            scheduled.forEach { $0() }
-            scheduled.removeAll()
+    func execute() -> Int {
+        return lock.synchronized {
+            var count: Int = 0
+            while executeFirst() { count += 1 }
+            return count
         }
     }
     
     var taskCount: Int {
-        return lock.synchronized {
-            scheduled.count
-        }
+        return lock.synchronized { scheduled.count }
+    }
+    
+    var isEmpty: Bool {
+        return lock.synchronized { scheduled.count == 0 }
     }
 }

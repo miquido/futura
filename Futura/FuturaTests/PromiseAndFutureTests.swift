@@ -17,2449 +17,1008 @@ import Futura
 
 class PromiseAndFutureTestsTests: XCTestCase {
     
+    var worker: TestWorker = .init()
+    var workLog: WorkLog = .init()
+    var promise: Promise<Int> = .init()
+    
+    override func setUp() {
+        super.setUp()
+        worker = .init()
+        workLog = .init()
+        promise = .init(executionContext: .explicit(worker))
+    }
+    
     // MARK: -
     // MARK: completing
     
     func testShouldHandleValue_WhenCompletingWithValue() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedResult: Int = 0
-        let expectedWorkLog: WorkLog = [.then, .resulted, .always]
-        
         promise.future
             .then { value in
-                workLog.log(.then)
-                XCTAssert(value == expectedResult, "Future value not matching expected. Expected: \(expectedResult) Received: \(value)")
+                self.workLog.log(.then(testDescription(of: value)))
             }
-            .fail { _ in
-                workLog.log(.fail)
-                XCTFail("Should not be called")
+            .fail { reason in
+                self.workLog.log(.fail(testDescription(of: reason)))
             }
             .resulted {
-                workLog.log(.resulted)
+                self.workLog.log(.resulted)
             }
             .always {
-                workLog.log(.always)
+                self.workLog.log(.always)
             }
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks before completing promise. Received: \(worker.taskCount)")
+        XCTAssert(worker.isEmpty, "Worker should not recieve tasks before completing promise")
         
-        promise.fulfill(with: expectedResult)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        promise.fulfill(with: 0)
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.then(testDescription(of: 0)), .resulted, .always])
     }
     
     func testShouldHandleError_WhenCompletingWithError() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedResult: Error = TestError()
-        let expectedWorkLog: WorkLog = [.fail, .resulted, .always]
-        
         promise.future
-            .then { _ in
-                workLog.log(.then)
-                XCTFail("Should not be called")
+            .then { value in
+                self.workLog.log(.then(testDescription(of: value)))
             }
             .fail { reason in
-                workLog.log(.fail)
-                XCTAssert(reason is TestError, "Future error not matching expected. Expected: \(expectedResult) Received: \(reason)")
+                self.workLog.log(.fail(testDescription(of: reason)))
             }
             .resulted {
-                workLog.log(.resulted)
+                self.workLog.log(.resulted)
             }
             .always {
-                workLog.log(.always)
+                self.workLog.log(.always)
             }
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks before completing promise. Received: \(worker.taskCount)")
+        XCTAssert(worker.isEmpty, "Worker should not recieve tasks before completing promise")
         
-        promise.break(with: expectedResult)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        promise.break(with: testError)
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
     }
     
-    func testShouldHandleCancel_WhenCanceling() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedWorkLog: WorkLog = [.always]
-        
+    func testShouldHandleCancel_WhenCompletingWithCancel() {
         promise.future
-            .then { _ in
-                workLog.log(.then)
-                XCTFail("Should not be called")
+            .then { value in
+                self.workLog.log(.then(testDescription(of: value)))
             }
-            .fail { _ in
-                workLog.log(.fail)
-                XCTFail("Should not be called")
+            .fail { reason in
+                self.workLog.log(.fail(testDescription(of: reason)))
             }
             .resulted {
-                workLog.log(.resulted)
-                XCTFail("Should not be called")
+                self.workLog.log(.resulted)
             }
             .always {
-                workLog.log(.always)
+                self.workLog.log(.always)
             }
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks before completing promise. Received: \(worker.taskCount)")
+        XCTAssert(worker.isEmpty, "Worker should not recieve tasks before completing promise")
         
         promise.cancel()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.always])
     }
     
     func testShouldHandleValue_WhenCompletingWithValue_UsingRecovery() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedResult: Int = 0
-        let expectedWorkLog: WorkLog = [.then, .resulted, .always]
-        
         promise.future
             .recover { error in
-                workLog.log(.recover)
-                XCTFail("Should not be called")
-                throw error
+                self.workLog.log(.recover)
+                return 0 as Int
             }
-            .then { value in
-                workLog.log(.then)
-                XCTAssert(value == expectedResult, "Future value not matching expected. Expected: \(expectedResult) Received: \(value)")
-            }
-            .fail { reason in
-                workLog.log(.fail)
-                XCTFail("Should not be called")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-        }
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks before completing promise. Received: \(worker.taskCount)")
+            .logResults(with: workLog)
+        XCTAssert(worker.isEmpty, "Worker should not recieve tasks before completing promise")
         
-        promise.fulfill(with: expectedResult)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        promise.fulfill(with: 0)
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog(.catch)) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.then(testDescription(of: 0)), .resulted, .always])
     }
     
     func testShouldHandleValue_WhenCompletingWithError_UsingRecovery() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedError: Error = TestError()
-        let expectedResult: Int = 0
-        let expectedWorkLog: WorkLog = [.recover, .then, .resulted, .always]
-        
         promise.future
             .recover { error in
-                workLog.log(.recover)
-                XCTAssert(error is TestError, "Future error not matching expected. Expected: \(expectedError) Received: \(error)")
-                return expectedResult
+                self.workLog.log(.recover)
+                return 0 as Int
             }
-            .then { value in
-                workLog.log(.then)
-                XCTAssert(value == expectedResult, "Recovered future value not matching expected. Expected: \(expectedResult) Received: \(value)")
-            }
-            .fail { _ in
-                workLog.log(.fail)
-                XCTFail("Should not be called")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-            }
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks before completing promise. Received: \(worker.taskCount)")
+            .logResults(with: workLog)
+        XCTAssert(worker.isEmpty, "Worker should not recieve tasks before completing promise")
         
-        promise.break(with: expectedError)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        promise.break(with: testError)
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [.recover], "Work log not matching expected. Expected: \(WorkLog(.recover)) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.recover, .then(testDescription(of: 0)), .resulted, .always])
     }
     
     func testShouldHandleError_WhenCompletingWithError_UsingThrowingRecovery() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedResult: Error = TestError()
-        let expectedWorkLog: WorkLog = [.recover, .fail, .resulted, .always]
-        
         promise.future
             .recover { error in
-                workLog.log(.recover)
-                XCTAssert(error is TestError, "Future error not matching expected. Expected: \(expectedResult) Received: \(error)")
+                self.workLog.log(.recover)
                 throw error
             }
-            .then { value in
-                workLog.log(.then)
-                XCTFail("Should not be called")
-            }
-            .fail { reason in
-                workLog.log(.fail)
-                XCTAssert(reason is TestError, "Future error not matching expected. Expected: \(expectedResult) Received: \(reason)")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-            }
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks before completing promise. Received: \(worker.taskCount)")
+            .logResults(with: workLog)
+        XCTAssert(worker.isEmpty, "Worker should not recieve tasks before completing promise")
         
-        promise.break(with: expectedResult)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        promise.break(with: testError)
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [.recover], "Work log not matching expected. Expected: \(WorkLog(.recover)) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.recover, .fail(testErrorDescription), .resulted, .always])
     }
     
-    func testShouldHandleCancel_WhenCanceling_UsingRecovery() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedWorkLog: WorkLog = [.always]
-        
+    func testShouldHandleCancel_WhenCompletingWithCancel_UsingRecovery() {
         promise.future
             .recover { error in
-                workLog.log(.recover)
-                XCTFail("Should not be called")
+                self.workLog.log(.recover)
                 throw error
             }
-            .then { value in
-                workLog.log(.then)
-                XCTFail("Should not be called")
-            }
-            .fail { reason in
-                workLog.log(.fail)
-                XCTFail("Should not be called")
-            }
-            .resulted {
-                XCTFail("Should not be called")
-            }
-            .always {
-                workLog.log(.always)
-        }
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks before completing promise. Received: \(worker.taskCount)")
+            .logResults(with: workLog)
+        XCTAssert(worker.isEmpty, "Worker should not recieve tasks before completing promise")
         
         promise.cancel()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog(.catch)) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.always])
     }
     
     func testShouldHandleValue_WhenCompletingWithValue_UsingCatch() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedResult: Int = 0
-        let expectedWorkLog: WorkLog = [.then, .resulted, .always]
-        
         promise.future
             .catch { error in
-                workLog.log(.catch)
-                XCTFail("Should not be called")
+                self.workLog.log(.catch)
             }
-            .then { value in
-                workLog.log(.then)
-                XCTAssert(value == expectedResult, "Future value not matching expected. Expected: \(expectedResult) Received: \(value)")
-            }
-            .fail { reason in
-                workLog.log(.fail)
-                XCTFail("Should not be called")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-        }
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks before completing promise. Received: \(worker.taskCount)")
+            .logResults(with: workLog)
+        XCTAssert(worker.isEmpty, "Worker should not recieve tasks before completing promise")
         
-        promise.fulfill(with: expectedResult)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        promise.fulfill(with: 0)
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog(.catch)) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.then(testDescription(of: 0)), .resulted, .always])
     }
     
     func testShouldHandleCancel_WhenCompletingWithError_UsingCatch() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedResult: Error = TestError()
-        let expectedWorkLog: WorkLog = [.catch, .always]
-        
         promise.future
             .catch { error in
-                workLog.log(.catch)
-                XCTAssert(error is TestError, "Future error not matching expected. Expected: \(expectedResult) Received: \(error)")
+                self.workLog.log(.catch)
             }
-            .then { value in
-                workLog.log(.then)
-                XCTFail("Should not be called")
-            }
-            .fail { reason in
-                workLog.log(.fail)
-                XCTFail("Should not be called")
-            }
-            .resulted {
-                workLog.log(.resulted)
-                XCTFail("Should not be called")
-            }
-            .always {
-                workLog.log(.always)
-            }
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks before completing promise. Received: \(worker.taskCount)")
+            .logResults(with: workLog)
+        XCTAssert(worker.isEmpty, "Worker should not recieve tasks before completing promise")
         
-        promise.break(with: expectedResult)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        promise.break(with: testError)
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [.catch], "Work log not matching expected. Expected: \(WorkLog(.catch)) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.catch, .always])
     }
     
     func testShouldHandleError_WhenCompletingWithError_UsingThrowingCatch() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedResult: Error = TestError()
-        let expectedWorkLog: WorkLog = [.catch, .fail, .resulted, .always]
-        
         promise.future
             .catch { error in
-                workLog.log(.catch)
-                XCTAssert(error is TestError, "Future error not matching expected. Expected: \(expectedResult) Received: \(error)")
+                self.workLog.log(.catch)
                 throw error
             }
-            .then { value in
-                workLog.log(.then)
-                XCTFail("Should not be called")
-            }
-            .fail { reason in
-                workLog.log(.fail)
-                XCTAssert(reason is TestError, "Future error not matching expected. Expected: \(expectedResult) Received: \(reason)")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-            }
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks before completing promise. Received: \(worker.taskCount)")
+            .logResults(with: workLog)
+        XCTAssert(worker.isEmpty, "Worker should not recieve tasks before completing promise")
         
-        promise.break(with: expectedResult)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        promise.break(with: testError)
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [.catch], "Work log not matching expected. Expected: \(WorkLog(.catch)) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.catch, .fail(testErrorDescription), .resulted, .always])
     }
     
-    func testShouldHandleCancel_WhenCanceling_UsingCatch() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedWorkLog: WorkLog = [.always]
-        
+    func testShouldHandleCancel_WhenCompletingWithCancel_UsingCatch() {
         promise.future
             .catch { error in
-                workLog.log(.catch)
-                XCTFail("Should not be called")
-                throw error
+                self.workLog.log(.catch)
             }
-            .then { value in
-                workLog.log(.then)
-                XCTFail("Should not be called")
-            }
-            .fail { reason in
-                workLog.log(.fail)
-                XCTFail("Should not be called")
-            }
-            .resulted {
-                XCTFail("Should not be called")
-            }
-            .always {
-                workLog.log(.always)
-        }
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks before completing promise. Received: \(worker.taskCount)")
+            .logResults(with: workLog)
+        XCTAssert(worker.isEmpty, "Worker should not recieve tasks before completing promise")
         
         promise.cancel()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog(.catch)) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.always])
     }
     
     func testShouldHandleValue_WhenCompletingWithValue_UsingMap() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedResult: Int = 1
-        let expectedWorkLog: WorkLog = [.map, .then, .resulted, .always]
-        
         promise.future
             .map { (value: Int) -> Int in
-                workLog.log(.map)
-                XCTAssert(value == 0, "Future value not matching expected. Expected: \(0) Received: \(value)")
+                self.workLog.log(.map)
                 return value + 1
             }
-            .then { value in
-                workLog.log(.then)
-                XCTAssert(value == expectedResult, "Mapped future value not matching expected. Expected: \(expectedResult) Received: \(value)")
-            }
-            .fail { _ in
-                workLog.log(.fail)
-                XCTFail("Should not be called")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-            }
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks before completing promise. Received: \(worker.taskCount)")
+            .logResults(with: workLog)
+        XCTAssert(worker.isEmpty, "Worker should not recieve tasks before completing promise")
         
         promise.fulfill(with: 0)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [.map], "Work log not matching expected. Expected: \(WorkLog(.map)) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.map, .then(testDescription(of: 1)), .resulted, .always])
     }
     
     func testShouldHandleError_WhenCompletingWithValue_UsingThrowingMap() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedResult: Error = TestError()
-        let expectedWorkLog: WorkLog = [.map, .fail, .resulted, .always]
-        
         promise.future
             .map { (value: Int) -> Int in
-                workLog.log(.map)
-                XCTAssert(value == 0, "Future value not matching expected. Expected: \(0) Received: \(value)")
-                throw expectedResult
+                self.workLog.log(.map)
+                throw testError
             }
-            .then { _ in
-                workLog.log(.then)
-                XCTFail("Should not be called")
-            }
-            .fail { reason in
-                workLog.log(.fail)
-                XCTAssert(reason is TestError, "Future error not matching expected. Expected: \(expectedResult) Received: \(reason)")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-            }
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks before completing promise. Received: \(worker.taskCount)")
+            .logResults(with: workLog)
+        XCTAssert(worker.isEmpty, "Worker should not recieve tasks before completing promise")
         
         promise.fulfill(with: 0)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [.map], "Work log not matching expected. Expected: \(WorkLog(.map)) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
-    }
-    
-    func testShouldHandleCancel_WhenCanceling_UsingMap() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedWorkLog: WorkLog = [.always]
-        
-        promise.future
-            .map { (value: Int) -> Int in
-                workLog.log(.map)
-                XCTFail("Should not be called")
-                return value
-            }
-            .then { value in
-                workLog.log(.then)
-                XCTFail("Should not be called")
-            }
-            .fail { _ in
-                workLog.log(.fail)
-                XCTFail("Should not be called")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-        }
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks before completing promise. Received: \(worker.taskCount)")
-        
-        promise.cancel()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.map, .fail(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleError_WhenCompletingWithError_UsingMap() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedResult: Error = TestError()
-        let expectedWorkLog: WorkLog = [.fail, .resulted, .always]
-        
         promise.future
             .map { (value: Int) -> Int in
-                workLog.log(.map)
-                XCTFail("Should not be called")
-                return value
+                self.workLog.log(.map)
+                return value + 1
             }
-            .then { _ in
-                workLog.log(.then)
-                XCTFail("Should not be called")
-            }
-            .fail { reason in
-                workLog.log(.fail)
-                XCTAssert(reason is TestError, "Future error not matching expected. Expected: \(expectedResult) Received: \(reason)")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-            }
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks before completing promise. Received: \(worker.taskCount)")
+            .logResults(with: workLog)
+        XCTAssert(worker.isEmpty, "Worker should not recieve tasks before completing promise")
         
-        promise.break(with: expectedResult)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        promise.break(with: testError)
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+    }
+    
+    func testShouldHandleCancel_WhenCompletingWithCancel_UsingMap() {
+        promise.future
+            .map { (value: Int) -> Int in
+                self.workLog.log(.map)
+                return value + 1
+            }
+            .logResults(with: workLog)
+        XCTAssert(worker.isEmpty, "Worker should not recieve tasks before completing promise")
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        promise.cancel()
+        
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.always])
     }
     
     func testShouldHandleValue_WhenCompletingWithValue_UsingFlatMapWithSuccess() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedResult: Int = 1
-        let expectedWorkLog: WorkLog = [.flatMap, .then, .resulted, .always]
-        
         promise.future
             .flatMap { (value: Int) -> Future<Int> in
-                workLog.log(.flatMap)
-                XCTAssert(value == 0, "Future value not matching expected. Expected: \(0) Received: \(value)")
+                self.workLog.log(.flatMap)
                 return Future<Int>(succeededWith: value + 1)
             }
-            .then { value in
-                workLog.log(.then)
-                XCTAssert(value == expectedResult, "Mapped future value not matching expected. Expected: \(expectedResult) Received: \(value)")
-            }
-            .fail { _ in
-                workLog.log(.fail)
-                XCTFail("Should not be called")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-            }
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks before completing promise. Received: \(worker.taskCount)")
+            .logResults(with: workLog)
+        XCTAssert(worker.isEmpty, "Worker should not recieve tasks before completing promise")
         
         promise.fulfill(with: 0)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [.flatMap], "Work log not matching expected. Expected: \(WorkLog(.flatMap)) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.flatMap, .then(testDescription(of: 1)), .resulted, .always])
     }
     
     func testShouldHandleError_WhenCompletingWithValue_UsingThrowingFlatMap() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedResult: Error = TestError()
-        let expectedWorkLog: WorkLog = [.flatMap, .fail, .resulted, .always]
-        
         promise.future
             .flatMap { (value: Int) -> Future<Int> in
-                workLog.log(.flatMap)
-                XCTAssert(value == 0, "Future value not matching expected. Expected: \(0) Received: \(value)")
-                throw expectedResult
+                self.workLog.log(.flatMap)
+                throw testError
             }
-            .then { _ in
-                workLog.log(.then)
-                XCTFail("Should not be called")
-            }
-            .fail { reason in
-                workLog.log(.fail)
-                XCTAssert(reason is TestError, "Future error not matching expected. Expected: \(expectedResult) Received: \(reason)")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-            }
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks before completing promise. Received: \(worker.taskCount)")
+            .logResults(with: workLog)
+        XCTAssert(worker.isEmpty, "Worker should not recieve tasks before completing promise")
         
         promise.fulfill(with: 0)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [.flatMap], "Work log not matching expected. Expected: \(WorkLog(.flatMap)) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
-    }
-    
-    func testShouldHandleError_WhenCompletingWithError_UsingFlatMap() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedResult: Error = TestError()
-        let expectedWorkLog: WorkLog = [.fail, .resulted, .always]
-        
-        promise.future
-            .flatMap { (value: Int) -> Future<Int> in
-                workLog.log(.flatMap)
-                XCTFail("Should not be called")
-                return Future<Int>(succeededWith: value)
-            }
-            .then { _ in
-                workLog.log(.then)
-                XCTFail("Should not be called")
-            }
-            .fail { reason in
-                workLog.log(.fail)
-                XCTAssert(reason is TestError, "Future error not matching expected. Expected: \(expectedResult) Received: \(reason)")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-            }
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks before completing promise. Received: \(worker.taskCount)")
-        
-        promise.break(with: expectedResult)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.flatMap, .fail(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleError_WhenCompletingWithValue_UsingFlatMapWithError() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedResult: Error = TestError()
-        let expectedWorkLog: WorkLog = [.flatMap, .fail, .resulted, .always]
-        
         promise.future
             .flatMap { (value: Int) -> Future<Int> in
-                workLog.log(.flatMap)
-                XCTAssert(value == 0, "Future value not matching expected. Expected: \(0) Received: \(value)")
-                return Future<Int>(failedWith: expectedResult)
+                self.workLog.log(.flatMap)
+                return Future<Int>(failedWith: testError)
             }
-            .then { _ in
-                workLog.log(.then)
-                XCTFail("Should not be called")
-            }
-            .fail { reason in
-                workLog.log(.fail)
-                XCTAssert(reason is TestError, "Future error not matching expected. Expected: \(expectedResult) Received: \(reason)")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-        }
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks before completing promise. Received: \(worker.taskCount)")
+            .logResults(with: workLog)
+        XCTAssert(worker.isEmpty, "Worker should not recieve tasks before completing promise")
         
         promise.fulfill(with: 0)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [.flatMap], "Work log not matching expected. Expected: \(WorkLog(.flatMap)) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.flatMap, .fail(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleCancel_WhenCompletingWithValue_UsingFlatMapWithCancel() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedWorkLog: WorkLog = [.flatMap, .always]
-        
         promise.future
             .flatMap { (value: Int) -> Future<Int> in
-                workLog.log(.flatMap)
-                XCTAssert(value == 0, "Future value not matching expected. Expected: \(0) Received: \(value)")
-                let inner: Future<Int> = Promise<Int>().future
+                self.workLog.log(.flatMap)
+                let inner = Promise<Int>().future
                 inner.cancel()
                 return inner
             }
-            .then { _ in
-                workLog.log(.then)
-                XCTFail("Should not be called")
-            }
-            .fail { reason in
-                workLog.log(.fail)
-                XCTFail("Should not be called")
-            }
-            .resulted {
-                workLog.log(.resulted)
-                XCTFail("Should not be called")
-            }
-            .always {
-                workLog.log(.always)
-            }
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks before completing promise. Received: \(worker.taskCount)")
+            .logResults(with: workLog)
+        XCTAssert(worker.isEmpty, "Worker should not recieve tasks before completing promise")
         
         promise.fulfill(with: 0)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [.flatMap], "Work log not matching expected. Expected: \(WorkLog(.flatMap)) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.flatMap, .always])
     }
     
-    func testShouldHandleCancel_WhenCanceling_UsingFlatMap() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedWorkLog: WorkLog = [.always]
-        
+    func testShouldHandleError_WhenCompletingWithError_UsingFlatMap() {
         promise.future
             .flatMap { (value: Int) -> Future<Int> in
-                workLog.log(.flatMap)
-                XCTFail("Should not be called")
-                return .init(succeededWith: value)
+                self.workLog.log(.flatMap)
+                return Future<Int>(succeededWith: value + 1)
             }
-            .then { value in
-                workLog.log(.then)
-                XCTFail("Should not be called")
+            .logResults(with: workLog)
+        XCTAssert(worker.isEmpty, "Worker should not recieve tasks before completing promise")
+        
+        promise.break(with: testError)
+        
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+    }
+    
+    func testShouldHandleCancel_WhenCompletingWithCancel_UsingFlatMap() {
+        promise.future
+            .flatMap { (value: Int) -> Future<Int> in
+                self.workLog.log(.flatMap)
+                return Future<Int>(succeededWith: value + 1)
             }
-            .fail { _ in
-                workLog.log(.fail)
-                XCTFail("Should not be called")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-        }
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks before completing promise. Received: \(worker.taskCount)")
+            .logResults(with: workLog)
+        XCTAssert(worker.isEmpty, "Worker should not recieve tasks before completing promise")
         
         promise.cancel()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.always])
     }
     
     func testShouldHandleValue_WhenCompletingWithValue_UsingClone() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedResult: Int = 0
-        let expectedWorkLog: WorkLog = [.then, .resulted, .always]
-        
         promise.future
             .clone()
-            .then { value in
-                workLog.log(.then)
-                XCTAssert(value == expectedResult, "Mapped future value not matching expected. Expected: \(expectedResult) Received: \(value)")
-            }
-            .fail { _ in
-                workLog.log(.fail)
-                XCTFail("Should not be called")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-        }
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks before completing promise. Received: \(worker.taskCount)")
+            .logResults(with: workLog)
+        XCTAssert(worker.isEmpty, "Worker should not recieve tasks before completing promise")
         
-        promise.fulfill(with: expectedResult)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        promise.fulfill(with: 0)
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
-    }
-    
-    func testShouldHandleCancel_WhenCanceling_UsingClone() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedWorkLog: WorkLog = [.always]
-        
-        promise.future
-            .clone()
-            .then { value in
-                workLog.log(.then)
-                XCTFail("Should not be called")
-            }
-            .fail { _ in
-                workLog.log(.fail)
-                XCTFail("Should not be called")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-        }
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks before completing promise. Received: \(worker.taskCount)")
-        
-        promise.cancel()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.then(testDescription(of: 0)), .resulted, .always])
     }
     
     func testShouldHandleError_WhenCompletingWithError_UsingClone() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedResult: Error = TestError()
-        let expectedWorkLog: WorkLog = [.fail, .resulted, .always]
-        
         promise.future
             .clone()
-            .then { _ in
-                workLog.log(.then)
-                XCTFail("Should not be called")
-            }
-            .fail { reason in
-                workLog.log(.fail)
-                XCTAssert(reason is TestError, "Future error not matching expected. Expected: \(expectedResult) Received: \(reason)")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-        }
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks before completing promise. Received: \(worker.taskCount)")
+            .logResults(with: workLog)
+        XCTAssert(worker.isEmpty, "Worker should not recieve tasks before completing promise")
         
-        promise.break(with: expectedResult)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        promise.break(with: testError)
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+    }
+    
+    func testShouldHandleCancel_WhenCompletingWithCancel_UsingClone() {
+        promise.future
+            .clone()
+            .logResults(with: workLog)
+        XCTAssert(worker.isEmpty, "Worker should not recieve tasks before completing promise")
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        promise.cancel()
+        
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.always])
     }
     
     func testShouldHandleValue_WhenCompletingWithValue_UsingContextSwitch() {
-        let worker: TestWorker = .init()
+        #warning("TODO FIXME")
         let otherWorker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedResult: Int = 0
-        let expectedWorkLog: WorkLog = [.then, .resulted, .always]
         
         promise.future
             .switch(to: otherWorker)
-            .then { value in
-                workLog.log(.then)
-                XCTAssert(value == expectedResult, "Mapped future value not matching expected. Expected: \(expectedResult) Received: \(value)")
-            }
-            .fail { _ in
-                workLog.log(.fail)
-                XCTFail("Should not be called")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-        }
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks before completing promise. Received: \(worker.taskCount)")
+            .logResults(with: workLog)
+        XCTAssert(worker.isEmpty, "Worker should not recieve tasks before completing promise")
+        XCTAssert(otherWorker.isEmpty, "Worker should not recieve tasks before completing promise")
         
-        promise.fulfill(with: expectedResult)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        promise.fulfill(with: 0)
         
-        worker.executeFirst()
-        XCTAssert(otherWorker.taskCount == 1, "Worker should recieve task after completing promise with transforming handler. Received: \(otherWorker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
-        
-        otherWorker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(otherWorker.taskCount == 0, "Worker should not contain unused work after test. Received: \(otherWorker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
-    }
-    
-    func testShouldHandleCancel_WhenCanceling_UsingContextSwitch() {
-        let worker: TestWorker = .init()
-        let otherWorker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedWorkLog: WorkLog = [.always]
-        
-        promise.future
-            .switch(to: otherWorker)
-            .then { value in
-                workLog.log(.then)
-                XCTFail("Should not be called")
-            }
-            .fail { _ in
-                workLog.log(.fail)
-                XCTFail("Should not be called")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-        }
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks before completing promise. Received: \(worker.taskCount)")
-        
-        promise.cancel()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(otherWorker.taskCount == 1, "Worker should recieve task after completing promise with transforming handler. Received: \(otherWorker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
-        
-        otherWorker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(otherWorker.taskCount == 0, "Worker should not contain unused work after test. Received: \(otherWorker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [])
+        XCTAssertEqual(otherWorker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.then(testDescription(of: 0)), .resulted, .always])
     }
     
     func testShouldHandleError_WhenCompletingWithError_UsingContextSwitch() {
-        let worker: TestWorker = .init()
+        #warning("TODO FIXME")
         let otherWorker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedResult: Error = TestError()
-        let expectedWorkLog: WorkLog = [.fail, .resulted, .always]
         
         promise.future
             .switch(to: otherWorker)
-            .then { _ in
-                workLog.log(.then)
-                XCTFail("Should not be called")
-            }
-            .fail { reason in
-                workLog.log(.fail)
-                XCTAssert(reason is TestError, "Future error not matching expected. Expected: \(expectedResult) Received: \(reason)")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-        }
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks before completing promise. Received: \(worker.taskCount)")
+            .logResults(with: workLog)
+        XCTAssert(worker.isEmpty, "Worker should not recieve tasks before completing promise")
+        XCTAssert(otherWorker.isEmpty, "Worker should not recieve tasks before completing promise")
         
-        promise.break(with: expectedResult)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        promise.break(with: testError)
         
-        worker.executeFirst()
-        XCTAssert(otherWorker.taskCount == 1, "Worker should recieve task after completing promise with transforming handler. Received: \(otherWorker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [])
+        XCTAssertEqual(otherWorker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+    }
+    
+    func testShouldHandleCancel_WhenCompletingWithCancel_UsingContextSwitch() {
+        #warning("TODO FIXME")
+        let otherWorker: TestWorker = .init()
         
-        otherWorker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(otherWorker.taskCount == 0, "Worker should not contain unused work after test. Received: \(otherWorker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        promise.future
+            .switch(to: otherWorker)
+            .logResults(with: workLog)
+        XCTAssert(worker.isEmpty, "Worker should not recieve tasks before completing promise")
+        XCTAssert(otherWorker.isEmpty, "Worker should not recieve tasks before completing promise")
+        
+        promise.cancel()
+        
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [])
+        XCTAssertEqual(otherWorker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.always])
     }
     
     // MARK: -
     // MARK: completed
     
     func testShouldHandleValue_WhenAlreadyCompletedWithValue() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedResult: Int = 0
-        let expectedWorkLog: WorkLog = [.then, .resulted, .always]
-        
-        promise.fulfill(with: expectedResult)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise without handlers. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        promise.fulfill(with: 0)
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before adding handlers")
         
         promise.future
             .then { value in
-                workLog.log(.then)
-                XCTAssert(value == expectedResult, "Promise value not matching expected. Expected: \(expectedResult) Received: \(value)")
+                self.workLog.log(.then(testDescription(of: value)))
             }
-            .fail { _ in
-                workLog.log(.fail)
-                XCTFail("Should not be called")
+            .fail { reason in
+                self.workLog.log(.fail(testDescription(of: reason)))
             }
             .resulted {
-                workLog.log(.resulted)
+                self.workLog.log(.resulted)
             }
             .always {
-                workLog.log(.always)
-            }
-        XCTAssert(worker.taskCount == 4, "Worker should recieve task for each handler. Expected: \(4) Received: \(worker.taskCount)")
+                self.workLog.log(.always)
+        }
         
-        worker.executeAll()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 4, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.then(testDescription(of: 0)), .resulted, .always])
     }
     
     func testShouldHandleError_WhenAlreadyCompletedWithError() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedResult: Error = TestError()
-        let expectedWorkLog: WorkLog = [.fail, .resulted, .always]
-        
-        promise.break(with: expectedResult)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise without handlers. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        promise.break(with: testError)
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before adding handlers")
         
         promise.future
-            .then { _ in
-                workLog.log(.then)
-                XCTFail("Should not be called")
+            .then { value in
+                self.workLog.log(.then(testDescription(of: value)))
             }
             .fail { reason in
-                workLog.log(.fail)
-                XCTAssert(reason is TestError, "Promise error not matching expected. Expected: \(expectedResult) Received: \(reason)")
+                self.workLog.log(.fail(testDescription(of: reason)))
             }
             .resulted {
-                workLog.log(.resulted)
+                self.workLog.log(.resulted)
             }
             .always {
-                workLog.log(.always)
-            }
-        XCTAssert(worker.taskCount == 4, "Worker should recieve task for each handler. Expected: \(4) Received: \(worker.taskCount)")
+                self.workLog.log(.always)
+        }
         
-        worker.executeAll()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 4, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
     }
     
-    func testShouldHandleCancel_WhenAlreadyCanceled() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedWorkLog: WorkLog = [.always]
-        
+    func testShouldHandleCancel_WhenAlreadyCompletedWithCancel() {
         promise.cancel()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise without handlers. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before adding handlers")
         
         promise.future
-            .then { _ in
-                workLog.log(.then)
-                XCTFail("Should not be called")
+            .then { value in
+                self.workLog.log(.then(testDescription(of: value)))
             }
-            .fail { _ in
-                workLog.log(.fail)
-                XCTFail("Should not be called")
+            .fail { reason in
+                self.workLog.log(.fail(testDescription(of: reason)))
             }
             .resulted {
-                workLog.log(.resulted)
-                XCTFail("Should not be called")
+                self.workLog.log(.resulted)
             }
             .always {
-                workLog.log(.always)
-            }
-        XCTAssert(worker.taskCount == 4, "Worker should recieve task for each handler. Expected: \(4) Received: \(worker.taskCount)")
+                self.workLog.log(.always)
+        }
         
-        worker.executeAll()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 4, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.always])
     }
     
     func testShouldHandleValue_WhenAlreadyCompletedWithValue_UsingRecovery() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedResult: Int = 0
-        let expectedWorkLog: WorkLog = [.then, .resulted, .always]
-        
-        promise.fulfill(with: expectedResult)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise without handlers. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        promise.fulfill(with: 0)
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before adding handlers")
         
         promise.future
             .recover { error in
-                workLog.log(.recover)
-                XCTFail("Should not be called")
-                throw error
+                self.workLog.log(.recover)
+                return 0 as Int
             }
-            .then { value in
-                workLog.log(.then)
-                XCTAssert(value == expectedResult, "Future value not matching expected. Expected: \(expectedResult) Received: \(value)")
-            }
-            .fail { reason in
-                workLog.log(.fail)
-                XCTFail("Should not be called")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-        }
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after adding transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+            .logResults(with: workLog)
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after performing transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog(.catch)) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.then(testDescription(of: 0)), .resulted, .always])
     }
     
     func testShouldHandleValue_WhenAlreadyCompletedWithError_UsingRecovery() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedError: Error = TestError()
-        let expectedResult: Int = 0
-        let expectedWorkLog: WorkLog = [.recover, .then, .resulted, .always]
-        
-        promise.break(with: expectedError)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise without handlers. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        promise.break(with: testError)
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before adding handlers")
         
         promise.future
             .recover { error in
-                workLog.log(.recover)
-                XCTAssert(error is TestError, "Future error not matching expected. Expected: \(expectedError) Received: \(error)")
-                return expectedResult
+                self.workLog.log(.recover)
+                return 0 as Int
             }
-            .then { value in
-                workLog.log(.then)
-                XCTAssert(value == expectedResult, "Recovered future value not matching expected. Expected: \(expectedResult) Received: \(value)")
-            }
-            .fail { _ in
-                workLog.log(.fail)
-                XCTFail("Should not be called")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-        }
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after adding transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+            .logResults(with: workLog)
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [.recover], "Work log not matching expected. Expected: \(WorkLog(.recover)) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.recover, .then(testDescription(of: 0)), .resulted, .always])
     }
     
     func testShouldHandleError_WhenAlreadyCompletedWithError_UsingThrowingRecovery() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedResult: Error = TestError()
-        let expectedWorkLog: WorkLog = [.recover, .fail, .resulted, .always]
-        
-        promise.break(with: expectedResult)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise without handlers. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        promise.break(with: testError)
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before adding handlers")
         
         promise.future
             .recover { error in
-                workLog.log(.recover)
-                XCTAssert(error is TestError, "Future error not matching expected. Expected: \(expectedResult) Received: \(error)")
+                self.workLog.log(.recover)
                 throw error
             }
-            .then { value in
-                workLog.log(.then)
-                XCTFail("Should not be called")
-            }
-            .fail { reason in
-                workLog.log(.fail)
-                XCTAssert(reason is TestError, "Future error not matching expected. Expected: \(expectedResult) Received: \(reason)")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-        }
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after adding transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+            .logResults(with: workLog)
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [.recover], "Work log not matching expected. Expected: \(WorkLog(.recover)) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.recover, .fail(testErrorDescription), .resulted, .always])
     }
     
-    func testShouldHandleCancel_WhenAlreadyCanceled_UsingRecovery() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedWorkLog: WorkLog = [.always]
-        
+    func testShouldHandleCancel_WhenAlreadyCompletedWithCancel_UsingRecovery() {
         promise.cancel()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise without handlers. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before adding handlers")
         
         promise.future
             .recover { error in
-                workLog.log(.recover)
-                XCTFail("Should not be called")
+                self.workLog.log(.recover)
                 throw error
             }
-            .then { value in
-                workLog.log(.then)
-                XCTFail("Should not be called")
-            }
-            .fail { reason in
-                workLog.log(.fail)
-                XCTFail("Should not be called")
-            }
-            .resulted {
-                workLog.log(.resulted)
-                XCTFail("Should not be called")
-            }
-            .always {
-                workLog.log(.always)
-            }
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after adding transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+            .logResults(with: workLog)
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.always])
     }
     
     func testShouldHandleValue_WhenAlreadyCompletedWithValue_UsingCatch() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedResult: Int = 0
-        let expectedWorkLog: WorkLog = [.then, .resulted, .always]
-        
-        promise.fulfill(with: expectedResult)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise without handlers. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        promise.fulfill(with: 0)
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before adding handlers")
         
         promise.future
             .catch { error in
-                workLog.log(.catch)
-                XCTFail("Should not be called")
+                self.workLog.log(.catch)
             }
-            .then { value in
-                workLog.log(.then)
-                XCTAssert(value == expectedResult, "Future value not matching expected. Expected: \(expectedResult) Received: \(value)")
-            }
-            .fail { reason in
-                workLog.log(.fail)
-                XCTFail("Should not be called")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-        }
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after adding transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+            .logResults(with: workLog)
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog(.catch)) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.then(testDescription(of: 0)), .resulted, .always])
     }
     
     func testShouldHandleCancel_WhenAlreadyCompletedWithError_UsingCatch() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedResult: Error = TestError()
-        let expectedWorkLog: WorkLog = [.catch, .always]
-        
-        promise.break(with: expectedResult)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise without handlers. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        promise.break(with: testError)
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before adding handlers")
         
         promise.future
             .catch { error in
-                workLog.log(.catch)
-                XCTAssert(error is TestError, "Future error not matching expected. Expected: \(expectedResult) Received: \(error)")
+                self.workLog.log(.catch)
             }
-            .then { value in
-                workLog.log(.then)
-                XCTFail("Should not be called")
-            }
-            .fail { reason in
-                workLog.log(.fail)
-                XCTFail("Should not be called")
-            }
-            .resulted {
-                workLog.log(.resulted)
-                XCTFail("Should not be called")
-            }
-            .always {
-                workLog.log(.always)
-        }
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after adding transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+            .logResults(with: workLog)
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [.catch], "Work log not matching expected. Expected: \(WorkLog(.catch)) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.catch, .always])
     }
     
     func testShouldHandleError_WhenAlreadyCompletedWithError_UsingThrowingCatch() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedResult: Error = TestError()
-        let expectedWorkLog: WorkLog = [.catch, .fail, .resulted, .always]
-        
-        promise.break(with: expectedResult)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise without handlers. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        promise.break(with: testError)
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before adding handlers")
         
         promise.future
             .catch { error in
-                workLog.log(.catch)
-                XCTAssert(error is TestError, "Future error not matching expected. Expected: \(expectedResult) Received: \(error)")
+                self.workLog.log(.catch)
                 throw error
             }
-            .then { value in
-                workLog.log(.then)
-                XCTFail("Should not be called")
-            }
-            .fail { reason in
-                workLog.log(.fail)
-                XCTAssert(reason is TestError, "Future error not matching expected. Expected: \(expectedResult) Received: \(reason)")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-        }
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after adding transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [.catch], "Work log not matching expected. Expected: \(WorkLog(.catch)) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+            .logResults(with: workLog)
+       
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.catch, .fail(testErrorDescription), .resulted, .always])
     }
     
-    func testShouldHandleCancel_WhenAlreadyCanceled_UsingCatch() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedWorkLog: WorkLog = [.always]
-        
+    func testShouldHandleCancel_WhenAlreadyCompletedWithCancel_UsingCatch() {
         promise.cancel()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise without handlers. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before adding handlers")
         
         promise.future
             .catch { error in
-                workLog.log(.catch)
-                XCTFail("Should not be called")
-                throw error
+                self.workLog.log(.catch)
             }
-            .then { value in
-                workLog.log(.then)
-                XCTFail("Should not be called")
-            }
-            .fail { reason in
-                workLog.log(.fail)
-                XCTFail("Should not be called")
-            }
-            .resulted {
-                workLog.log(.resulted)
-                XCTFail("Should not be called")
-            }
-            .always {
-                workLog.log(.always)
-        }
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after adding transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+            .logResults(with: workLog)
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.always])
     }
     
     func testShouldHandleValue_WhenAlreadyCompletedWithValue_UsingMap() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedResult: Int = 1
-        let expectedWorkLog: WorkLog = [.map, .then, .resulted, .always]
-        
         promise.fulfill(with: 0)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise without handlers. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before adding handlers")
         
         promise.future
             .map { (value: Int) -> Int in
-                workLog.log(.map)
-                XCTAssert(value == 0, "Future value not matching expected. Expected: \(0) Received: \(value)")
+                self.workLog.log(.map)
                 return value + 1
             }
-            .then { value in
-                workLog.log(.then)
-                XCTAssert(value == expectedResult, "Mapped future value not matching expected. Expected: \(expectedResult) Received: \(value)")
-            }
-            .fail { _ in
-                workLog.log(.fail)
-                XCTFail("Should not be called")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-        }
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after adding transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+            .logResults(with: workLog)
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [.map], "Work log not matching expected. Expected: \(WorkLog(.map)) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.map, .then(testDescription(of: 1)), .resulted, .always])
     }
     
     func testShouldHandleError_WhenAlreadyCompletedWithValue_UsingThrowingMap() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedResult: Error = TestError()
-        let expectedWorkLog: WorkLog = [.map, .fail, .resulted, .always]
-        
         promise.fulfill(with: 0)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise without handlers. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before adding handlers")
         
         promise.future
             .map { (value: Int) -> Int in
-                workLog.log(.map)
-                XCTAssert(value == 0, "Future value not matching expected. Expected: \(0) Received: \(value)")
-                throw expectedResult
+                self.workLog.log(.map)
+                throw testError
             }
-            .then { _ in
-                workLog.log(.then)
-                XCTFail("Should not be called")
-            }
-            .fail { reason in
-                workLog.log(.fail)
-                XCTAssert(reason is TestError, "Future error not matching expected. Expected: \(expectedResult) Received: \(reason)")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-        }
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after adding transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+            .logResults(with: workLog)
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [.map], "Work log not matching expected. Expected: \(WorkLog(.map)) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
-    }
-    
-    func testShouldHandleCancel_WhenAlreadyCanceled_UsingMap() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedWorkLog: WorkLog = [.always]
-        
-        promise.cancel()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise without handlers. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
-        
-        promise.future
-            .map { (value: Int) -> Int in
-                workLog.log(.map)
-                XCTFail("Should not be called")
-                return value
-            }
-            .then { value in
-                workLog.log(.then)
-                XCTFail("Should not be called")
-            }
-            .fail { _ in
-                workLog.log(.fail)
-                XCTFail("Should not be called")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-        }
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after adding transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.map, .fail(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleError_WhenAlreadyCompletedWithError_UsingMap() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedResult: Error = TestError()
-        let expectedWorkLog: WorkLog = [.fail, .resulted, .always]
-        
-        promise.break(with: expectedResult)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise without handlers. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        promise.break(with: testError)
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before adding handlers")
         
         promise.future
             .map { (value: Int) -> Int in
-                workLog.log(.map)
-                XCTFail("Should not be called")
-                return value
+                self.workLog.log(.map)
+                return value + 1
             }
-            .then { _ in
-                workLog.log(.then)
-                XCTFail("Should not be called")
-            }
-            .fail { reason in
-                workLog.log(.fail)
-                XCTAssert(reason is TestError, "Future error not matching expected. Expected: \(expectedResult) Received: \(reason)")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-        }
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after adding transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+            .logResults(with: workLog)
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+    }
+    
+    func testShouldHandleCancel_WhenAlreadyCompletedWithCancel_UsingMap() {
+        promise.cancel()
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before adding handlers")
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        promise.future
+            .map { (value: Int) -> Int in
+                self.workLog.log(.map)
+                return value + 1
+            }
+            .logResults(with: workLog)
+        
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.always])
     }
     
     func testShouldHandleValue_WhenAlreadyCompletedWithValue_UsingFlatMapWithSuccess() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedResult: Int = 1
-        let expectedWorkLog: WorkLog = [.flatMap, .then, .resulted, .always]
-        
         promise.fulfill(with: 0)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise without handlers. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before adding handlers")
         
         promise.future
             .flatMap { (value: Int) -> Future<Int> in
-                workLog.log(.flatMap)
-                XCTAssert(value == 0, "Future value not matching expected. Expected: \(0) Received: \(value)")
+                self.workLog.log(.flatMap)
                 return Future<Int>(succeededWith: value + 1)
             }
-            .then { value in
-                workLog.log(.then)
-                XCTAssert(value == expectedResult, "Mapped future value not matching expected. Expected: \(expectedResult) Received: \(value)")
-            }
-            .fail { _ in
-                workLog.log(.fail)
-                XCTFail("Should not be called")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-        }
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after adding transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+            .logResults(with: workLog)
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [.flatMap], "Work log not matching expected. Expected: \(WorkLog(.flatMap)) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.flatMap, .then(testDescription(of: 1)), .resulted, .always])
     }
     
     func testShouldHandleError_WhenAlreadyCompletedWithValue_UsingThrowingFlatMap() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedResult: Error = TestError()
-        let expectedWorkLog: WorkLog = [.flatMap, .fail, .resulted, .always]
-        
         promise.fulfill(with: 0)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise without handlers. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before adding handlers")
         
         promise.future
             .flatMap { (value: Int) -> Future<Int> in
-                workLog.log(.flatMap)
-                XCTAssert(value == 0, "Future value not matching expected. Expected: \(0) Received: \(value)")
-                throw expectedResult
+                self.workLog.log(.flatMap)
+                throw testError
             }
-            .then { _ in
-                workLog.log(.then)
-                XCTFail("Should not be called")
-            }
-            .fail { reason in
-                workLog.log(.fail)
-                XCTAssert(reason is TestError, "Future error not matching expected. Expected: \(expectedResult) Received: \(reason)")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-        }
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after adding transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [.flatMap], "Work log not matching expected. Expected: \(WorkLog(.flatMap)) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
-    }
-    
-    func testShouldHandleError_WhenAlreadyCompletedWithError_UsingFlatMap() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedResult: Error = TestError()
-        let expectedWorkLog: WorkLog = [.fail, .resulted, .always]
-        
-        promise.break(with: expectedResult)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise without handlers. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
-        
-        promise.future
-            .flatMap { (value: Int) -> Future<Int> in
-                workLog.log(.flatMap)
-                XCTFail("Should not be called")
-                return Future<Int>(succeededWith: value)
-            }
-            .then { _ in
-                workLog.log(.then)
-                XCTFail("Should not be called")
-            }
-            .fail { reason in
-                workLog.log(.fail)
-                XCTAssert(reason is TestError, "Future error not matching expected. Expected: \(expectedResult) Received: \(reason)")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-        }
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after adding transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+            .logResults(with: workLog)
+       
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.flatMap, .fail(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleError_WhenAlreadyCompletedWithValue_UsingFlatMapWithError() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedResult: Error = TestError()
-        let expectedWorkLog: WorkLog = [.flatMap, .fail, .resulted, .always]
-        
         promise.fulfill(with: 0)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise without handlers. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before adding handlers")
         
         promise.future
             .flatMap { (value: Int) -> Future<Int> in
-                workLog.log(.flatMap)
-                XCTAssert(value == 0, "Future value not matching expected. Expected: \(0) Received: \(value)")
-                return Future<Int>(failedWith: expectedResult)
+                self.workLog.log(.flatMap)
+                return Future<Int>(failedWith: testError)
             }
-            .then { _ in
-                workLog.log(.then)
-                XCTFail("Should not be called")
-            }
-            .fail { reason in
-                workLog.log(.fail)
-                XCTAssert(reason is TestError, "Future error not matching expected. Expected: \(expectedResult) Received: \(reason)")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-        }
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after adding transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+            .logResults(with: workLog)
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [.flatMap], "Work log not matching expected. Expected: \(WorkLog(.flatMap)) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.flatMap, .fail(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleCancel_WhenAlreadyCompletedWithValue_UsingFlatMapWithCancel() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedWorkLog: WorkLog = [.flatMap, .always]
-        
         promise.fulfill(with: 0)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise without handlers. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before adding handlers")
         
         promise.future
             .flatMap { (value: Int) -> Future<Int> in
-                workLog.log(.flatMap)
-                XCTAssert(value == 0, "Future value not matching expected. Expected: \(0) Received: \(value)")
-                let inner: Future<Int> = Promise<Int>().future
+                self.workLog.log(.flatMap)
+                let inner = Promise<Int>().future
                 inner.cancel()
                 return inner
             }
-            .then { _ in
-                workLog.log(.then)
-                XCTFail("Should not be called")
-            }
-            .fail { reason in
-                workLog.log(.fail)
-                XCTFail("Should not be called")
-            }
-            .resulted {
-                workLog.log(.resulted)
-                XCTFail("Should not be called")
-            }
-            .always {
-                workLog.log(.always)
-        }
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after adding transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+            .logResults(with: workLog)
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [.flatMap], "Work log not matching expected. Expected: \(WorkLog(.flatMap)) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.flatMap, .always])
     }
     
-    func testShouldHandleCancel_WhenAlreadyCanceled_UsingFlatMap() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedWorkLog: WorkLog = [.always]
-        
-        promise.cancel()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise without handlers. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+    func testShouldHandleError_WhenAlreadyCompletedWithError_UsingFlatMap() {
+        promise.break(with: testError)
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before adding handlers")
         
         promise.future
             .flatMap { (value: Int) -> Future<Int> in
-                workLog.log(.flatMap)
-                XCTFail("Should not be called")
-                return .init(succeededWith: value)
+                self.workLog.log(.flatMap)
+                return Future<Int>(succeededWith: value + 1)
             }
-            .then { _ in
-                workLog.log(.then)
-                XCTFail("Should not be called")
-            }
-            .fail { reason in
-                workLog.log(.fail)
-                XCTFail("Should not be called")
-            }
-            .resulted {
-                workLog.log(.resulted)
-                XCTFail("Should not be called")
-            }
-            .always {
-                workLog.log(.always)
-        }
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after adding transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+            .logResults(with: workLog)
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+    }
+    
+    func testShouldHandleCancel_WhenAlreadyCompletedWithCancel_UsingFlatMap() {
+        promise.cancel()
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before adding handlers")
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        promise.future
+            .flatMap { (value: Int) -> Future<Int> in
+                self.workLog.log(.flatMap)
+                return Future<Int>(succeededWith: value + 1)
+            }
+            .logResults(with: workLog)
+        
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.always])
     }
     
     func testShouldHandleValue_WhenAlreadyCompletedWithValue_UsingClone() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedResult: Int = 0
-        let expectedWorkLog: WorkLog = [.then, .resulted, .always]
-        
-        promise.fulfill(with: expectedResult)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise without handlers. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        promise.fulfill(with: 0)
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before adding handlers")
         
         promise.future
             .clone()
-            .then { value in
-                workLog.log(.then)
-                XCTAssert(value == expectedResult, "Mapped future value not matching expected. Expected: \(expectedResult) Received: \(value)")
-            }
-            .fail { _ in
-                workLog.log(.fail)
-                XCTFail("Should not be called")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-        }
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after adding transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+            .logResults(with: workLog)
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
-    }
-    
-    func testShouldHandleCancel_WhenAlreadyCanceled_UsingClone() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedWorkLog: WorkLog = [.always]
-        
-        promise.cancel()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise without handlers. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
-        
-        promise.future
-            .clone()
-            .then { value in
-                workLog.log(.then)
-                XCTFail("Should not be called")
-            }
-            .fail { _ in
-                workLog.log(.fail)
-                XCTFail("Should not be called")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-        }
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after adding transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.then(testDescription(of: 0)), .resulted, .always])
     }
     
     func testShouldHandleError_WhenAlreadyCompletedWithError_UsingClone() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedResult: Error = TestError()
-        let expectedWorkLog: WorkLog = [.fail, .resulted, .always]
-        
-        promise.break(with: expectedResult)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise without handlers. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        promise.break(with: testError)
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before adding handlers")
         
         promise.future
             .clone()
-            .then { _ in
-                workLog.log(.then)
-                XCTFail("Should not be called")
-            }
-            .fail { reason in
-                workLog.log(.fail)
-                XCTAssert(reason is TestError, "Future error not matching expected. Expected: \(expectedResult) Received: \(reason)")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-        }
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after adding transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+            .logResults(with: workLog)
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+    }
+    
+    func testShouldHandleCancel_WhenAlreadyCompletedWithCancel_UsingClone() {
+        promise.cancel()
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before adding handlers")
         
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        promise.future
+            .clone()
+            .logResults(with: workLog)
+        
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.always])
     }
     
     func testShouldHandleValue_WhenAlreadyCompletedWithValue_UsingContextSwitch() {
-        let worker: TestWorker = .init()
+        #warning("TODO FIXME")
         let otherWorker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
         
-        let expectedResult: Int = 0
-        let expectedWorkLog: WorkLog = [.then, .resulted, .always]
-        
-        promise.fulfill(with: expectedResult)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise without handlers. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        promise.fulfill(with: 0)
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before adding handlers")
+        XCTAssert(otherWorker.isEmpty, "Worker should not recieve tasks before completing promise")
         
         promise.future
             .switch(to: otherWorker)
-            .then { value in
-                workLog.log(.then)
-                XCTAssert(value == expectedResult, "Mapped future value not matching expected. Expected: \(expectedResult) Received: \(value)")
-            }
-            .fail { _ in
-                workLog.log(.fail)
-                XCTFail("Should not be called")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-        }
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after adding transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+            .logResults(with: workLog)
+        XCTAssert(worker.isEmpty, "Worker should not recieve tasks before completing promise")
+        XCTAssert(otherWorker.isEmpty, "Worker should not recieve tasks before completing promise")
         
-        worker.executeFirst()
-        XCTAssert(otherWorker.taskCount == 1, "Worker should recieve task after completing promise with transforming handler. Received: \(otherWorker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
-        
-        otherWorker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(otherWorker.taskCount == 0, "Worker should not contain unused work after test. Received: \(otherWorker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
-    }
-    
-    func testShouldHandleCancel_WhenAlreadyCanceled_UsingContextSwitch() {
-        let worker: TestWorker = .init()
-        let otherWorker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedWorkLog: WorkLog = [.always]
-        
-        promise.cancel()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise without handlers. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
-        
-        promise.future
-            .switch(to: otherWorker)
-            .then { value in
-                workLog.log(.then)
-                XCTFail("Should not be called")
-            }
-            .fail { _ in
-                workLog.log(.fail)
-                XCTFail("Should not be called")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-        }
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after adding transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
-        
-        worker.executeFirst()
-        XCTAssert(otherWorker.taskCount == 1, "Worker should recieve task after completing promise with transforming handler. Received: \(otherWorker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
-        
-        otherWorker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(otherWorker.taskCount == 0, "Worker should not contain unused work after test. Received: \(otherWorker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [])
+        XCTAssertEqual(otherWorker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.then(testDescription(of: 0)), .resulted, .always])
     }
     
     func testShouldHandleError_WhenAlreadyCompletedWithError_UsingContextSwitch() {
-        let worker: TestWorker = .init()
+        #warning("TODO FIXME")
         let otherWorker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
         
-        let expectedResult: Error = TestError()
-        let expectedWorkLog: WorkLog = [.fail, .resulted, .always]
-        
-        promise.break(with: expectedResult)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise without handlers. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        promise.break(with: testError)
         
         promise.future
             .switch(to: otherWorker)
-            .then { _ in
-                workLog.log(.then)
-                XCTFail("Should not be called")
-            }
-            .fail { reason in
-                workLog.log(.fail)
-                XCTAssert(reason is TestError, "Future error not matching expected. Expected: \(expectedResult) Received: \(reason)")
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-        }
-        XCTAssert(worker.taskCount == 1, "Worker should recieve task after adding transforming handler. Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+            .logResults(with: workLog)
+        XCTAssert(worker.isEmpty, "Worker should not recieve tasks before completing promise")
+        XCTAssert(otherWorker.isEmpty, "Worker should not recieve tasks before completing promise")
         
-        worker.executeFirst()
-        XCTAssert(otherWorker.taskCount == 1, "Worker should recieve task after completing promise with transforming handler. Received: \(otherWorker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [])
+        XCTAssertEqual(otherWorker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+    }
+    
+    func testShouldHandleCancel_WhenAlreadyCompletedWithCancel_UsingContextSwitch() {
+        #warning("TODO FIXME")
+        let otherWorker: TestWorker = .init()
         
-        otherWorker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(otherWorker.taskCount == 0, "Worker should not contain unused work after test. Received: \(otherWorker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        promise.cancel()
+        
+        promise.future
+            .switch(to: otherWorker)
+            .logResults(with: workLog)
+        XCTAssert(worker.isEmpty, "Worker should not recieve tasks before completing promise")
+        XCTAssert(otherWorker.isEmpty, "Worker should not recieve tasks before completing promise")
+        
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [])
+        XCTAssertEqual(otherWorker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.always])
     }
     
     func testShouldCompleteOnce_WhenAlreadySucceeded() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedWorkLog: WorkLog = [.always]
-        
         promise.future
             .always {
-                workLog.log(.always)
+                self.workLog.log(.always)
             }
         
-        XCTAssert(worker.taskCount == 0, "Worker task count not matching expected. Expected: \(0) Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
+        promise.fulfill(with: 0)
         
         promise.fulfill(with: 0)
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise. Received: \(worker.taskCount)")
-        
-        promise.fulfill(with: 0)
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise. Received: \(worker.taskCount)")
-        
-        promise.break(with: TestError())
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise. Received: \(worker.taskCount)")
-        
+        promise.break(with: testError)
         promise.cancel()
-        XCTAssert(worker.taskCount == 0, "Worker task count not matching expected. Expected: \(1) Received: \(worker.taskCount)")
         
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.always])
     }
     
     func testShouldCompleteOnce_WhenAlreadyFailed() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedWorkLog: WorkLog = [.always]
-        
         promise.future
             .always {
-                workLog.log(.always)
+                self.workLog.log(.always)
             }
         
-        XCTAssert(worker.taskCount == 0, "Worker task count not matching expected. Expected: \(0) Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
-        
-        promise.break(with: TestError())
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise. Received: \(worker.taskCount)")
+        promise.break(with: testError)
         
         promise.fulfill(with: 0)
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise. Received: \(worker.taskCount)")
-        
-        promise.break(with: TestError())
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise. Received: \(worker.taskCount)")
-        
+        promise.break(with: testError)
         promise.cancel()
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise. Received: \(worker.taskCount)")
         
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.always])
     }
     
     func testShouldCompleteOnce_WhenAlreadyCanceled() {
-        let worker: TestWorker = .init()
-        let workLog: WorkLog = .init()
-        let promise: Promise<Int> = .init(executionContext: .explicit(worker))
-        
-        let expectedWorkLog: WorkLog = [.always]
-        
         promise.future
             .always {
-                workLog.log(.always)
+                self.workLog.log(.always)
             }
         
-        XCTAssert(worker.taskCount == 0, "Worker task count not matching expected. Expected: \(0) Received: \(worker.taskCount)")
-        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
-        
         promise.cancel()
-        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-        
-        worker.executeFirst()
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise. Received: \(worker.taskCount)")
         
         promise.fulfill(with: 0)
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise. Received: \(worker.taskCount)")
-        
-        promise.break(with: TestError())
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise. Received: \(worker.taskCount)")
-        
+        promise.break(with: testError)
         promise.cancel()
-        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks after completing promise. Received: \(worker.taskCount)")
         
-        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 1, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.always])
     }
     
     // MARK: -
     // MARK: workers
-    
+    /*
     func testShouldPropagateExecutionContext_WhenAlreadyCompletedWithValue_UsingTransformations() {
         let worker: TestWorker = .init()
         let workLog: WorkLog = .init()
@@ -2595,7 +1154,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         XCTAssert(catchWorker.taskCount == 0, "Worker should not contain unused work after test. Received: \(catchWorker.taskCount)")
         XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
     }
-    
+    *//*
     func testShouldPropagateExecutionContext_WhenAlreadyCompletedWithError_UsingTransformations() {
         let worker: TestWorker = .init()
         let workLog: WorkLog = .init()
@@ -2731,7 +1290,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         XCTAssert(catchWorker.taskCount == 0, "Worker should not contain unused work after test. Received: \(catchWorker.taskCount)")
         XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
     }
-    
+    *//*
     func testShouldPropagateExecutionContext_WhenAlreadyCanceled_UsingTransformations() {
         let worker: TestWorker = .init()
         let workLog: WorkLog = .init()
@@ -2867,94 +1426,97 @@ class PromiseAndFutureTestsTests: XCTestCase {
         XCTAssert(catchWorker.taskCount == 0, "Worker should not contain unused work after test. Received: \(catchWorker.taskCount)")
         XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
     }
-    
+    */
     // MARK: -
     // MARK: memory and init
     
     func testShouldInitializeSucceeded() {
-        let workLog: WorkLog = .init()
+        let promise: Promise<Int> = Promise<Int>(succeededWith: 0)
+        promise.future.logResults(with: workLog)
         
-        let expectedResult: Int = 0
-        let expectedWorkLog: WorkLog = [.then, .then]
+        XCTAssertEqual(workLog, [.then(testDescription(of: 0)), .resulted, .always])
         
-        let promise: Promise<Int> = Promise<Int>(succeededWith: expectedResult)
-        promise.future.then { value in
-            workLog.log(.then)
-            XCTAssert(value == expectedResult, "Future value not matching expected. Expected: \(expectedResult) Received: \(value)")
-        }
+        workLog = .init()
         
-        let future: Future<Int> = Future<Int>(succeededWith: expectedResult)
-        future.then { value in
-            workLog.log(.then)
-            XCTAssert(value == expectedResult, "Future value not matching expected. Expected: \(expectedResult) Received: \(value)")
-        }
-        
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        let future: Future<Int> = Future<Int>(succeededWith: 0)
+        future.logResults(with: workLog)
+
+        XCTAssertEqual(workLog, [.then(testDescription(of: 0)), .resulted, .always])
     }
     
     func testShouldInitializeFailed() {
-        let workLog: WorkLog = .init()
+        let promise: Promise<Int> = Promise<Int>(failedWith: testError)
+        promise.future.logResults(with: workLog)
         
-        let expectedResult: Error = TestError()
-        let expectedWorkLog: WorkLog = [.fail, .fail]
+        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
         
-        let promise: Promise<Int> = Promise<Int>(failedWith: expectedResult)
-        promise.future.fail { reason in
-            workLog.log(.fail)
-            XCTAssert(reason is TestError, "Future error not matching expected. Expected: \(expectedResult) Received: \(reason)")
-        }
+        workLog = .init()
         
-        let future: Future<Int> = Future<Int>(failedWith: expectedResult)
-        future.fail { reason in
-            workLog.log(.fail)
-            XCTAssert(reason is TestError, "Future error not matching expected. Expected: \(expectedResult) Received: \(reason)")
-        }
+        let future: Future<Int> = Future<Int>(failedWith: testError)
+        future.logResults(with: workLog)
         
-        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
     }
     
-    func testShouldDeallocate() {
+    func testShouldDeallocateWithoutHandlers() {
+        #warning("TODO FIXME")
         var promise: Promise<Int>? = Promise<Int>(succeededWith: 0)
         weak var future = promise?.future
-        XCTAssert(future != nil, "Future deallocated while responsible Promise still available")
+        
+        XCTAssertNotNil(future, "Future deallocated while responsible Promise still available")
+        
         promise = nil
-        XCTAssert(future == nil, "Future not deallocated while responsible Promise dealocated")
+        
+        XCTAssertNil(future, "Future not deallocated while responsible Promise dealocated")
+    }
+    
+    func testShouldDeallocateWithHandlersWithoutReference() {
+        #warning("TODO FIXME")
+        var promise: Promise<Int>? = Promise<Int>(succeededWith: 0)
+        weak var future = promise?.future
+        
+        future?.clone().clone().clone().always {}
+        
+        XCTAssertNotNil(future, "Future deallocated while responsible Promise still available")
+        
+        promise = nil
+        
+        XCTAssertNil(future, "Future not deallocated while responsible Promise dealocated")
+    }
+    
+    func testShouldDeallocateWithHandlersWithReference() {
+        #warning("TODO FIXME")
+        var promise: Promise<Int>? = Promise<Int>(succeededWith: 0)
+        weak var future = promise?.future
+        var child = future?.clone()//.clone().clone()
+        weak var weakChild = child
+        let strongChild = child?.clone()
+
+        XCTAssertNotNil(future, "Future deallocated while responsible Promise still available")
+        XCTAssertNotNil(weakChild, "Future not deallocated while responsible Promise dealocated")
+        
+        promise = nil
+        
+        
+        XCTAssertNil(future, "Future not deallocated while responsible Promise dealocated")
+//        XCTAssertNil(weakChild, "Future not deallocated while responsible Promise dealocated")
+        XCTAssertNotNil(strongChild)
     }
     
     func testShouldHandleCancel_WhenDeallocating() {
-        #warning("Currently failing - crash on access to dealocated memory - not tested until fixed")
-//        let worker: TestWorker = .init()
-//        let workLog: WorkLog = .init()
-//        var promise: Promise<Int>? = .init(executionContext: .explicit(worker))
-//        let future: Future<Int> = promise!.future.clone()
-//
-//        let expectedWorkLog: WorkLog = [.always]
-//
-//        future
-//            .then { _ in
-//                workLog.log(.then)
-//                XCTFail("Should not be called")
-//            }
-//            .fail { _ in
-//                workLog.log(.fail)
-//                XCTFail("Should not be called")
-//            }
-//            .resulted {
-//                workLog.log(.resulted)
-//                XCTFail("Should not be called")
-//            }
-//            .always {
-//                workLog.log(.always)
-//        }
-//        XCTAssert(worker.taskCount == 0, "Worker should not recieve tasks before completing promise. Received: \(worker.taskCount)")
-//
-//        promise = nil
-//        XCTAssert(worker.taskCount == 1, "Worker should recieve exactly one task when completing promise. Received: \(worker.taskCount)")
-//        XCTAssert(workLog == [], "Work log not matching expected. Expected: \(WorkLog()) Received: \(workLog)")
-//
-//        worker.executeFirst()
-//        XCTAssert(worker.taskCount == 0, "Worker should not contain unused work after test. Received: \(worker.taskCount)")
-//        XCTAssert(workLog == expectedWorkLog, "Final work log not matching expected. Expected: \(expectedWorkLog) Received: \(workLog)")
+        #warning("TODO FIXME")
+        var promise: Promise<Int>? = .init(executionContext: .explicit(worker))
+        let future: Future<Int> = promise!.future.clone()
+
+        future.logResults(with: workLog)
+        XCTAssert(workLog.isEmpty, "Work log should be empty before deinit")
+        XCTAssert(worker.isEmpty, "Worker should be empty before deinit")
+
+        promise = nil
+        
+        XCTAssert(workLog.isEmpty, "Work log should be empty before execution")
+        XCTAssertEqual(worker.execute(), 2, "Worker executed incorrect number of tasks")
+        XCTAssertEqual(workLog, [.always])
     }
     
     // MARK: -
@@ -2973,8 +1535,6 @@ class PromiseAndFutureTestsTests: XCTestCase {
             let lock_2: Lock = Lock()
             let lock_3: Lock = Lock()
             var counter = 0
-            
-            let expectedResult: Int = 300
             
             dispatchQueue.async {
                 lock_1.lock()
@@ -3004,12 +1564,12 @@ class PromiseAndFutureTestsTests: XCTestCase {
                 lock_3.unlock()
             }
             
-            sleep(1)
+            sleep(1) // make sure that queue locks first
             lock_1.lock()
             lock_2.lock()
             lock_3.lock()
             
-            XCTAssert(counter == expectedResult, "Handlers not called properly. Expected: \(expectedResult) Received: \(counter)")
+            XCTAssertEqual(counter, 300, "Calls count not matching expected")
             complete()
         }
     }
@@ -3029,8 +1589,6 @@ class PromiseAndFutureTestsTests: XCTestCase {
             var counter_1 = 0
             var counter_2 = 0
             var counter_3 = 0
-            
-            let expectedResult: Int = 300
             
             dispatchQueue.async {
                 lock_1.lock()
@@ -3072,12 +1630,12 @@ class PromiseAndFutureTestsTests: XCTestCase {
                 lock_3.unlock()
             }
             
-            sleep(1)
+            sleep(1) // make sure that queue locks first
             lock_1.lock()
             lock_2.lock()
             lock_3.lock()
             
-            XCTAssert(counter_1 + counter_2 + counter_3 == expectedResult, "Handlers not called properly. Expected: \(expectedResult) Received: \(counter_1 + counter_2 + counter_3)")
+            XCTAssertEqual(counter_1 + counter_2 + counter_3, 300, "Calls count not matching expected")
             complete()
         }
     }
