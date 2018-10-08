@@ -13,32 +13,14 @@
  limitations under the License. */
 
 import XCTest
+import Futura
 
 struct TestError : Error {}
 
-let performanceTestIterations = 10_000_000
+let testError: TestError = TestError()
+let testErrorDescription: String = testDescription(of: testError)
 
-extension XCTestCase {
-    
-    func asyncTest(
-        iterationTimeout: TimeInterval = 3,
-        iterations: UInt = 1,
-        timeoutBody: @escaping ()->(),
-        testBody: @escaping (@escaping ()->())->())
-    {
-        let testQueue = DispatchQueue(label: "AsyncTestQueue")
-        (0..<iterations).forEach { iteration in
-            let lock = NSConditionLock()
-            lock.lock()
-            testQueue.async {
-                testBody() { lock.unlock() }
-            }
-            guard lock.lock(before: Date.init(timeIntervalSinceNow: iterationTimeout)) else {
-                return timeoutBody()
-            }
-        }
-    }
-}
+let performanceTestIterations = 10_000_000
 
 let markedQueueKey = DispatchSpecificKey<Void>()
 let markedQueue: DispatchQueue = {
@@ -52,4 +34,50 @@ extension DispatchQueue {
     static var isOnMarkedQueue: Bool {
         return DispatchQueue.getSpecific(key: markedQueueKey) != nil
     }
+}
+
+extension XCTestCase {
+    
+    func asyncTest(
+        iterationTimeout: TimeInterval = 3,
+        iterations: UInt = 1,
+        timeoutBody: @escaping ()->(),
+        testBody: @escaping (@escaping ()->())->())
+    {
+        let testQueue = DispatchQueue(label: "AsyncTestQueue")
+        (0 ..< iterations).forEach { iteration in
+            let lock = NSConditionLock()
+            lock.lock()
+            testQueue.async {
+                testBody() { lock.unlock() }
+            }
+            guard lock.lock(before: Date.init(timeIntervalSinceNow: iterationTimeout)) else {
+                return timeoutBody()
+            }
+        }
+    }
+}
+
+extension Future {
+    @discardableResult
+    func logResults(with workLog: WorkLog) -> Self {
+        self
+            .then { value in
+                workLog.log(.then(testDescription(of: value)))
+            }
+            .fail { reason in
+                workLog.log(.fail(testDescription(of: reason)))
+            }
+            .resulted {
+                workLog.log(.resulted)
+            }
+            .always {
+                workLog.log(.always)
+            }
+        return self
+    }
+}
+
+func testDescription(of any: Any) -> String {
+    return "\(any):\(type(of: any))"
 }

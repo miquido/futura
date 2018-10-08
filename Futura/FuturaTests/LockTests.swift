@@ -17,19 +17,21 @@ import Futura
 
 class LockTests: XCTestCase {
     
-    func testReleasingLockedLock() {
+    func testShould_NotCrash_When_ReleasingLocked() {
         Lock().lock()
     }
     
-    func testLockLockAndUnlock() {
+    // make sure that tests run with thread sanitizer enabled
+    func testShould_LockAndUnlock_When_CalledOnDistinctThreads() {
         asyncTest(timeoutBody: {
             XCTFail("Not in time - possible deadlock or fail")
         })
         { complete in
-            var completed: Bool = false
             let lock = Lock()
+            var completed: Bool = false
+            
             lock.lock()
-            DispatchWorker.default.schedule {
+            DispatchQueue.global().async {
                 lock.lock()
                 XCTAssert(completed, "Lock unlocked while should be locked")
                 complete()
@@ -40,16 +42,43 @@ class LockTests: XCTestCase {
         }
     }
     
-    func testLockTryLockSuccess() {
-        let lock = Lock()
-        if lock.tryLock() {
-            // expected
-        } else {
-            XCTFail("Lock failed to lock")
+    func testShould_LockAndUnlock_When_CalledOnSameThread() {
+        asyncTest(timeoutBody: {
+            XCTFail("Not in time - possible deadlock or fail")
+        })
+        { complete in
+            let lock = Lock()
+            
+            lock.lock()
+            lock.lock()
+            lock.lock()
+            lock.unlock()
+            lock.unlock()
+            lock.unlock()
+            
+            complete()
         }
     }
     
-    func testLockTryLockFail() {
+    func testShould_SucceedTryLock_When_Unlocked() {
+        let lock = Lock()
+        
+        guard lock.tryLock() else {
+            return XCTFail("Lock failed to lock")
+        }
+    }
+    
+    func testShould_SucceedTryLock_When_LockedOnSameThread() {
+        let lock = Lock()
+        lock.lock()
+        
+        guard lock.tryLock() else {
+            return XCTFail("Lock failed to lock")
+        }
+    }
+    
+    // make sure that tests run with thread sanitizer enabled
+    func testShould_FailTryLock_When_LockedOnOtherThread() {
         asyncTest(timeoutBody: {
             XCTFail("Not in time - possible deadlock or fail")
         })
@@ -57,154 +86,92 @@ class LockTests: XCTestCase {
             let lock = Lock()
             lock.lock()
             
-            DispatchWorker.default.schedule {
-                if lock.tryLock() {
-                    XCTFail("Lock not failed to lock")
-                } else {
-                    // expected
+            DispatchQueue.global().async {
+                defer { complete() }
+                guard !lock.tryLock() else {
+                    return XCTFail("Lock not failed to lock")
                 }
-                complete()
             }
-            sleep(1)
+            sleep(1) // ensure that will not exit too early deallocating lock
         }
     }
     
-    func testLockRecursive() {
+    // make sure that tests run with thread sanitizer enabled
+    func testShould_SynchronizeBlock_When_CalledOnDistinctThreads() {
         asyncTest(timeoutBody: {
-                    XCTFail("Not in time - possible deadlock or fail")
-        })
-        { complete in
-            let lock = Lock()
-            lock.lock()
-            lock.lock()
-            lock.lock()
-            lock.unlock()
-            lock.unlock()
-            lock.unlock()
-            complete()
-        }
-    }
-    
-    func testLockRecursiveWithSleeps() {
-        asyncTest(iterationTimeout: 6,
-            timeoutBody: {
             XCTFail("Not in time - possible deadlock or fail")
         })
         { complete in
             let lock = Lock()
-            lock.lock()
-            sleep(1)
-            lock.lock()
-            sleep(1)
-            lock.lock()
-            sleep(1)
-            lock.unlock()
-            sleep(1)
-            lock.unlock()
-            sleep(1)
-            lock.unlock()
+            var testValue = 0
+            
+            DispatchQueue.global().async {
+                lock.synchronized {
+                    sleep(2) // ensure that claims lock longer
+                    XCTAssert(testValue == 0, "Test value changed without synchronization")
+                    testValue += 1
+                }
+            }
+            sleep(1) // ensure that DispatchWorker performs its task before
+            lock.synchronized {
+                XCTAssert(testValue == 1, "Test value changed without synchronization")
+            }
+            
             complete()
         }
     }
     
-    func testLockSynchronizedRecursive() {
+    // make sure that tests run with thread sanitizer enabled
+    func testShould_NotCauseDeadlock_When_SynchronizedCalledRecursively() {
         asyncTest(iterationTimeout: 6,
                   timeoutBody: {
                     XCTFail("Not in time - possible deadlock or fail")
         })
         { complete in
             let lock = Lock()
+            var completed: Bool = false
+            
             lock.synchronized {
                 lock.synchronized {
                     lock.synchronized {
                         lock.synchronized {
                             lock.synchronized {
-                                return Void()
+                                completed = true
                             }
                         }
                     }
                 }
             }
+            
+            XCTAssert(completed, "Synchronized blocks not performed")
             complete()
         }
     }
     
-    func testLockSynchronizedRecursiveWithSleeps() {
-        asyncTest(iterationTimeout: 6,
-            timeoutBody: {
-            XCTFail("Not in time - possible deadlock or fail")
-        })
-        { complete in
-            let lock = Lock()
-            lock.synchronized {
-                sleep(1)
-                lock.synchronized {
-                    sleep(1)
-                    lock.synchronized {
-                        sleep(1)
-                        lock.synchronized {
-                            sleep(1)
-                            lock.synchronized {
-                                _ = sleep(1)
-                            }
-                        }
-                    }
-                }
-            }
-            complete()
-        }
-    }
-    
-    func testLockSynchronized() {
-        asyncTest(iterationTimeout: 5, timeoutBody: {
-            XCTFail("Not in time - possible deadlock or fail")
-        })
-        { complete in
-            var testValue = 0
-            let lock = Lock()
-            DispatchWorker.default.schedule {
-                sleep(1)
-                lock.synchronized {
-                    XCTAssert(testValue == 1, "Test value not changed")
-                    testValue = -1
-                }
-            }
-            lock.synchronized {
-                testValue = 1
-                sleep(2)
-                XCTAssert(testValue == 1, "Test value changed without synchronization")
-            }
-            sleep(1)
-            lock.synchronized {
-                XCTAssert(testValue == -1, "Test value not changed before completing")
-            }
-            complete()
-        }
-    }
-    
-    func testThrowingLockSynchronized() {
+    func testShould_ThrowInSynchronizedWithoutChangingError() {
         let lock = Lock()
+        let expectedResult = TestError()
+        
         do {
-            try lock.synchronized {
-                throw TestError()
-            }
+            try lock.synchronized { throw expectedResult }
             XCTFail("Lock not threw")
         } catch {
-            // expected
+            XCTAssert(error is TestError, "Catched error does not match expected. Expected: \(expectedResult) Received: \(error)")
         }
     }
     
-    func testLockAndUnlockPerformance() {
+    func testPerformance_LockAndUnlock() {
         measure {
             let lock = Lock()
             var total = 0
+            
             for _ in 0..<performanceTestIterations {
                 lock.lock()
                 total += 1
                 lock.unlock()
             }
+            
             XCTAssert(total == performanceTestIterations)
         }
     }
-    
 }
