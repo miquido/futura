@@ -21,6 +21,7 @@
 		404B94C0215A5CC600640928 /* DispatchWorkerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404B94BF215A5CC600640928 /* DispatchWorkerTests.swift */; };
 		4075C52421624F8100B40806 /* TestWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4075C52321624F8100B40806 /* TestWorker.swift */; };
 		408B60FC2163630300C1A948 /* WorkLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 408B60FB2163630300C1A948 /* WorkLog.swift */; };
+		40AFB89C216B72BC00ABB5BB /* FutureZipTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40AFB89B216B72BC00ABB5BB /* FutureZipTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +52,7 @@
 		404B94BF215A5CC600640928 /* DispatchWorkerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DispatchWorkerTests.swift; sourceTree = "<group>"; };
 		4075C52321624F8100B40806 /* TestWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestWorker.swift; sourceTree = "<group>"; };
 		408B60FB2163630300C1A948 /* WorkLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkLog.swift; sourceTree = "<group>"; };
+		40AFB89B216B72BC00ABB5BB /* FutureZipTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureZipTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -115,6 +117,7 @@
 				404B94B9215A364100640928 /* LockTests.swift */,
 				404B94BB215A365100640928 /* PromiseAndFutureTests.swift */,
 				404B94BF215A5CC600640928 /* DispatchWorkerTests.swift */,
+				40AFB89B216B72BC00ABB5BB /* FutureZipTests.swift */,
 			);
 			path = FuturaTests;
 			sourceTree = "<group>";
@@ -242,6 +245,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				404B94BA215A364100640928 /* LockTests.swift in Sources */,
+				40AFB89C216B72BC00ABB5BB /* FutureZipTests.swift in Sources */,
 				4075C52421624F8100B40806 /* TestWorker.swift in Sources */,
 				404B949E215A351100640928 /* FuturaTests.swift in Sources */,
 				404B94BC215A365100640928 /* PromiseAndFutureTests.swift in Sources */,
