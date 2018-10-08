@@ -294,6 +294,55 @@ fileprivate extension Future {
     }
 }
 
+/// Zip futures. Returns new Future instance.
+/// Execution context of returned Future is undefined. It will be inherited from completion of last of provided Futures.
+/// If you need explicit execution context use switch(to:) to ensure usage of specific Worker.
+/// Result Future will fail or become canceled if any of provided Futures fails or becomes canceled without waiting for other results.
+public func zip<T, U>(_ f1: Future<T>, _ f2: Future<U>) -> Future<(T, U)> {
+    let future = Future<(T, U)>(executionContext: .undefined)
+    #if FUTURA_DEBUG
+    os_log("Zipping on %{public}@ & %{public}@ => %{public}@", log: logger, type: .debug, f1.debugDescriptionSynchronized, f2.debugDescriptionSynchronized, future.debugDescriptionSynchronized)
+    #endif
+    let lock = Lock()
+    var results: (T?, U?)
+    
+    f1.observe { state in
+        switch state {
+        case let .resulted(.success(value)):
+            lock.synchronized {
+                if case let (_, r2?) = results {
+                    future.become(.resulted(with: .success((value, r2))))
+                } else {
+                    results = (value, nil)
+                }
+            }
+        case let .resulted(.error(reason)):
+            future.become(.resulted(with: .error(reason)))
+        case .canceled:
+            future.become(.canceled)
+        case .waiting: break
+        }
+    }
+    f2.observe { state in
+        switch state {
+        case let .resulted(.success(value)):
+            lock.synchronized {
+                if case let (r1?, _) = results {
+                    future.become(.resulted(with: .success((r1, value))))
+                } else {
+                    results = (nil, value)
+                }
+            }
+        case let .resulted(.error(reason)):
+            future.become(.resulted(with: .error(reason)))
+        case .canceled:
+            future.become(.canceled)
+        case .waiting: break
+        }
+    }
+    return future
+}
+
 #if FUTURA_DEBUG
 
 import os.log
