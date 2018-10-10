@@ -17,42 +17,31 @@ import Darwin
 /// Lock is a simple pthread_mutex wrapper with basic recursive lock functionality.
 /// It should not be used to synchronize threads from multiple processes.
 public final class Lock {
-    private let mtx = UnsafeMutablePointer<pthread_mutex_t>.allocate(capacity: 1)
+    private let mtx = Mutex.make(recursive: true)
     
     /// Creates instance of recursive lock.
-    public init() {
-        let attr = UnsafeMutablePointer<pthread_mutexattr_t>.allocate(capacity: 1)
-        guard pthread_mutexattr_init(attr) == 0 else { preconditionFailure() }
-        pthread_mutexattr_settype(attr, PTHREAD_MUTEX_RECURSIVE)
-        pthread_mutexattr_setpshared(attr, PTHREAD_PROCESS_PRIVATE)
-        guard pthread_mutex_init(mtx, attr) == 0 else { preconditionFailure() }
-        pthread_mutexattr_destroy(attr)
-        attr.deinitialize(count: 1)
-        attr.deallocate()
-    }
+    public init() {}
     
     deinit {
-        pthread_mutex_destroy(mtx)
-        mtx.deinitialize(count: 1)
-        mtx.deallocate()
+        Mutex.destroy(mtx)
     }
     
     /// Locks if available or waits until unlocked.
     /// Since Lock is recursive it will continue when already locked on same thread.
     public func lock() -> Void {
-        pthread_mutex_lock(mtx)
+        Mutex.lock(mtx)
     }
     
     /// Locks if available and returns true or returns false otherwise without locking.
     /// Since Lock is recursive it will returns true when already locked on same thread.
     public func tryLock() -> Bool {
-        return pthread_mutex_trylock(mtx) == 0
+        return Mutex.tryLock(mtx)
     }
     
     
     /// Unlocks a lock.
     public func unlock() -> Void {
-        pthread_mutex_unlock(mtx)
+        Mutex.unlock(mtx)
     }
     
     /// Execute closure with synchronization on self as lock.

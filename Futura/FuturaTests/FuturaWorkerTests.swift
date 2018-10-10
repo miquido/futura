@@ -24,6 +24,9 @@ class FuturaWorkerTests: XCTestCase {
         })
         { complete in
             let worker = FuturaWorker()
+            worker.schedule {
+                print("current~ \(worker.isCurrent)")
+            }
             worker.schedule { () -> Void in
                 print("current1 \(worker.isCurrent)")
                 worker.schedule { () -> Void in
@@ -49,10 +52,10 @@ class FuturaWorkerTests: XCTestCase {
             worker.schedule { () -> Void in
                 print("current~ \(worker.isCurrent)")
             }
-            
+
             var worker_strong:FuturaWorker? = FuturaWorker()
             weak var worker_weak = worker_strong
-            
+
             let prom = Promise<Int>()
             prom.future.switch(to: worker_strong!).clone().clone().clone().always {
                 print("fut \(worker_weak?.isCurrent ?? false)")
@@ -60,8 +63,8 @@ class FuturaWorkerTests: XCTestCase {
             worker_strong = nil
             XCTAssertNotNil(worker_weak)
             prom.fulfill(with: 0)
-            
-            
+
+
             XCTAssertNotNil(worker_weak)
             sleep(3)
             complete()

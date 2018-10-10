@@ -16,97 +16,67 @@ import Darwin
 
 public final class FuturaWorker : Worker {
     
-    fileprivate typealias Task = () -> Void
-    
     fileprivate var thread: UnsafeMutablePointer<_opaque_pthread_t>! = UnsafeMutablePointer<_opaque_pthread_t>.allocate(capacity: 1)
-    fileprivate let threadMutex = UnsafeMutablePointer<_opaque_pthread_mutex_t>.allocate(capacity: 1)
-     fileprivate let taskMutex = UnsafeMutablePointer<_opaque_pthread_mutex_t>.allocate(capacity: 1)
-    fileprivate let cond = UnsafeMutablePointer<_opaque_pthread_cond_t>.allocate(capacity: 1)
-    
-    fileprivate var tasks: ContiguousArray<Task> = []
+    fileprivate let context
+        = ThreadContext(threadMutex: Mutex.make(recursive: false),
+                        taskMutex: Mutex.make(recursive: false),
+                        cond: ThreadCond.make(),
+                        aliveFlag: AtomicFlag.make(),
+                        tasks: [])
     
     public init() {
-        setupMutex(threadMutex)
-        setupMutex(taskMutex)
-        setupCond(cond)
         setupThread()
     }
     
-    fileprivate func setupMutex(_ mtx: UnsafeMutablePointer<_opaque_pthread_mutex_t>) {
-        let mtxattr = UnsafeMutablePointer<pthread_mutexattr_t>.allocate(capacity: 1)
-        guard pthread_mutexattr_init(mtxattr) == 0 else { preconditionFailure() }
-        pthread_mutexattr_settype(mtxattr, PTHREAD_MUTEX_NORMAL)
-        pthread_mutexattr_setpshared(mtxattr, PTHREAD_PROCESS_PRIVATE)
-        guard pthread_mutex_init(mtx, mtxattr) == 0 else { preconditionFailure() }
-        pthread_mutexattr_destroy(mtxattr)
-        mtxattr.deinitialize(count: 1)
-        mtxattr.deallocate()
-    }
-    
-    fileprivate func setupCond(_ cond: UnsafeMutablePointer<_opaque_pthread_cond_t>) {
-        let condattr = UnsafeMutablePointer<pthread_condattr_t>.allocate(capacity: 1)
-        guard pthread_condattr_init(condattr) == 0 else { preconditionFailure() }
-        pthread_cond_init(cond, condattr)
-    }
-    
     fileprivate func setupThread() {
-        let threadBox = ThreadBody(self.run)
         let attr = UnsafeMutablePointer<pthread_attr_t>.allocate(capacity: 1)
         guard pthread_attr_init(attr) == 0 else { fatalError() }
         pthread_attr_setdetachstate(attr, PTHREAD_CREATE_DETACHED)
         
-        pthread_mutex_lock(threadMutex)
         let res = pthread_create(&thread, attr, { (pointer) -> UnsafeMutableRawPointer? in
-            let threadBox = Unmanaged<ThreadBody>.fromOpaque(pointer).takeRetainedValue()
-            threadBox.body()
+            let context: ThreadContext = Unmanaged<ThreadContext>.fromOpaque(pointer).takeRetainedValue()
+            FuturaWorker.run(context: context)
             return nil
-        }, Unmanaged.passRetained(threadBox).toOpaque())
+        }, Unmanaged.passRetained(context).toOpaque())
         precondition(res == 0, "Unable to create thread: \(res)")
-        
-        pthread_mutex_lock(threadMutex)
-        pthread_mutex_unlock(threadMutex)
+        pthread_attr_destroy(attr)
+        attr.deinitialize(count: 1)
+        attr.deallocate()
     }
     
-    fileprivate func run() {
-        pthread_mutex_unlock(threadMutex)
+    fileprivate static func run(context: ThreadContext) {
+        AtomicFlag.readAndSet(context.aliveFlag)
         
-        while true {
-            pthread_mutex_lock(taskMutex)
-            while let task = tasks.popLast() {
-                pthread_mutex_unlock(taskMutex)
+        while AtomicFlag.readAndSet(context.aliveFlag) {
+            Mutex.lock(context.taskMutex)
+            while let task = context.tasks.popLast() {
+                Mutex.unlock(context.taskMutex)
                 task()
-                pthread_mutex_lock(taskMutex)
+                Mutex.lock(context.taskMutex)
             }
-            pthread_mutex_unlock(taskMutex)
-            pthread_cond_wait(cond, threadMutex)
+            Mutex.unlock(context.taskMutex)
+            guard AtomicFlag.readAndSet(context.aliveFlag) else { break }
+            ThreadCond.wait(context.cond, with: context.threadMutex)
         }
+        Mutex.destroy(context.taskMutex)
+        Mutex.destroy(context.threadMutex)
+        ThreadCond.destroy(context.cond)
         pthread_exit(pthread_self())
     }
     
     deinit {
-        pthread_cond_destroy(cond)
-        cond.deinitialize(count: 1)
-        cond.deallocate()
-        
-        pthread_mutex_destroy(taskMutex)
-        taskMutex.deinitialize(count: 1)
-        taskMutex.deallocate()
-        
-        pthread_mutex_destroy(threadMutex)
-        threadMutex.deinitialize(count: 1)
-        threadMutex.deallocate()
-        
-        pthread_kill(thread, 0)
+        AtomicFlag.clear(context.aliveFlag)
+        ThreadCond.signal(context.cond)
     }
     
     public func schedule(_ work: @escaping () -> Void) {
         if isCurrent {
             work()
         } else {
-            pthread_mutex_lock(taskMutex)
-            defer { pthread_mutex_unlock(taskMutex) }
-            tasks.insert(work, at: 0)
-            pthread_cond_signal(cond)
+            Mutex.lock(context.taskMutex)
+            defer { Mutex.unlock(context.taskMutex) }
+            context.tasks.insert(work, at: 0)
+            ThreadCond.signal(context.cond)
         }
     }
     
@@ -115,10 +85,26 @@ public final class FuturaWorker : Worker {
     }
 }
 
-private final class ThreadBody {
-    let body: () -> Void
+fileprivate typealias Task = () -> Void
+
+fileprivate final class ThreadContext {
+    fileprivate let threadMutex: UnsafeMutablePointer<pthread_mutex_t>
+    fileprivate let taskMutex: UnsafeMutablePointer<pthread_mutex_t>
+    fileprivate let cond: UnsafeMutablePointer<_opaque_pthread_cond_t>
+    fileprivate var aliveFlag: UnsafeMutablePointer<atomic_flag>
+    fileprivate var tasks: ContiguousArray<Task>
     
-    init(_ body: @escaping () -> Void) {
-        self.body = body
+    fileprivate init(
+        threadMutex: UnsafeMutablePointer<pthread_mutex_t>,
+        taskMutex: UnsafeMutablePointer<pthread_mutex_t>,
+        cond: UnsafeMutablePointer<_opaque_pthread_cond_t>,
+        aliveFlag: UnsafeMutablePointer<atomic_flag>,
+        tasks: ContiguousArray<Task>)
+    {
+        self.threadMutex = threadMutex
+        self.taskMutex = taskMutex
+        self.cond = cond
+        self.aliveFlag = aliveFlag
+        self.tasks = tasks
     }
 }
