@@ -29,7 +29,7 @@ extension String {
         return string
     }
 }
-
+let fWorker = FuturaWorker()
 let githubRequest = URLRequest(url: URL(string: "https://www.github.com")!)
 make(request: githubRequest)
     .map { (response, data) -> Data in
@@ -39,14 +39,24 @@ make(request: githubRequest)
         return data
     }
     .map(String.from(data:))
-    .switch(to: DispatchWorker.main)
+    .switch(to: fWorker)
     .then { _ in
         print("Github is here!")
+        print("still works! -> \(fWorker.isCurrent)")
     }
     .fail { reason in
         print("There was an error when getting github: \(reason)")
     }
-
+    .clone()
+    .clone()
+    .clone()
+    .map {
+        $0 + "!!!"
+    }
+    .always {
+        print("still works! -> \(fWorker.isCurrent)")
+    }
+print("still works! -> \(fWorker.isCurrent)")
 // similar to String extension we can define JSONDecoder extension for easy decoding
 extension JSONDecoder {
    

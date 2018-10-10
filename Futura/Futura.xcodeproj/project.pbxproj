@@ -20,6 +20,8 @@
 		404B94BC215A365100640928 /* PromiseAndFutureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404B94BB215A365100640928 /* PromiseAndFutureTests.swift */; };
 		404B94C0215A5CC600640928 /* DispatchWorkerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404B94BF215A5CC600640928 /* DispatchWorkerTests.swift */; };
 		4075C52421624F8100B40806 /* TestWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4075C52321624F8100B40806 /* TestWorker.swift */; };
+		407AA4A3216BDF350030C433 /* FuturaWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 407AA4A2216BDF350030C433 /* FuturaWorker.swift */; };
+		407AA542216DE7920030C433 /* FuturaWorkerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 407AA541216DE7920030C433 /* FuturaWorkerTests.swift */; };
 		408B60FC2163630300C1A948 /* WorkLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 408B60FB2163630300C1A948 /* WorkLog.swift */; };
 		40AFB89C216B72BC00ABB5BB /* FutureZipTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40AFB89B216B72BC00ABB5BB /* FutureZipTests.swift */; };
 /* End PBXBuildFile section */
@@ -51,6 +53,8 @@
 		404B94BB215A365100640928 /* PromiseAndFutureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromiseAndFutureTests.swift; sourceTree = "<group>"; };
 		404B94BF215A5CC600640928 /* DispatchWorkerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DispatchWorkerTests.swift; sourceTree = "<group>"; };
 		4075C52321624F8100B40806 /* TestWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestWorker.swift; sourceTree = "<group>"; };
+		407AA4A2216BDF350030C433 /* FuturaWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuturaWorker.swift; sourceTree = "<group>"; };
+		407AA541216DE7920030C433 /* FuturaWorkerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuturaWorkerTests.swift; sourceTree = "<group>"; };
 		408B60FB2163630300C1A948 /* WorkLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkLog.swift; sourceTree = "<group>"; };
 		40AFB89B216B72BC00ABB5BB /* FutureZipTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureZipTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -103,6 +107,7 @@
 				404B94B3215A35AF00640928 /* Worker.swift */,
 				404B94B5215A35C700640928 /* DispatchWorker.swift */,
 				404B94B1215A358900640928 /* ExecutionContext.swift */,
+				407AA4A2216BDF350030C433 /* FuturaWorker.swift */,
 			);
 			path = Futura;
 			sourceTree = "<group>";
@@ -118,6 +123,7 @@
 				404B94BB215A365100640928 /* PromiseAndFutureTests.swift */,
 				404B94BF215A5CC600640928 /* DispatchWorkerTests.swift */,
 				40AFB89B216B72BC00ABB5BB /* FutureZipTests.swift */,
+				407AA541216DE7920030C433 /* FuturaWorkerTests.swift */,
 			);
 			path = FuturaTests;
 			sourceTree = "<group>";
@@ -236,6 +242,7 @@
 				404B94B0215A356B00640928 /* Future.swift in Sources */,
 				404B94B6215A35C700640928 /* DispatchWorker.swift in Sources */,
 				404B94AA215A352D00640928 /* Lock.swift in Sources */,
+				407AA4A3216BDF350030C433 /* FuturaWorker.swift in Sources */,
 				404B94B8215A35E700640928 /* Promise.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -250,6 +257,7 @@
 				404B949E215A351100640928 /* FuturaTests.swift in Sources */,
 				404B94BC215A365100640928 /* PromiseAndFutureTests.swift in Sources */,
 				404B94C0215A5CC600640928 /* DispatchWorkerTests.swift in Sources */,
+				407AA542216DE7920030C433 /* FuturaWorkerTests.swift in Sources */,
 				408B60FC2163630300C1A948 /* WorkLog.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
