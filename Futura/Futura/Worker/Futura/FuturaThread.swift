@@ -14,37 +14,37 @@
 
 import Darwin
 
-public final class FuturaWorker : Worker {
+internal final class FuturaThread {
     
-    fileprivate var thread: UnsafeMutablePointer<_opaque_pthread_t>! = UnsafeMutablePointer<_opaque_pthread_t>.allocate(capacity: 1)
-    fileprivate let context
-        = ThreadContext(threadMutex: Mutex.make(recursive: false),
-                        taskMutex: Mutex.make(recursive: false),
-                        cond: ThreadCond.make(),
-                        aliveFlag: AtomicFlag.make(),
-                        tasks: [])
+    internal var pthread: UnsafeMutablePointer<_opaque_pthread_t>
+    internal let context: ThreadContext
     
-    public init() {
-        setupThread()
-    }
-    
-    fileprivate func setupThread() {
+    internal init(with context: ThreadContext = .init()) {
         let attr = UnsafeMutablePointer<pthread_attr_t>.allocate(capacity: 1)
         guard pthread_attr_init(attr) == 0 else { fatalError() }
         pthread_attr_setdetachstate(attr, PTHREAD_CREATE_DETACHED)
         
-        let res = pthread_create(&thread, attr, { (pointer) -> UnsafeMutableRawPointer? in
+        var pthread: UnsafeMutablePointer<_opaque_pthread_t>!
+        let res = pthread_create(&pthread, attr, { (pointer) -> UnsafeMutableRawPointer? in
             let context: ThreadContext = Unmanaged<ThreadContext>.fromOpaque(pointer).takeRetainedValue()
-            FuturaWorker.run(context: context)
+            FuturaThread.run(with: context)
             return nil
         }, Unmanaged.passRetained(context).toOpaque())
         precondition(res == 0, "Unable to create thread: \(res)")
         pthread_attr_destroy(attr)
         attr.deinitialize(count: 1)
         attr.deallocate()
+        
+        self.pthread = pthread
+        self.context = context
     }
     
-    fileprivate static func run(context: ThreadContext) {
+    internal func endAfterCompleting() {
+        AtomicFlag.clear(context.aliveFlag)
+        ThreadCond.signal(context.cond)
+    }
+    
+    internal static func run(with context: ThreadContext) {
         AtomicFlag.readAndSet(context.aliveFlag)
         
         while AtomicFlag.readAndSet(context.aliveFlag) {
@@ -63,38 +63,27 @@ public final class FuturaWorker : Worker {
         ThreadCond.destroy(context.cond)
         pthread_exit(pthread_self())
     }
-    
-    deinit {
-        AtomicFlag.clear(context.aliveFlag)
-        ThreadCond.signal(context.cond)
-    }
-    
-    public func schedule(_ work: @escaping () -> Void) {
-        if isCurrent {
-            work()
-        } else {
-            Mutex.lock(context.taskMutex)
-            defer { Mutex.unlock(context.taskMutex) }
-            context.tasks.insert(work, at: 0)
-            ThreadCond.signal(context.cond)
-        }
-    }
-    
-    public var isCurrent: Bool {
-        return pthread_equal(thread, pthread_self()) != 0
-    }
 }
 
-fileprivate typealias Task = () -> Void
+internal typealias Task = () -> Void
 
-fileprivate final class ThreadContext {
-    fileprivate let threadMutex: UnsafeMutablePointer<pthread_mutex_t>
-    fileprivate let taskMutex: UnsafeMutablePointer<pthread_mutex_t>
-    fileprivate let cond: UnsafeMutablePointer<_opaque_pthread_cond_t>
-    fileprivate var aliveFlag: UnsafeMutablePointer<atomic_flag>
-    fileprivate var tasks: ContiguousArray<Task>
+internal final class ThreadContext {
     
-    fileprivate init(
+    internal let threadMutex: UnsafeMutablePointer<pthread_mutex_t>
+    internal let taskMutex: UnsafeMutablePointer<pthread_mutex_t>
+    internal let cond: UnsafeMutablePointer<_opaque_pthread_cond_t>
+    internal var aliveFlag: UnsafeMutablePointer<atomic_flag>
+    internal var tasks: ContiguousArray<Task>
+    
+    internal convenience init() {
+        self.init(threadMutex: Mutex.make(recursive: false),
+                      taskMutex: Mutex.make(recursive: false),
+                      cond: ThreadCond.make(),
+                      aliveFlag: AtomicFlag.make(),
+                      tasks: [])
+    }
+    
+    internal init(
         threadMutex: UnsafeMutablePointer<pthread_mutex_t>,
         taskMutex: UnsafeMutablePointer<pthread_mutex_t>,
         cond: UnsafeMutablePointer<_opaque_pthread_cond_t>,

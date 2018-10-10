@@ -25,6 +25,7 @@
 		407AA544216E174F0030C433 /* Mutex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 407AA543216E174F0030C433 /* Mutex.swift */; };
 		407AA54B216E34B40030C433 /* AtomicFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 407AA54A216E34B40030C433 /* AtomicFlag.swift */; };
 		407AA54D216E34DA0030C433 /* ThreadCond.swift in Sources */ = {isa = PBXBuildFile; fileRef = 407AA54C216E34DA0030C433 /* ThreadCond.swift */; };
+		407AA54F216E44B70030C433 /* FuturaThread.swift in Sources */ = {isa = PBXBuildFile; fileRef = 407AA54E216E44B70030C433 /* FuturaThread.swift */; };
 		408B60FC2163630300C1A948 /* WorkLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 408B60FB2163630300C1A948 /* WorkLog.swift */; };
 		40AFB89C216B72BC00ABB5BB /* FutureZipTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40AFB89B216B72BC00ABB5BB /* FutureZipTests.swift */; };
 /* End PBXBuildFile section */
@@ -61,6 +62,7 @@
 		407AA543216E174F0030C433 /* Mutex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mutex.swift; sourceTree = "<group>"; };
 		407AA54A216E34B40030C433 /* AtomicFlag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AtomicFlag.swift; sourceTree = "<group>"; };
 		407AA54C216E34DA0030C433 /* ThreadCond.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadCond.swift; sourceTree = "<group>"; };
+		407AA54E216E44B70030C433 /* FuturaThread.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuturaThread.swift; sourceTree = "<group>"; };
 		408B60FB2163630300C1A948 /* WorkLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkLog.swift; sourceTree = "<group>"; };
 		40AFB89B216B72BC00ABB5BB /* FutureZipTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureZipTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -106,17 +108,10 @@
 			isa = PBXGroup;
 			children = (
 				404B9493215A351100640928 /* Info.plist */,
+				407AA551216E48670030C433 /* Future */,
+				407AA555216E4CD60030C433 /* Synchronization */,
+				407AA550216E481B0030C433 /* Worker */,
 				404B94AB215A354000640928 /* Result.swift */,
-				404B94AF215A356B00640928 /* Future.swift */,
-				404B94B7215A35E700640928 /* Promise.swift */,
-				404B94A9215A352D00640928 /* Lock.swift */,
-				404B94B3215A35AF00640928 /* Worker.swift */,
-				404B94B5215A35C700640928 /* DispatchWorker.swift */,
-				404B94B1215A358900640928 /* ExecutionContext.swift */,
-				407AA4A2216BDF350030C433 /* FuturaWorker.swift */,
-				407AA543216E174F0030C433 /* Mutex.swift */,
-				407AA54A216E34B40030C433 /* AtomicFlag.swift */,
-				407AA54C216E34DA0030C433 /* ThreadCond.swift */,
 			);
 			path = Futura;
 			sourceTree = "<group>";
@@ -124,10 +119,8 @@
 		404B949C215A351100640928 /* FuturaTests */ = {
 			isa = PBXGroup;
 			children = (
-				4075C52321624F8100B40806 /* TestWorker.swift */,
-				408B60FB2163630300C1A948 /* WorkLog.swift */,
-				404B949D215A351100640928 /* FuturaTests.swift */,
 				404B949F215A351100640928 /* Info.plist */,
+				407AA552216E4B840030C433 /* Support */,
 				404B94B9215A364100640928 /* LockTests.swift */,
 				404B94BB215A365100640928 /* PromiseAndFutureTests.swift */,
 				404B94BF215A5CC600640928 /* DispatchWorkerTests.swift */,
@@ -135,6 +128,64 @@
 				407AA541216DE7920030C433 /* FuturaWorkerTests.swift */,
 			);
 			path = FuturaTests;
+			sourceTree = "<group>";
+		};
+		407AA550216E481B0030C433 /* Worker */ = {
+			isa = PBXGroup;
+			children = (
+				404B94B3215A35AF00640928 /* Worker.swift */,
+				404B94B1215A358900640928 /* ExecutionContext.swift */,
+				407AA554216E4CA20030C433 /* Futura */,
+				407AA553216E4C9B0030C433 /* Dispatch */,
+			);
+			path = Worker;
+			sourceTree = "<group>";
+		};
+		407AA551216E48670030C433 /* Future */ = {
+			isa = PBXGroup;
+			children = (
+				404B94AF215A356B00640928 /* Future.swift */,
+				404B94B7215A35E700640928 /* Promise.swift */,
+			);
+			path = Future;
+			sourceTree = "<group>";
+		};
+		407AA552216E4B840030C433 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				4075C52321624F8100B40806 /* TestWorker.swift */,
+				408B60FB2163630300C1A948 /* WorkLog.swift */,
+				404B949D215A351100640928 /* FuturaTests.swift */,
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
+		407AA553216E4C9B0030C433 /* Dispatch */ = {
+			isa = PBXGroup;
+			children = (
+				404B94B5215A35C700640928 /* DispatchWorker.swift */,
+			);
+			path = Dispatch;
+			sourceTree = "<group>";
+		};
+		407AA554216E4CA20030C433 /* Futura */ = {
+			isa = PBXGroup;
+			children = (
+				407AA4A2216BDF350030C433 /* FuturaWorker.swift */,
+				407AA54E216E44B70030C433 /* FuturaThread.swift */,
+				407AA54C216E34DA0030C433 /* ThreadCond.swift */,
+			);
+			path = Futura;
+			sourceTree = "<group>";
+		};
+		407AA555216E4CD60030C433 /* Synchronization */ = {
+			isa = PBXGroup;
+			children = (
+				407AA543216E174F0030C433 /* Mutex.swift */,
+				407AA54A216E34B40030C433 /* AtomicFlag.swift */,
+				404B94A9215A352D00640928 /* Lock.swift */,
+			);
+			path = Synchronization;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -253,6 +304,7 @@
 				404B94B6215A35C700640928 /* DispatchWorker.swift in Sources */,
 				404B94AA215A352D00640928 /* Lock.swift in Sources */,
 				407AA54B216E34B40030C433 /* AtomicFlag.swift in Sources */,
+				407AA54F216E44B70030C433 /* FuturaThread.swift in Sources */,
 				407AA4A3216BDF350030C433 /* FuturaWorker.swift in Sources */,
 				404B94B8215A35E700640928 /* Promise.swift in Sources */,
 				407AA544216E174F0030C433 /* Mutex.swift in Sources */,
