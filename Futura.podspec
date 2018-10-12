@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "Futura"
-  s.version      = "1.0.0"
+  s.version      = "1.1.0"
   s.summary      = "Simple yet powerful promise library in Swift"
   s.description  = "Futura is a small library that provides simple yet powerful implementation of promises for iOS and macOS."
   s.homepage     = "https://www.miquido.com/"
