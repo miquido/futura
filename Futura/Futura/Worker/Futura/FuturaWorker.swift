@@ -14,8 +14,11 @@
 
 import Darwin
 
-/// FuturaWorker is associated for its lifetime with exactly one p_thread.
+/// FuturaWorker is associated during its lifetime with exactly one pthread.
 /// It guarantees that on each schedule call the same thread will be reused.
+/// It is not recommended to create a lot of FuturaWorker instances or recreating those often.
+/// Sincie each instance spawns new pthread it may produce unnecesary overhead.
+/// 
 public final class FuturaWorker : Worker {
     
     fileprivate let thread = FuturaThread()
@@ -33,7 +36,7 @@ public final class FuturaWorker : Worker {
         } else {
             Mutex.lock(thread.context.taskMutex)
             defer { Mutex.unlock(thread.context.taskMutex) }
-            thread.context.tasks.insert(work, at: 0)
+            thread.context.tasks.append(work) // TODO: appending and array is bottleneck now
             ThreadCond.signal(thread.context.cond)
         }
     }

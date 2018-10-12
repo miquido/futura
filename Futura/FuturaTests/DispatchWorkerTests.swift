@@ -17,7 +17,7 @@ import Futura
 
 class DispatchWorkerTests: XCTestCase {
     
-    func testShould_PerformScheduledTask_When_WorkItemIsExecuted() {
+    func testShouldPerformTask_AfterWorkScheduled() {
         asyncTest(timeoutBody: {
             XCTFail("Not in time - possible deadlock or fail")
         })
@@ -25,6 +25,22 @@ class DispatchWorkerTests: XCTestCase {
             let worker: Worker = DispatchWorker.default
             worker.schedule { () -> Void in
                 complete()
+            }
+        }
+    }
+    
+    func testShouldPerformTasks_AfterWorkScheduledRecursively() {
+        asyncTest(timeoutBody: {
+            XCTFail("Not in time - possible deadlock or fail")
+        })
+        { complete in
+            let worker: Worker = DispatchWorker.default
+            worker.schedule { () -> Void in
+                worker.schedule { () -> Void in
+                    worker.schedule { () -> Void in
+                        complete()
+                    }
+                }
             }
         }
     }

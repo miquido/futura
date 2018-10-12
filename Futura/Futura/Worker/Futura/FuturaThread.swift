@@ -31,9 +31,6 @@ internal final class FuturaThread {
             return nil
         }, Unmanaged.passRetained(context).toOpaque())
         precondition(res == 0, "Unable to create thread: \(res)")
-        pthread_attr_destroy(attr)
-        attr.deinitialize(count: 1)
-        attr.deallocate()
         
         self.pthread = pthread
         self.context = context
@@ -46,10 +43,12 @@ internal final class FuturaThread {
     
     internal static func run(with context: ThreadContext) {
         AtomicFlag.readAndSet(context.aliveFlag)
+        Mutex.unlock(context.threadMutex) // this is wired, but without this unlock it does not run properly... to check
         
         while AtomicFlag.readAndSet(context.aliveFlag) {
             Mutex.lock(context.taskMutex)
-            while let task = context.tasks.popLast() {
+            while let task = context.tasks.first {
+                context.tasks.removeFirst(1) // TODO: array is bottleneck now
                 Mutex.unlock(context.taskMutex)
                 task()
                 Mutex.lock(context.taskMutex)
@@ -61,7 +60,6 @@ internal final class FuturaThread {
         Mutex.destroy(context.taskMutex)
         Mutex.destroy(context.threadMutex)
         ThreadCond.destroy(context.cond)
-        pthread_exit(pthread_self())
     }
 }
 
@@ -73,7 +71,7 @@ internal final class ThreadContext {
     internal let taskMutex: UnsafeMutablePointer<pthread_mutex_t>
     internal let cond: UnsafeMutablePointer<_opaque_pthread_cond_t>
     internal var aliveFlag: UnsafeMutablePointer<atomic_flag>
-    internal var tasks: ContiguousArray<Task>
+    internal var tasks: Array<Task>
     
     internal convenience init() {
         self.init(threadMutex: Mutex.make(recursive: false),
@@ -88,7 +86,7 @@ internal final class ThreadContext {
         taskMutex: UnsafeMutablePointer<pthread_mutex_t>,
         cond: UnsafeMutablePointer<_opaque_pthread_cond_t>,
         aliveFlag: UnsafeMutablePointer<atomic_flag>,
-        tasks: ContiguousArray<Task>)
+        tasks: Array<Task>)
     {
         self.threadMutex = threadMutex
         self.taskMutex = taskMutex
