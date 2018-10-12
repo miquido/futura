@@ -16,12 +16,12 @@ Note here that compiling generic interfaces as public cannot be optimised as goo
 
 You can also use Carthage with a little less flexibility.
 ```
-github "miquido/futura" ~> 1.0
+github "miquido/futura" ~> 1.1
 ```
 
 Or even CocoaPods, but since this library hasn't been added yet to the official CocoaPods spec repository you must point to it explicitly.
 ```
-pod 'Futura', :git => 'https://github.com/miquido/futura.git', :tag => '1.0.0'
+pod 'Futura', :git => 'https://github.com/miquido/futura.git', :tag => '1.1.0'
 ```
 
 ## Usage
