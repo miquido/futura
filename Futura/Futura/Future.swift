@@ -343,6 +343,21 @@ public func zip<T, U>(_ f1: Future<T>, _ f2: Future<U>) -> Future<(T, U)> {
     return future
 }
 
+/// Schedules task using selected worker.
+/// Returned Future represents result of passed body function.
+/// Default worker used for execution is DispatchWorker.default.
+public func future<T>(on worker: Worker = DispatchWorker.default, _ body: @escaping () throws -> T) -> Future<T> {
+    let future = Future<T>(executionContext: .explicit(worker))
+    worker.schedule {
+        do {
+            future.become(.resulted(with: .success(try body())))
+        } catch {
+            future.become(.resulted(with: .error(error)))
+        }
+    }
+    return future
+}
+
 #if FUTURA_DEBUG
 
 import os.log
