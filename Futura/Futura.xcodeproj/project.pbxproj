@@ -7,6 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		40258CA72175C406008EE920 /* Subscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40258CA62175C406008EE920 /* Subscription.swift */; };
+		40258CA92175C40F008EE920 /* Stream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40258CA82175C40F008EE920 /* Stream.swift */; };
+		40258CAB2175C44C008EE920 /* SubscribtionCollector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40258CAA2175C44C008EE920 /* SubscribtionCollector.swift */; };
+		40258CAD2175C60C008EE920 /* ForwardingStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40258CAC2175C60C008EE920 /* ForwardingStream.swift */; };
+		40258CAF2175C64F008EE920 /* MappingStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40258CAE2175C64F008EE920 /* MappingStream.swift */; };
+		40258CB12175C6E5008EE920 /* FlatMappingStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40258CB02175C6E5008EE920 /* FlatMappingStream.swift */; };
+		40258CB32175C7CE008EE920 /* SchedulingStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40258CB22175C7CE008EE920 /* SchedulingStream.swift */; };
+		40258CB52175C814008EE920 /* Channel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40258CB42175C814008EE920 /* Channel.swift */; };
 		404B9499215A351100640928 /* Futura.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 404B948F215A351100640928 /* Futura.framework */; };
 		404B949E215A351100640928 /* FuturaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404B949D215A351100640928 /* FuturaTests.swift */; };
 		404B94AA215A352D00640928 /* Lock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404B94A9215A352D00640928 /* Lock.swift */; };
@@ -35,6 +43,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		40258CA62175C406008EE920 /* Subscription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Subscription.swift; sourceTree = "<group>"; };
+		40258CA82175C40F008EE920 /* Stream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stream.swift; sourceTree = "<group>"; };
+		40258CAA2175C44C008EE920 /* SubscribtionCollector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscribtionCollector.swift; sourceTree = "<group>"; };
+		40258CAC2175C60C008EE920 /* ForwardingStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForwardingStream.swift; sourceTree = "<group>"; };
+		40258CAE2175C64F008EE920 /* MappingStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MappingStream.swift; sourceTree = "<group>"; };
+		40258CB02175C6E5008EE920 /* FlatMappingStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlatMappingStream.swift; sourceTree = "<group>"; };
+		40258CB22175C7CE008EE920 /* SchedulingStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulingStream.swift; sourceTree = "<group>"; };
+		40258CB42175C814008EE920 /* Channel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Channel.swift; sourceTree = "<group>"; };
 		404B948F215A351100640928 /* Futura.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Futura.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		404B9493215A351100640928 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		404B9498215A351100640928 /* FuturaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FuturaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -74,6 +90,21 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		40258CA52175C3C4008EE920 /* Stream */ = {
+			isa = PBXGroup;
+			children = (
+				40258CA62175C406008EE920 /* Subscription.swift */,
+				40258CAA2175C44C008EE920 /* SubscribtionCollector.swift */,
+				40258CA82175C40F008EE920 /* Stream.swift */,
+				40258CB42175C814008EE920 /* Channel.swift */,
+				40258CAC2175C60C008EE920 /* ForwardingStream.swift */,
+				40258CAE2175C64F008EE920 /* MappingStream.swift */,
+				40258CB02175C6E5008EE920 /* FlatMappingStream.swift */,
+				40258CB22175C7CE008EE920 /* SchedulingStream.swift */,
+			);
+			path = Stream;
+			sourceTree = "<group>";
+		};
 		404B9485215A351100640928 = {
 			isa = PBXGroup;
 			children = (
@@ -95,6 +126,7 @@
 		404B9491215A351100640928 /* Futura */ = {
 			isa = PBXGroup;
 			children = (
+				40258CA52175C3C4008EE920 /* Stream */,
 				404B9493215A351100640928 /* Info.plist */,
 				404B94AB215A354000640928 /* Result.swift */,
 				404B94AF215A356B00640928 /* Future.swift */,
@@ -230,12 +262,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				40258CAB2175C44C008EE920 /* SubscribtionCollector.swift in Sources */,
+				40258CB52175C814008EE920 /* Channel.swift in Sources */,
 				404B94AC215A354000640928 /* Result.swift in Sources */,
 				404B94B4215A35AF00640928 /* Worker.swift in Sources */,
+				40258CA72175C406008EE920 /* Subscription.swift in Sources */,
 				404B94B2215A358900640928 /* ExecutionContext.swift in Sources */,
+				40258CB32175C7CE008EE920 /* SchedulingStream.swift in Sources */,
 				404B94B0215A356B00640928 /* Future.swift in Sources */,
+				40258CB12175C6E5008EE920 /* FlatMappingStream.swift in Sources */,
+				40258CAF2175C64F008EE920 /* MappingStream.swift in Sources */,
 				404B94B6215A35C700640928 /* DispatchWorker.swift in Sources */,
 				404B94AA215A352D00640928 /* Lock.swift in Sources */,
+				40258CA92175C40F008EE920 /* Stream.swift in Sources */,
+				40258CAD2175C60C008EE920 /* ForwardingStream.swift in Sources */,
 				404B94B8215A35E700640928 /* Promise.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
