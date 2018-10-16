@@ -16,7 +16,7 @@ public class Stream<Value> {
 
     private var nextSubscriptionID: Subscription.ID = 0
     private let privateCollector: SubscribtionCollector = .init()
-    private var allowSubscriptions: Bool = true
+    internal var allowSubscriptions: Bool = true
     
     internal var subscribers: [Subscription.ID : (Event) -> Void] = [:]
     internal let lock: Lock = .init()

@@ -35,6 +35,15 @@ internal final class SchedulingStream<Value> : ForwardingStream<Value, Value> {
             associatedWorker.schedule {
                 subscribers.forEach { $0.1(event) }
             }
+            
+            // TODO: what to do with subscribers after close / terminate?
+            if case .close = event {
+                allowSubscriptions = false
+                self.subscribers = [:]
+            } else if case .terminate = event {
+                allowSubscriptions = false
+                self.subscribers = [:]
+            } else { /* nothing */ }
         }
     }
 }
