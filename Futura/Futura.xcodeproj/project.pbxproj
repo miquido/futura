@@ -15,6 +15,7 @@
 		40258CB12175C6E5008EE920 /* FlatMappingStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40258CB02175C6E5008EE920 /* FlatMappingStream.swift */; };
 		40258CB32175C7CE008EE920 /* SchedulingStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40258CB22175C7CE008EE920 /* SchedulingStream.swift */; };
 		40258CB52175C814008EE920 /* Channel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40258CB42175C814008EE920 /* Channel.swift */; };
+		40258CB72175CE79008EE920 /* StreamTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40258CB62175CE79008EE920 /* StreamTests.swift */; };
 		404B9499215A351100640928 /* Futura.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 404B948F215A351100640928 /* Futura.framework */; };
 		404B949E215A351100640928 /* FuturaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404B949D215A351100640928 /* FuturaTests.swift */; };
 		404B94AA215A352D00640928 /* Lock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404B94A9215A352D00640928 /* Lock.swift */; };
@@ -51,6 +52,7 @@
 		40258CB02175C6E5008EE920 /* FlatMappingStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlatMappingStream.swift; sourceTree = "<group>"; };
 		40258CB22175C7CE008EE920 /* SchedulingStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulingStream.swift; sourceTree = "<group>"; };
 		40258CB42175C814008EE920 /* Channel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Channel.swift; sourceTree = "<group>"; };
+		40258CB62175CE79008EE920 /* StreamTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamTests.swift; sourceTree = "<group>"; };
 		404B948F215A351100640928 /* Futura.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Futura.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		404B9493215A351100640928 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		404B9498215A351100640928 /* FuturaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FuturaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -150,6 +152,7 @@
 				404B94BB215A365100640928 /* PromiseAndFutureTests.swift */,
 				404B94BF215A5CC600640928 /* DispatchWorkerTests.swift */,
 				40AFB89B216B72BC00ABB5BB /* FutureZipTests.swift */,
+				40258CB62175CE79008EE920 /* StreamTests.swift */,
 			);
 			path = FuturaTests;
 			sourceTree = "<group>";
@@ -287,6 +290,7 @@
 				404B94BA215A364100640928 /* LockTests.swift in Sources */,
 				40AFB89C216B72BC00ABB5BB /* FutureZipTests.swift in Sources */,
 				4075C52421624F8100B40806 /* TestWorker.swift in Sources */,
+				40258CB72175CE79008EE920 /* StreamTests.swift in Sources */,
 				404B949E215A351100640928 /* FuturaTests.swift in Sources */,
 				404B94BC215A365100640928 /* PromiseAndFutureTests.swift in Sources */,
 				404B94C0215A5CC600640928 /* DispatchWorkerTests.swift in Sources */,

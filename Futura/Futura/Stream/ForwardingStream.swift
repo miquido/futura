@@ -12,12 +12,16 @@
  See the License for the specific language governing permissions and
  limitations under the License. */
 
-import Foundation
 internal class ForwardingStream<V1, V2> : Stream<V2> {
+    
     private unowned let source: Stream<V1>
     
     internal init(source: Stream<V1>, collector: SubscribtionCollector?) {
         self.source = source
         super.init(collector: collector)
+    }
+    
+    override var isSuspended: Bool {
+        return super.isSuspended || source.isSuspended
     }
 }

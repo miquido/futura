@@ -14,6 +14,9 @@
 
 public extension Stream {
     
+    /// Starting at this point all transformations and observations
+    /// will be executed by provided Worker until next switch call.
+    /// Returns new instance of stream.
     func `switch`(to worker: Worker) -> Stream<Value> {
         return SchedulingStream.init(source: self, worker: worker)
     }
@@ -31,19 +34,12 @@ internal final class SchedulingStream<Value> : ForwardingStream<Value, Value> {
     
     internal override func broadcast(_ event: Event) {
         lock.synchronized {
+            guard !self.isSuspended else { return }
             let subscribers = self.subscribers
             associatedWorker.schedule {
                 subscribers.forEach { $0.1(event) }
             }
-            
-            // TODO: what to do with subscribers after close / terminate?
-            if case .close = event {
-                allowSubscriptions = false
-                self.subscribers = [:]
-            } else if case .terminate = event {
-                allowSubscriptions = false
-                self.subscribers = [:]
-            } else { /* nothing */ }
+            cleanupIfNeeded(after: event)
         }
     }
 }

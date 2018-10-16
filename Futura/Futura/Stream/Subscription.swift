@@ -12,10 +12,10 @@
  See the License for the specific language governing permissions and
  limitations under the License. */
 
-public final class Subscription {
-    public typealias ID = UInt64
+internal final class Subscription {
+    internal typealias ID = UInt64
     
-    private let unsubscribe: () -> Void
+    internal let unsubscribe: () -> Void
     
     internal init(_ unsubscribe: @escaping () -> Void) {
         self.unsubscribe = unsubscribe
@@ -26,7 +26,7 @@ public final class Subscription {
 
 extension Subscription.ID {
     
-    public mutating func currentThenNext() -> Subscription.ID {
+    internal mutating func getThenIterate() -> Subscription.ID {
         defer { self += 1 }
         return self
     }

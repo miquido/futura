@@ -14,6 +14,9 @@
 
 public extension Stream {
     
+    /// FlatMap stream to other type or modify value passed further by other stream.
+    /// Transformation may throw to propagate error instad of value.
+    /// Returns new instance of stream.
     func flatMap<T>(_ transform: @escaping (Value) -> Stream<T>) -> Stream<T> {
         return FlatMappingStream(source: self, transform: transform)
     }
@@ -21,30 +24,32 @@ public extension Stream {
 
 internal final class FlatMappingStream<SourceValue, Value> : ForwardingStream<SourceValue, Value> {
     
-    private let transform: (SourceValue) -> Stream<Value>
     private var mappedCollector: SubscribtionCollector = .init()
     
-    internal init(source: Stream<SourceValue>, transform: @escaping (SourceValue) -> Stream<Value>) {
-        self.transform = transform
+    internal init(source: Stream<SourceValue>, transform: @escaping (SourceValue) throws -> Stream<Value>) {
         super.init(source: source, collector: source.collector)
         collect(source.subscribe {
             self.mappedCollector = .init()
             switch $0 {
             case let .value(value):
-                let subscribtion = transform(value).subscribe {
-                    switch $0 {
-                    case let .value(value):
-                        self.broadcast(.value(value))
-                    case let .error(error):
-                        self.broadcast(.error(error))
-                    case .close:
-                        self.broadcast(.close)
-                    case let .terminate(reason):
-                        self.broadcast(.terminate(reason))
+                do {
+                    let subscribtion = try transform(value).subscribe {
+                        switch $0 {
+                        case let .value(value):
+                            self.broadcast(.value(value))
+                        case let .error(error):
+                            self.broadcast(.error(error))
+                        case .close:
+                            self.broadcast(.close)
+                        case let .terminate(reason):
+                            self.broadcast(.terminate(reason))
+                        }
                     }
+                    guard let sub = subscribtion else { return }
+                    self.mappedCollector.collect(sub)
+                } catch {
+                    self.broadcast(.error(error))
                 }
-                guard let sub = subscribtion else { return }
-                self.mappedCollector.collect(sub)
             case let .error(error):
                 self.broadcast(.error(error))
             case .close:

@@ -12,23 +12,41 @@
  See the License for the specific language governing permissions and
  limitations under the License. */
 
+/// SubscribtionCollector is object that holds and collects subscriptions
+/// created by transforming and observing streams.
+/// Subscriptions are managed internally and valid until SubscribtionCollector used
+/// for collecting subscriptions is not deallocated.
+/// All associated subscriptions are removed when deallocating SubscribtionCollector instance.
+/// You can delegate ownership of subscriptions to any owned collector by collect method.
 public final class SubscribtionCollector {
+    
     private let lock: Lock = .init()
     private var subscribtions: [Subscription] = []
-    private var allowNew: Bool = true
+    
+    internal var isSuspended: Bool = false
     
     public init() {}
     
     internal func collect(_ subscribtion: Subscription) {
         lock.synchronized {
-            guard allowNew else { return }
+            guard !isSuspended else { return }
             subscribtions.append(subscribtion)
+        }
+    }
+    
+    // TODO: it might be public?
+    internal func unsubscribeAll() {
+        lock.synchronized {
+            isSuspended = true
+            subscribtions.forEach { $0.unsubscribe() }
+            isSuspended = false
         }
     }
     
     deinit {
         lock.synchronized {
-            allowNew = false
+            isSuspended = true
+            subscribtions.forEach { $0.unsubscribe() }
         }
         // TODO: adding subscription while on deinit may cause crash - to check
     }
@@ -36,9 +54,12 @@ public final class SubscribtionCollector {
 
 extension Stream {
     
-    public func collect(on collector: SubscribtionCollector) -> Stream {
-        let next = Stream.init(collector: collector)
-        next.collect(self.subscribe {
+    /// Starting at this point all transformations and observations
+    /// will be managed by provided SubscribtionCollector until next collect call.
+    /// Returns new instance of Stream that will propagate collector to its children.
+    public func collect(with collector: SubscribtionCollector) -> Stream {
+        let next = ForwardingStream<Value, Value>.init(source: self, collector: collector)
+        next.collect(subscribe {
             next.broadcast($0)
         })
         return next

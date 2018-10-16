@@ -12,15 +12,17 @@
  See the License for the specific language governing permissions and
  limitations under the License. */
 
+/// Stream is read only object for accessing data provided as stream.
 public class Stream<Value> {
 
     private var nextSubscriptionID: Subscription.ID = 0
     private let privateCollector: SubscribtionCollector = .init()
-    internal var allowSubscriptions: Bool = true
     
-    internal var subscribers: [Subscription.ID : (Event) -> Void] = [:]
     internal let lock: Lock = .init()
+    internal var subscribers: [Subscription.ID : (Event) -> Void] = [:]
     internal weak var collector: SubscribtionCollector?
+    internal var isClosed: Bool = false
+    internal var isUnsubscribing: Bool = false
     
     internal init(collector: SubscribtionCollector?) {
         self.collector = collector
@@ -28,12 +30,15 @@ public class Stream<Value> {
     
     internal func subscribe(_ subscriber: @escaping (Event) -> Void) -> Subscription? {
         return lock.synchronized {
-            guard allowSubscriptions else { return nil }
-            let id = nextSubscriptionID.currentThenNext()
+            guard !isClosed else { return nil }
+            let id = nextSubscriptionID.getThenIterate()
             subscribers[id] = subscriber
             return Subscription.init { [weak self] in
-                self?.lock.synchronized {
+                guard let lock = self?.lock else { return }
+                lock.synchronized {
+                    self?.isUnsubscribing = true
                     self?.subscribers[id] = nil
+                    self?.isUnsubscribing = false
                 }
             }
         }
@@ -41,16 +46,19 @@ public class Stream<Value> {
     
     internal func broadcast(_ event: Event) {
         lock.synchronized {
+            guard !self.isSuspended else { return }
             subscribers.forEach { $0.1(event) }
-            
-            // TODO: what to do with subscribers after close / terminate?
-            if case .close = event {
-                allowSubscriptions = false
-                subscribers = [:]
-            } else if case .terminate = event {
-                allowSubscriptions = false
-                subscribers = [:]
-            } else { /* nothing */ }
+            cleanupIfNeeded(after: event)
+        }
+    }
+    
+    internal func cleanupIfNeeded(after event: Event) {
+        switch event {
+        case .close, .terminate:
+            isClosed = true
+            let sub = subscribers // cache until end of scope to prevent deallocation of subscribers while making changes in subscribers dictionary - prevents crash
+            subscribers = [:]
+        default: break
         }
     }
     
@@ -63,13 +71,17 @@ public class Stream<Value> {
         }
     }
     
+    internal var isSuspended: Bool {
+        return isUnsubscribing || collector?.isSuspended ?? false || privateCollector.isSuspended
+    }
+    
     deinit {
-        lock.synchronized { allowSubscriptions = false }
+        lock.synchronized { isClosed = true }
+        
         // TODO: adding subscription while on deinit may cause crash - to check
         broadcast(.close)
     }
 }
-
 
 extension Stream {
     
@@ -83,6 +95,7 @@ extension Stream {
 
 public extension Stream {
     
+    /// Access each value passed by this stream
     @discardableResult
     func next(_ observer: @escaping (Value) -> Void) -> Stream {
         collect(subscribe { (event) in
@@ -92,6 +105,7 @@ public extension Stream {
         return self
     }
     
+    /// Access each error passed by this stream
     @discardableResult
     func fail(_ observer: @escaping (Error) -> Void) -> Stream {
         collect(subscribe { (event) in
@@ -101,6 +115,7 @@ public extension Stream {
         return self
     }
     
+    /// Access stream closing information
     @discardableResult
     func closed(_ observer: @escaping () -> Void) -> Stream {
         collect(subscribe { (event) in
@@ -110,6 +125,7 @@ public extension Stream {
         return self
     }
     
+    /// Access stream termination information
     @discardableResult
     func terminated(_ observer: @escaping (Error) -> Void) -> Stream {
         collect(subscribe { (event) in
