@@ -480,6 +480,50 @@ class PromiseAndFutureTestsTests: XCTestCase {
         XCTAssertEqual(workLog, [.always])
     }
     
+    func testShouldHandleValue_WhenReturningValue() {
+        future(on: worker) {
+            return 0
+        }
+        .then { value in
+            self.workLog.log(.then(testDescription(of: value)))
+        }
+        .fail { reason in
+            self.workLog.log(.fail(testDescription(of: reason)))
+        }
+        .resulted {
+            self.workLog.log(.resulted)
+        }
+        .always {
+            self.workLog.log(.always)
+        }
+        
+        XCTAssert(workLog.isEmpty)
+        XCTAssertEqual(worker.execute(), 2)
+        XCTAssertEqual(workLog, [.then(testDescription(of: 0)), .resulted, .always])
+    }
+    
+    func testShouldHandleError_WhenThrowingError() {
+        future(on: worker) {
+            throw testError
+        }
+        .then { value in
+            self.workLog.log(.then(testDescription(of: value)))
+        }
+        .fail { reason in
+            self.workLog.log(.fail(testDescription(of: reason)))
+        }
+        .resulted {
+            self.workLog.log(.resulted)
+        }
+        .always {
+            self.workLog.log(.always)
+        }
+        
+        XCTAssert(workLog.isEmpty)
+        XCTAssertEqual(worker.execute(), 2)
+        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+    }
+    
     // MARK: -
     // MARK: completed
     

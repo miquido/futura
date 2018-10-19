@@ -345,6 +345,55 @@ public func zip<T, U>(_ f1: Future<T>, _ f2: Future<U>) -> Future<(T, U)> {
     return future
 }
 
+/// Zip futures. Returns new Future instance.
+/// Execution context of returned Future is undefined. It will be inherited from completion of last of provided Futures.
+/// If you need explicit execution context use switch(to:) to ensure usage of specific Worker.
+/// Result Future will fail or become canceled if any of provided Futures fails or becomes canceled without waiting for other results.
+public func zip<T>(_ farr: [Future<T>]) -> Future<[T]> {
+    let future = Future<[T]>(executionContext: .undefined)
+    #if FUTURA_DEBUG
+    os_log("Zipping array on %{public}@", log: logger, type: .debug, future.debugDescriptionSynchronized)
+    #endif
+    let lock = Lock()
+    let count = farr.count
+    var results: [T] = []
+    
+    farr.forEach {
+        $0.observe { state in
+            switch state {
+            case let .resulted(.success(value)):
+                lock.synchronized {
+                    results.append(value)
+                    guard results.count == count else { return }
+                    future.become(.resulted(with: .success(results)))
+                }
+            case let .resulted(.error(reason)):
+                future.become(.resulted(with: .error(reason)))
+            case .canceled:
+                future.become(.canceled)
+            case .waiting: break
+            }
+        }
+    }
+    
+    return future
+}
+
+/// Schedules task using selected worker.
+/// Returned Future represents result of passed body function.
+/// Default worker used for execution is DispatchWorker.default.
+public func future<T>(on worker: Worker = DispatchWorker.default, _ body: @escaping () throws -> T) -> Future<T> {
+    let future = Future<T>(executionContext: .explicit(worker))
+    worker.schedule {
+        do {
+            future.become(.resulted(with: .success(try body())))
+        } catch {
+            future.become(.resulted(with: .error(error)))
+        }
+    }
+    return future
+}
+
 #if FUTURA_DEBUG
 
 import os.log
