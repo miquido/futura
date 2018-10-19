@@ -1,7 +1,5 @@
 # [![Futura](logo.png)]()
 
-[![Futura](logo.png)]()
-
 [![Build Status](https://api.travis-ci.org/miquido/futura.svg?branch=master)](https://travis-ci.org/miquido/futura)
 [![Platforms](https://img.shields.io/badge/platform-iOS%20|%20macOS-gray.svg?style=flat)]()
 [![SwiftVersion](https://img.shields.io/badge/Swift-4.2-brightgreen.svg)]()
