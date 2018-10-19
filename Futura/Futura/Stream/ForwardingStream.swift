@@ -14,7 +14,7 @@
 
 internal class ForwardingStream<V1, V2> : Stream<V2> {
     
-    private unowned let source: Stream<V1>
+    private weak var source: Stream<V1>?
     
     internal init(source: Stream<V1>, collector: SubscribtionCollector?) {
         self.source = source
@@ -22,6 +22,6 @@ internal class ForwardingStream<V1, V2> : Stream<V2> {
     }
     
     override var isSuspended: Bool {
-        return super.isSuspended || source.isSuspended
+        return super.isSuspended || source?.isSuspended ?? false
     }
 }

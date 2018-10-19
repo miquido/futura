@@ -17,8 +17,8 @@ public extension Stream {
     /// FlatMap stream to other type or modify value passed further by other stream.
     /// Transformation may throw to propagate error instad of value.
     /// Returns new instance of stream.
-    func flatMap<T>(_ transform: @escaping (Value) -> Stream<T>) -> Stream<T> {
-        return FlatMappingStream(source: self, transform: transform)
+    func flatMap<T>(_ transform: @escaping (Value) throws -> Stream<T>) -> Stream<T> {
+        return FlatMappingStream.init(source: self, transform: transform)
     }
 }
 

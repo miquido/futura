@@ -34,11 +34,11 @@ public class Stream<Value> {
             let id = nextSubscriptionID.getThenIterate()
             subscribers[id] = subscriber
             return Subscription.init { [weak self] in
-                guard let lock = self?.lock else { return }
-                lock.synchronized {
-                    self?.isUnsubscribing = true
-                    self?.subscribers[id] = nil
-                    self?.isUnsubscribing = false
+                guard let self = self else { return }
+                self.lock.synchronized {
+                    self.isUnsubscribing = true
+                    self.subscribers[id] = nil
+                    self.isUnsubscribing = false
                 }
             }
         }
@@ -46,7 +46,7 @@ public class Stream<Value> {
     
     internal func broadcast(_ event: Event) {
         lock.synchronized {
-            guard !self.isSuspended else { return }
+            guard !isSuspended else { return }
             subscribers.forEach { $0.1(event) }
             cleanupIfNeeded(after: event)
         }
@@ -56,8 +56,10 @@ public class Stream<Value> {
         switch event {
         case .close, .terminate:
             isClosed = true
-            let sub = subscribers // cache until end of scope to prevent deallocation of subscribers while making changes in subscribers dictionary - prevents crash
+            var sub = subscribers
+            // cache until end of scope to prevent deallocation of subscribers while making changes in subscribers dictionary - prevents crash
             subscribers = [:]
+            sub.removeAll() // TODO: to check performance
         default: break
         }
     }
@@ -75,12 +77,7 @@ public class Stream<Value> {
         return isUnsubscribing || collector?.isSuspended ?? false || privateCollector.isSuspended
     }
     
-    deinit {
-        lock.synchronized { isClosed = true }
-        
-        // TODO: adding subscription while on deinit may cause crash - to check
-        broadcast(.close)
-    }
+    deinit { broadcast(.close) }
 }
 
 extension Stream {

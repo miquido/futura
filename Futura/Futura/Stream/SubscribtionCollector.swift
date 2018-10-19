@@ -34,21 +34,20 @@ public final class SubscribtionCollector {
         }
     }
     
-    // TODO: it might be public?
-    internal func unsubscribeAll() {
-        lock.synchronized {
-            isSuspended = true
-            subscribtions.forEach { $0.unsubscribe() }
-            isSuspended = false
-        }
-    }
+//    // it might be public?
+//    internal func unsubscribeAll() {
+//        lock.synchronized {
+//            isSuspended = true
+//            subscribtions = []
+//            isSuspended = false
+//        }
+//    }
     
     deinit {
         lock.synchronized {
             isSuspended = true
-            subscribtions.forEach { $0.unsubscribe() }
-        }
-        // TODO: adding subscription while on deinit may cause crash - to check
+            subscribtions = []
+        } // leaves suspended since it is deinit
     }
 }
 

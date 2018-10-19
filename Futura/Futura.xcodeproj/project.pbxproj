@@ -28,6 +28,8 @@
 		404B94BA215A364100640928 /* LockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404B94B9215A364100640928 /* LockTests.swift */; };
 		404B94BC215A365100640928 /* PromiseAndFutureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404B94BB215A365100640928 /* PromiseAndFutureTests.swift */; };
 		404B94C0215A5CC600640928 /* DispatchWorkerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404B94BF215A5CC600640928 /* DispatchWorkerTests.swift */; };
+		40750C50217A3FFC00067852 /* FilteringStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40750C4F217A3FFC00067852 /* FilteringStream.swift */; };
+		40750C52217A423B00067852 /* StreamWorkLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40750C51217A423B00067852 /* StreamWorkLog.swift */; };
 		4075C52421624F8100B40806 /* TestWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4075C52321624F8100B40806 /* TestWorker.swift */; };
 		408B60FC2163630300C1A948 /* WorkLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 408B60FB2163630300C1A948 /* WorkLog.swift */; };
 		40AFB89C216B72BC00ABB5BB /* FutureZipTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40AFB89B216B72BC00ABB5BB /* FutureZipTests.swift */; };
@@ -68,6 +70,8 @@
 		404B94B9215A364100640928 /* LockTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockTests.swift; sourceTree = "<group>"; };
 		404B94BB215A365100640928 /* PromiseAndFutureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromiseAndFutureTests.swift; sourceTree = "<group>"; };
 		404B94BF215A5CC600640928 /* DispatchWorkerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DispatchWorkerTests.swift; sourceTree = "<group>"; };
+		40750C4F217A3FFC00067852 /* FilteringStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilteringStream.swift; sourceTree = "<group>"; };
+		40750C51217A423B00067852 /* StreamWorkLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamWorkLog.swift; sourceTree = "<group>"; };
 		4075C52321624F8100B40806 /* TestWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestWorker.swift; sourceTree = "<group>"; };
 		408B60FB2163630300C1A948 /* WorkLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkLog.swift; sourceTree = "<group>"; };
 		40AFB89B216B72BC00ABB5BB /* FutureZipTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureZipTests.swift; sourceTree = "<group>"; };
@@ -97,11 +101,12 @@
 			children = (
 				40258CA62175C406008EE920 /* Subscription.swift */,
 				40258CAA2175C44C008EE920 /* SubscribtionCollector.swift */,
-				40258CA82175C40F008EE920 /* Stream.swift */,
 				40258CB42175C814008EE920 /* Channel.swift */,
+				40258CA82175C40F008EE920 /* Stream.swift */,
 				40258CAC2175C60C008EE920 /* ForwardingStream.swift */,
 				40258CAE2175C64F008EE920 /* MappingStream.swift */,
 				40258CB02175C6E5008EE920 /* FlatMappingStream.swift */,
+				40750C4F217A3FFC00067852 /* FilteringStream.swift */,
 				40258CB22175C7CE008EE920 /* SchedulingStream.swift */,
 			);
 			path = Stream;
@@ -153,6 +158,7 @@
 				404B94BF215A5CC600640928 /* DispatchWorkerTests.swift */,
 				40AFB89B216B72BC00ABB5BB /* FutureZipTests.swift */,
 				40258CB62175CE79008EE920 /* StreamTests.swift */,
+				40750C51217A423B00067852 /* StreamWorkLog.swift */,
 			);
 			path = FuturaTests;
 			sourceTree = "<group>";
@@ -265,6 +271,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				40750C50217A3FFC00067852 /* FilteringStream.swift in Sources */,
 				40258CAB2175C44C008EE920 /* SubscribtionCollector.swift in Sources */,
 				40258CB52175C814008EE920 /* Channel.swift in Sources */,
 				404B94AC215A354000640928 /* Result.swift in Sources */,
@@ -294,6 +301,7 @@
 				404B949E215A351100640928 /* FuturaTests.swift in Sources */,
 				404B94BC215A365100640928 /* PromiseAndFutureTests.swift in Sources */,
 				404B94C0215A5CC600640928 /* DispatchWorkerTests.swift in Sources */,
+				40750C52217A423B00067852 /* StreamWorkLog.swift in Sources */,
 				408B60FC2163630300C1A948 /* WorkLog.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

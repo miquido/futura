@@ -34,7 +34,7 @@ internal final class SchedulingStream<Value> : ForwardingStream<Value, Value> {
     
     internal override func broadcast(_ event: Event) {
         lock.synchronized {
-            guard !self.isSuspended else { return }
+            guard !isSuspended else { return }
             let subscribers = self.subscribers
             associatedWorker.schedule {
                 subscribers.forEach { $0.1(event) }

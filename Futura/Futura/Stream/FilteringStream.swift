@@ -17,23 +17,20 @@ public extension Stream {
     /// Map stream to other type or modify value passed further.
     /// Transformation may throw to propagate error instad of value.
     /// Returns new instance of stream.
-    func map<T>(_ transform: @escaping (Value) throws -> T) -> Stream<T> {
-        return MappingStream.init(source: self, transform: transform)
+    func filter(_ filter: @escaping (Value) -> Bool) -> Stream<Value> {
+        return FilteringStream.init(source: self, filter: filter)
     }
 }
 
-internal final class MappingStream<SourceValue, Value> : ForwardingStream<SourceValue, Value> {
+internal final class FilteringStream<Value> : ForwardingStream<Value, Value> {
     
-    internal init(source: Stream<SourceValue>, transform: @escaping (SourceValue) throws -> Value) {
+    internal init(source: Stream<Value>, filter: @escaping (Value) -> Bool) {
         super.init(source: source, collector: source.collector)
         collect(source.subscribe {
             switch $0 {
             case let .value(value):
-                do {
-                    try self.broadcast(.value(transform(value)))
-                } catch {
-                    self.broadcast(.error(error))
-                }
+                guard filter(value) else { return }
+                self.broadcast(.value(value))
             case let .error(error):
                 self.broadcast(.error(error))
             case .close:

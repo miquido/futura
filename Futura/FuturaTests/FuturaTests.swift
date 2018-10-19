@@ -78,6 +78,26 @@ extension Future {
     }
 }
 
+extension Futura.Stream {
+    @discardableResult
+    func logResults(with workLog: StreamWorkLog) -> Self {
+        self
+            .next {
+                workLog.log(.next(testDescription(of: $0)))
+            }
+            .fail {
+                workLog.log(.fail(testDescription(of: $0)))
+            }
+            .closed {
+                workLog.log(.closed)
+            }
+            .terminated {
+                workLog.log(.terminated(testDescription(of: $0)))
+            }
+        return self
+    }
+}
+
 func testDescription(of any: Any) -> String {
     return "\(any):\(type(of: any))"
 }

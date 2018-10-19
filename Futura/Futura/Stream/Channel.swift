@@ -12,7 +12,7 @@
  See the License for the specific language governing permissions and
  limitations under the License. */
 
-/// Channel allows writing and broadcasting data through streams.
+/// Channel allows broadcasting data through streams.
 public final class Channel<Value> : Stream<Value> {
     
     public init() {
@@ -29,7 +29,8 @@ public final class Channel<Value> : Stream<Value> {
         broadcast(.error(error))
     }
     
-     /// Closes channel's stream and its children
+    /// Closes channel's stream and its children
+    /// Closed channels and streams do not broadcast events
     public func close() {
         broadcast(.close)
     }
@@ -37,11 +38,12 @@ public final class Channel<Value> : Stream<Value> {
     /// Terminates channel's stream and its children.
     /// Termination have similar effect to colosing but allows to pass error
     /// Which caused termination while closing is for just ending stream properly.
+    /// Terminated channels and streams do not broadcast events
     public func terminate(_ reason: Error) {
         broadcast(.terminate(reason))
     }
     
-    /// Read only reference (as Stream) of this channel
+    /// Read only reference (as Stream) to this channel
     public var stream: Stream<Value> {
         return self
     }
