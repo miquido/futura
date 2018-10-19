@@ -12,8 +12,6 @@
  See the License for the specific language governing permissions and
  limitations under the License. */
 
-import Darwin.POSIX
-
 /// RecursiveLock is a simple pthread_mutex wrapper with basic recursive lock functionality.
 /// It should not be used to synchronize threads from multiple processes.
 public final class RecursiveLock {

@@ -1,10 +1,16 @@
-//
-//  FutureZipTests.swift
-//  FuturaTests
-//
-//  Created by Kacper Kaliński on 08/10/2018.
-//  Copyright © 2018 Miquido. All rights reserved.
-//
+/* Copyright 2018 Miquido
+ 
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ 
+ http://www.apache.org/licenses/LICENSE-2.0
+ 
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License. */
 
 import XCTest
 import Futura
@@ -594,10 +600,10 @@ class FutureZipTests: XCTestCase {
             }
             
             let dispatchQueue: DispatchQueue = DispatchQueue(label: "test", qos: .default, attributes: .concurrent)
-            let lock_1: RecursiveLock = RecursiveLock()
-            let lock_2: RecursiveLock = RecursiveLock()
-            let lock_3: RecursiveLock = RecursiveLock()
-            let lock_4: RecursiveLock = RecursiveLock()
+            let lock_1: RecursiveLock = .init()
+            let lock_2: RecursiveLock = .init()
+            let lock_3: RecursiveLock = .init()
+            let lock_4: RecursiveLock = .init()
             var counter_1 = 0
             var counter_2 = 0
             var counter_3 = 0
@@ -798,10 +804,10 @@ class FutureZipTests: XCTestCase {
             }
             
             let dispatchQueue: DispatchQueue = DispatchQueue(label: "test", qos: .default, attributes: .concurrent)
-            let lock_1: Lock = Lock()
-            let lock_2: Lock = Lock()
-            let lock_3: Lock = Lock()
-            let lock_4: Lock = Lock()
+            let lock_1: RecursiveLock = .init()
+            let lock_2: RecursiveLock = .init()
+            let lock_3: RecursiveLock = .init()
+            let lock_4: RecursiveLock = .init()
             var counter_1 = 0
             var counter_2 = 0
             var counter_3 = 0
@@ -860,10 +866,10 @@ class FutureZipTests: XCTestCase {
             }
             
             let dispatchQueue: DispatchQueue = DispatchQueue(label: "test", qos: .default, attributes: .concurrent)
-            let lock_1: Lock = Lock()
-            let lock_2: Lock = Lock()
-            let lock_3: Lock = Lock()
-            let lock_4: Lock = Lock()
+            let lock_1: RecursiveLock = .init()
+            let lock_2: RecursiveLock = .init()
+            let lock_3: RecursiveLock = .init()
+            let lock_4: RecursiveLock = .init()
             var counter_1 = 0
             var counter_2 = 0
             var counter_3 = 0
@@ -922,10 +928,10 @@ class FutureZipTests: XCTestCase {
             }
             
             let dispatchQueue: DispatchQueue = DispatchQueue(label: "test", qos: .default, attributes: .concurrent)
-            let lock_1: Lock = Lock()
-            let lock_2: Lock = Lock()
-            let lock_3: Lock = Lock()
-            let lock_4: Lock = Lock()
+            let lock_1: RecursiveLock = .init()
+            let lock_2: RecursiveLock = .init()
+            let lock_3: RecursiveLock = .init()
+            let lock_4: RecursiveLock = .init()
             var counter_1 = 0
             var counter_2 = 0
             var counter_3 = 0

@@ -354,7 +354,7 @@ public func zip<T>(_ farr: [Future<T>]) -> Future<[T]> {
     #if FUTURA_DEBUG
     os_log("Zipping array on %{public}@", log: logger, type: .debug, future.debugDescriptionSynchronized)
     #endif
-    let lock = Lock()
+    let lock = RecursiveLock()
     let count = farr.count
     var results: [T] = []
     
