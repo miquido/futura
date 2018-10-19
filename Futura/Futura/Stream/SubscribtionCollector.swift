@@ -34,15 +34,6 @@ public final class SubscribtionCollector {
         }
     }
     
-//    // it might be public?
-//    internal func unsubscribeAll() {
-//        lock.synchronized {
-//            isSuspended = true
-//            subscribtions = []
-//            isSuspended = false
-//        }
-//    }
-    
     deinit {
         lock.synchronized {
             isSuspended = true
