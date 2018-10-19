@@ -266,7 +266,7 @@ class StreamTests: XCTestCase {
         XCTAssertEqual(workLog, [.flatMap, .next(testDescription(of: 1))])
     }
     
-    func testShouldHandleValue_WhenBroadcastingValue_WithFlatMap_WithError() {
+    func testShouldHandleError_WhenBroadcastingValue_WithFlatMap_WithError() {
         let otherChannel = Channel<Int>()
         
         channel
@@ -282,7 +282,7 @@ class StreamTests: XCTestCase {
         XCTAssertEqual(workLog, [.flatMap, .fail(testErrorDescription)])
     }
     
-    func testShouldHandleValue_WhenBroadcastingValue_WithFlatMap_WithClose() {
+    func testShouldHandleClosed_WhenBroadcastingValue_WithFlatMap_WithClose() {
         let otherChannel = Channel<Int>()
         
         channel
@@ -299,7 +299,7 @@ class StreamTests: XCTestCase {
         XCTAssertEqual(workLog, [.flatMap, .closed, .flatMap])
     }
     
-    func testShouldHandleValue_WhenBroadcastingValue_WithFlatMap_WithTerminate() {
+    func testShouldHandleTerminated_WhenBroadcastingValue_WithFlatMap_WithTerminate() {
         let otherChannel = Channel<Int>()
         
         channel
