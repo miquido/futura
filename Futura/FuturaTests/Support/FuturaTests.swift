@@ -58,7 +58,7 @@ extension XCTestCase {
 
 extension Future {
     @discardableResult
-    func logResults(with workLog: WorkLog) -> Self {
+    func logResults(with workLog: FutureWorkLog) -> Self {
         self
             .then { value in
                 workLog.log(.then(testDescription(of: value)))

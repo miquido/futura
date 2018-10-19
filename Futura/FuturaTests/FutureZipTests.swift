@@ -12,7 +12,7 @@ import Futura
 class FutureZipTests: XCTestCase {
     
     var worker: TestWorker = .init()
-    var workLog: WorkLog = .init()
+    var workLog: FutureWorkLog = .init()
     var promise_1: Promise<Int> = .init()
     var promise_2: Promise<Int> = .init()
     
@@ -320,10 +320,10 @@ class FutureZipTests: XCTestCase {
             }
             
             let dispatchQueue: DispatchQueue = DispatchQueue(label: "test", qos: .default, attributes: .concurrent)
-            let lock_1: Lock = Lock()
-            let lock_2: Lock = Lock()
-            let lock_3: Lock = Lock()
-            let lock_4: Lock = Lock()
+            let lock_1: RecursiveLock = RecursiveLock()
+            let lock_2: RecursiveLock = RecursiveLock()
+            let lock_3: RecursiveLock = RecursiveLock()
+            let lock_4: RecursiveLock = RecursiveLock()
             var counter_1 = 0
             var counter_2 = 0
             var counter_3 = 0
@@ -388,10 +388,10 @@ class FutureZipTests: XCTestCase {
             }
             
             let dispatchQueue: DispatchQueue = DispatchQueue(label: "test", qos: .default, attributes: .concurrent)
-            let lock_1: Lock = Lock()
-            let lock_2: Lock = Lock()
-            let lock_3: Lock = Lock()
-            let lock_4: Lock = Lock()
+            let lock_1: RecursiveLock = RecursiveLock()
+            let lock_2: RecursiveLock = RecursiveLock()
+            let lock_3: RecursiveLock = RecursiveLock()
+            let lock_4: RecursiveLock = RecursiveLock()
             var counter_1 = 0
             var counter_2 = 0
             var counter_3 = 0
@@ -456,10 +456,10 @@ class FutureZipTests: XCTestCase {
             }
             
             let dispatchQueue: DispatchQueue = DispatchQueue(label: "test", qos: .default, attributes: .concurrent)
-            let lock_1: Lock = Lock()
-            let lock_2: Lock = Lock()
-            let lock_3: Lock = Lock()
-            let lock_4: Lock = Lock()
+            let lock_1: RecursiveLock = RecursiveLock()
+            let lock_2: RecursiveLock = RecursiveLock()
+            let lock_3: RecursiveLock = RecursiveLock()
+            let lock_4: RecursiveLock = RecursiveLock()
             var counter_1 = 0
             var counter_2 = 0
             var counter_3 = 0

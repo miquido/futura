@@ -14,9 +14,15 @@
 
 import Darwin
 
-internal enum Mutex {
+/// pthread_mutex api wrapper
+public enum Mutex {
     
-    internal static func make(recursive: Bool) -> UnsafeMutablePointer<pthread_mutex_t> {
+    /// pthread_mutex_t pointer type
+    public typealias Pointer = UnsafeMutablePointer<pthread_mutex_t>
+    
+    /// Creates new instance of pthread_mutex
+    @inline(__always)
+    public static func make(recursive: Bool) -> Pointer {
         let pointer = UnsafeMutablePointer<pthread_mutex_t>.allocate(capacity: 1)
         let attr = UnsafeMutablePointer<pthread_mutexattr_t>.allocate(capacity: 1)
         guard pthread_mutexattr_init(attr) == 0 else { preconditionFailure() }
@@ -29,24 +35,29 @@ internal enum Mutex {
         return pointer
     }
     
-    internal static func destroy(_ pointer: UnsafeMutablePointer<pthread_mutex_t>) {
+    /// Deallocates instance of pthread_mutex
+    @inline(__always)
+    public static func destroy(_ pointer: Pointer) {
         pthread_mutex_destroy(pointer)
         pointer.deinitialize(count: 1)
         pointer.deallocate()
     }
     
+    /// Locks on instance of pthread_mutex
     @inline(__always)
-    internal static func lock(_ pointer: UnsafeMutablePointer<pthread_mutex_t>) {
+    public static func lock(_ pointer: Pointer) {
         pthread_mutex_lock(pointer)
     }
     
+    /// Tries to lock on instance of pthread_mutex
     @inline(__always)
-    internal static func tryLock(_ pointer: UnsafeMutablePointer<pthread_mutex_t>) -> Bool {
+    public static func tryLock(_ pointer: Pointer) -> Bool {
         return pthread_mutex_trylock(pointer) == 0
     }
     
+    /// Unlocks on instance of pthread_mutex
     @inline(__always)
-    internal static func unlock(_ pointer: UnsafeMutablePointer<pthread_mutex_t>) {
+    public static func unlock(_ pointer: Pointer) {
         pthread_mutex_unlock(pointer)
     }
 }

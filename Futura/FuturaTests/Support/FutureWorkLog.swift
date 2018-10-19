@@ -12,7 +12,7 @@
  See the License for the specific language governing permissions and
  limitations under the License. */
 
-final class WorkLog : Equatable {
+final class FutureWorkLog : Equatable {
 
     private var log: [Event]
     
@@ -28,11 +28,11 @@ final class WorkLog : Equatable {
         case `switch`
     }
 
-    init(_ elements: WorkLog.Event...) {
+    init(_ elements: FutureWorkLog.Event...) {
         self.log = Array(elements)
     }
     
-    init(_ elements: [WorkLog.Event]) {
+    init(_ elements: [FutureWorkLog.Event]) {
         self.log = Array(elements)
     }
     
@@ -44,18 +44,18 @@ final class WorkLog : Equatable {
         return log.isEmpty
     }
     
-    static func == (lhs: WorkLog, rhs: WorkLog) -> Bool {
+    static func == (lhs: FutureWorkLog, rhs: FutureWorkLog) -> Bool {
         return lhs.log == rhs.log
     }
 }
 
-extension WorkLog.Event : CustomStringConvertible {
+extension FutureWorkLog.Event : CustomStringConvertible {
     var description: String {
         return debugDescription
     }
 }
 
-extension WorkLog.Event : CustomDebugStringConvertible {
+extension FutureWorkLog.Event : CustomDebugStringConvertible {
     var debugDescription: String {
         switch self {
         case let .then(value):
@@ -80,26 +80,26 @@ extension WorkLog.Event : CustomDebugStringConvertible {
     }
 }
 
-extension WorkLog.Event : Equatable {
-    static func == (lhs: WorkLog.Event, rhs: WorkLog.Event) -> Bool {
+extension FutureWorkLog.Event : Equatable {
+    static func == (lhs: FutureWorkLog.Event, rhs: FutureWorkLog.Event) -> Bool {
         return lhs.debugDescription == rhs.debugDescription
     }
 }
 
-extension WorkLog : CustomStringConvertible {
+extension FutureWorkLog : CustomStringConvertible {
     var description: String {
         return debugDescription
     }
 }
 
-extension WorkLog : CustomDebugStringConvertible {
+extension FutureWorkLog : CustomDebugStringConvertible {
     var debugDescription: String {
         return "WorkLog[\(log.map { $0.debugDescription }.joined(separator: "-"))]"
     }
 }
 
-extension WorkLog : ExpressibleByArrayLiteral {
-    convenience init(arrayLiteral elements: WorkLog.Event...) {
+extension FutureWorkLog : ExpressibleByArrayLiteral {
+    convenience init(arrayLiteral elements: FutureWorkLog.Event...) {
         self.init(elements)
     }
 }

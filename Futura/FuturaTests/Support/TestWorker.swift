@@ -16,7 +16,7 @@ import Futura
 
 class TestWorker : Worker {
     
-    private let lock: Lock = .init()
+    private let lock: RecursiveLock = .init()
     private var scheduled: [() -> Void] = []
     
     func schedule(_ work: @escaping () -> Void) {

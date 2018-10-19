@@ -11,38 +11,33 @@ import Futura
 
 class FuturaPerformanceTests: XCTestCase {
 
-    func testPerformance_LockAndUnlock_OfLock() {
+    func testPerformance_LockAndUnlock_OfRecursiveLock() {
+        let count = 10_000_000
         measure {
-            let lock = Lock()
+            let lock = RecursiveLock()
             var total = 0
             
-            for _ in 0..<10_000_000 {
+            for _ in 0 ..< count{
                 lock.lock()
                 total += 1
                 lock.unlock()
             }
             
-            XCTAssert(total == 10_000_000)
-        }
-    }
-
-    func testPerformance_Init_OfFuturaWorker() {
-        measure {
-            // making a lot of threads is pointless and making too many causes errors - crash
-            for _ in 0..<100 {
-                _ = FuturaWorker.init()
-            }
+            XCTAssert(total == count)
         }
     }
     
-    func testPerformance_Schedule_OfFuturaWorker() {
-        let worker = FuturaWorker.init()
-        
+    func testPerformance_Synchronized_OfRecursiveLock() {
+        let count = 10_000_000
         measure {
-            // insert to array is a bottleneck now
-            for _ in 0..<100_000 {
-                worker.schedule {}
+            let lock = RecursiveLock()
+            var total = 0
+            
+            for _ in 0 ..< count{
+                lock.synchronized { total += 1 }
             }
+            
+            XCTAssert(total == count)
         }
     }
 }
