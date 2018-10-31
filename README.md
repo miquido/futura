@@ -8,12 +8,11 @@ Futura is a library that provides simple yet powerful tools for working with asy
 
 ## What it is about?
 
-The main goal of Futura is to keep things simple. This means that it provides easy to use tools that have compact and understandable implementation. You should not be worried about fixing and extending any of those because of massive code base or complicated architecture. This also means that Futura does not provide ultimate solution to all concurrency problems. It only simplifies many of them with proper tool for each problem. If certain tool does not work in your case, do not try to hack it, just use the other one or propose new one if needed.
+The main goal of Futura is to keep things simple. This means that it provides easy to use tools that have compact and understandable implementation. You should not be worried about fixing and extending any of those because of massive code base or complicated architecture. This also means that Futura does not provide ultimate solution to all concurrency problems. It only simplifies many of them with proper tool for each problem. If certain tool does not work in your case, do not try to hack it, just use the other one or propose a new one if needed.
 
-## What it is not?
+## What it is not about?
 
-Futura is not any kind of framework or complete solution. It does not provide single universal tool (like in example rx) for all problems. It also does not try to pack extra features where it not fits or feels right. It also does not provide multi layer abstraction connecting and organizing all internals. It just keeps things simple :)
-This repository does not contain any platform or library specific extensions too. It should be developed outside to provide reasonable small library that have wide usage.
+Futura is not any kind of framework or complete solution. It does not provide single universal tool for all problems. It also does not try to pack extra features where it not fits or feels right. It also does not provide multilayer abstraction connecting and organizing all internals. It just keeps things simple :) This repository does not contain any platform or library specific extensions too. It should be developed outside to provide reasonable small library for asynchronity and concurrency that have wide usage.
 
 ## Is that for me?
 
@@ -113,23 +112,22 @@ pod 'Futura', :git => 'https://github.com/miquido/futura.git', :tag => '2.0.0'
 
 Basic tools are already here. It is all tested and documented in simpliest way. This is not the end though. There are some extensions and features that will be developed in future.
 
- -[x] Foundation features
- -[x] Promise and future
- -[x] Promise and future tests
- -[ ] Promise and future debug system
- -[ ] Promise and future documentation (partially done)
- -[ ] Promise and future randomized test sets
- -[x] Stream 
- -[ ] Stream with buffer
- -[x] Stream tests
- -[ ] Stream debug system
- -[ ] Stream documentation (partially done)
- -[ ] Stream randomized test sets
- -[ ] Swift Package Manager support
- -[ ] Linux support
- -[ ] Custom worker implementation
-
-## What exactly it is? TODO:
+- [x] Worker
+- [x] Recursive lock
+- [x] Promise and future
+- [ ] Promise and future debug system
+- [ ] Promise and future documentation (partially done)
+- [ ] Promise and future randomized test sets
+- [x] Stream TODO: naming
+- [ ] Stream with buffer TODO: naming
+- [ ] Stream debug system TODO: naming
+- [ ] Stream documentation (partially done) TODO: naming
+- [ ] Stream randomized test sets TODO: naming
+- [ ] Swift Package Manager support
+- [ ] Linux support
+- [ ] Custom worker implementation optimized for futures
+ 
+## What exactly it is? TODO: to complete
 
 What excact tools are available in Futura? 
 Single async tasks and even caches can be done with promises and futures. 
@@ -213,9 +211,10 @@ func make(request: URLRequest, using session: URLSession) -> Future<(URLResponse
 }
 ```
 
-### Stream TODO:
+### Stream TODO: to complete and naming
 
-### Lock and mutex TODO:
+### Lock and mutex TODO: to complete
 
-## License
-TODO:
+## License TODO: to complete
+### Code license
+### Logo license
