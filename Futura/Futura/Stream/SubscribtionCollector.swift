@@ -20,7 +20,7 @@
 /// You can delegate ownership of subscriptions to any owned collector by collect method.
 public final class SubscribtionCollector {
     
-    private let lock: Lock = .init()
+    private let lock: RecursiveLock = .init()
     private var subscribtions: [Subscription] = []
     
     internal var isSuspended: Bool = false

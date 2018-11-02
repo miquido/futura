@@ -25,6 +25,9 @@ public enum DispatchWorker {
 
 extension DispatchWorker : Worker {
     
+    /// Assigns given work at the end of queue.
+    /// Depending on queue type (serial or concurrent) behaviour may be different.
+    /// It simple calls DispatchQueue.async for task execution.
     public func schedule(_ work: @escaping () -> Void) -> Void {
         queue.async(execute: work)
     }

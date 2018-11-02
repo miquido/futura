@@ -15,19 +15,19 @@
 import XCTest
 import Futura
 
-class LockTests: XCTestCase {
+class RecursiveLockTests: XCTestCase {
     
-    func testShould_NotCrash_When_ReleasingLocked() {
-        Lock().lock()
+    func testShouldNotCrash_When_ReleasingLocked() {
+        RecursiveLock().lock()
     }
     
     // make sure that tests run with thread sanitizer enabled
-    func testShould_LockAndUnlock_When_CalledOnDistinctThreads() {
+    func testShouldLockAndUnlock_WhenCalledOnDistinctThreads() {
         asyncTest(timeoutBody: {
             XCTFail("Not in time - possible deadlock or fail")
         })
         { complete in
-            let lock = Lock()
+            let lock: RecursiveLock = .init()
             var completed: Bool = false
             
             lock.lock()
@@ -42,12 +42,12 @@ class LockTests: XCTestCase {
         }
     }
     
-    func testShould_LockAndUnlock_When_CalledOnSameThread() {
+    func testShouldLockAndUnlock_WhenCalledOnSameThread() {
         asyncTest(timeoutBody: {
             XCTFail("Not in time - possible deadlock or fail")
         })
         { complete in
-            let lock = Lock()
+            let lock: RecursiveLock = .init()
             
             lock.lock()
             lock.lock()
@@ -60,16 +60,16 @@ class LockTests: XCTestCase {
         }
     }
     
-    func testShould_SucceedTryLock_When_Unlocked() {
-        let lock = Lock()
+    func testShouldSucceedTryLock_WhenUnlocked() {
+        let lock: RecursiveLock = .init()
         
         guard lock.tryLock() else {
             return XCTFail("Lock failed to lock")
         }
     }
     
-    func testShould_SucceedTryLock_When_LockedOnSameThread() {
-        let lock = Lock()
+    func testShouldSucceedTryLock_WhenLockedOnSameThread() {
+        let lock: RecursiveLock = .init()
         lock.lock()
         
         guard lock.tryLock() else {
@@ -78,12 +78,12 @@ class LockTests: XCTestCase {
     }
     
     // make sure that tests run with thread sanitizer enabled
-    func testShould_FailTryLock_When_LockedOnOtherThread() {
+    func testShouldFailTryLock_WhenLockedOnOtherThread() {
         asyncTest(timeoutBody: {
             XCTFail("Not in time - possible deadlock or fail")
         })
         { complete in
-            let lock = Lock()
+            let lock: RecursiveLock = .init()
             lock.lock()
             
             DispatchQueue.global().async {
@@ -97,12 +97,12 @@ class LockTests: XCTestCase {
     }
     
     // make sure that tests run with thread sanitizer enabled
-    func testShould_SynchronizeBlock_When_CalledOnDistinctThreads() {
+    func testShouldSynchronizeBlock_WhenCalledOnDistinctThreads() {
         asyncTest(timeoutBody: {
             XCTFail("Not in time - possible deadlock or fail")
         })
         { complete in
-            let lock = Lock()
+            let lock: RecursiveLock = .init()
             var testValue = 0
             
             DispatchQueue.global().async {
@@ -122,13 +122,13 @@ class LockTests: XCTestCase {
     }
     
     // make sure that tests run with thread sanitizer enabled
-    func testShould_NotCauseDeadlock_When_SynchronizedCalledRecursively() {
+    func testShouldNotCauseDeadlock_WhenSynchronizedCalledRecursively() {
         asyncTest(iterationTimeout: 6,
                   timeoutBody: {
                     XCTFail("Not in time - possible deadlock or fail")
         })
         { complete in
-            let lock = Lock()
+            let lock: RecursiveLock = .init()
             var completed: Bool = false
             
             lock.synchronized {
@@ -148,8 +148,8 @@ class LockTests: XCTestCase {
         }
     }
     
-    func testShould_ThrowInSynchronizedWithoutChangingError() {
-        let lock = Lock()
+    func testShouldThrowInSynchronizedWithoutChangingError() {
+        let lock: RecursiveLock = .init()
         let expectedResult = TestError()
         
         do {
@@ -157,21 +157,6 @@ class LockTests: XCTestCase {
             XCTFail("Lock not threw")
         } catch {
             XCTAssert(error is TestError, "Catched error does not match expected. Expected: \(expectedResult) Received: \(error)")
-        }
-    }
-    
-    func testPerformance_LockAndUnlock() {
-        measure {
-            let lock = Lock()
-            var total = 0
-            
-            for _ in 0..<performanceTestIterations {
-                lock.lock()
-                total += 1
-                lock.unlock()
-            }
-            
-            XCTAssert(total == performanceTestIterations)
         }
     }
 }

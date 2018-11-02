@@ -18,7 +18,7 @@ public class Stream<Value> {
     private var nextSubscriptionID: Subscription.ID = 0
     private let privateCollector: SubscribtionCollector = .init()
     
-    internal let lock: Lock = .init()
+    internal let lock: RecursiveLock = .init()
     internal var subscribers: [Subscription.ID : (Event) -> Void] = [:]
     internal weak var collector: SubscribtionCollector?
     internal var isClosed: Bool = false

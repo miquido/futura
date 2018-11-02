@@ -18,25 +18,35 @@
 		40258CB72175CE79008EE920 /* StreamTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40258CB62175CE79008EE920 /* StreamTests.swift */; };
 		404B9499215A351100640928 /* Futura.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 404B948F215A351100640928 /* Futura.framework */; };
 		404B949E215A351100640928 /* FuturaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404B949D215A351100640928 /* FuturaTests.swift */; };
-		404B94AA215A352D00640928 /* Lock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404B94A9215A352D00640928 /* Lock.swift */; };
+		404B94AA215A352D00640928 /* RecursiveLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404B94A9215A352D00640928 /* RecursiveLock.swift */; };
 		404B94AC215A354000640928 /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404B94AB215A354000640928 /* Result.swift */; };
 		404B94B0215A356B00640928 /* Future.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404B94AF215A356B00640928 /* Future.swift */; };
 		404B94B2215A358900640928 /* ExecutionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404B94B1215A358900640928 /* ExecutionContext.swift */; };
 		404B94B4215A35AF00640928 /* Worker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404B94B3215A35AF00640928 /* Worker.swift */; };
 		404B94B6215A35C700640928 /* DispatchWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404B94B5215A35C700640928 /* DispatchWorker.swift */; };
 		404B94B8215A35E700640928 /* Promise.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404B94B7215A35E700640928 /* Promise.swift */; };
-		404B94BA215A364100640928 /* LockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404B94B9215A364100640928 /* LockTests.swift */; };
+		404B94BA215A364100640928 /* RecursiveLockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404B94B9215A364100640928 /* RecursiveLockTests.swift */; };
 		404B94BC215A365100640928 /* PromiseAndFutureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404B94BB215A365100640928 /* PromiseAndFutureTests.swift */; };
 		404B94C0215A5CC600640928 /* DispatchWorkerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404B94BF215A5CC600640928 /* DispatchWorkerTests.swift */; };
+		405716CA217077EE00C79BE5 /* FuturaPerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 405716C9217077EE00C79BE5 /* FuturaPerformanceTests.swift */; };
+		405716CC217077EE00C79BE5 /* Futura.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 404B948F215A351100640928 /* Futura.framework */; };
 		40750C50217A3FFC00067852 /* FilteringStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40750C4F217A3FFC00067852 /* FilteringStream.swift */; };
 		40750C52217A423B00067852 /* StreamWorkLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40750C51217A423B00067852 /* StreamWorkLog.swift */; };
 		4075C52421624F8100B40806 /* TestWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4075C52321624F8100B40806 /* TestWorker.swift */; };
-		408B60FC2163630300C1A948 /* WorkLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 408B60FB2163630300C1A948 /* WorkLog.swift */; };
+		407AA544216E174F0030C433 /* Mutex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 407AA543216E174F0030C433 /* Mutex.swift */; };
+		408B60FC2163630300C1A948 /* FutureWorkLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 408B60FB2163630300C1A948 /* FutureWorkLog.swift */; };
 		40AFB89C216B72BC00ABB5BB /* FutureZipTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40AFB89B216B72BC00ABB5BB /* FutureZipTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
 		404B949A215A351100640928 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 404B9486215A351100640928 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 404B948E215A351100640928;
+			remoteInfo = Futura;
+		};
+		405716CD217077EE00C79BE5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 404B9486215A351100640928 /* Project object */;
 			proxyType = 1;
@@ -60,20 +70,24 @@
 		404B9498215A351100640928 /* FuturaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FuturaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		404B949D215A351100640928 /* FuturaTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuturaTests.swift; sourceTree = "<group>"; };
 		404B949F215A351100640928 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		404B94A9215A352D00640928 /* Lock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Lock.swift; sourceTree = "<group>"; };
+		404B94A9215A352D00640928 /* RecursiveLock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecursiveLock.swift; sourceTree = "<group>"; };
 		404B94AB215A354000640928 /* Result.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
 		404B94AF215A356B00640928 /* Future.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Future.swift; sourceTree = "<group>"; };
 		404B94B1215A358900640928 /* ExecutionContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExecutionContext.swift; sourceTree = "<group>"; };
 		404B94B3215A35AF00640928 /* Worker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Worker.swift; sourceTree = "<group>"; };
 		404B94B5215A35C700640928 /* DispatchWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DispatchWorker.swift; sourceTree = "<group>"; };
 		404B94B7215A35E700640928 /* Promise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Promise.swift; sourceTree = "<group>"; };
-		404B94B9215A364100640928 /* LockTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockTests.swift; sourceTree = "<group>"; };
+		404B94B9215A364100640928 /* RecursiveLockTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecursiveLockTests.swift; sourceTree = "<group>"; };
 		404B94BB215A365100640928 /* PromiseAndFutureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromiseAndFutureTests.swift; sourceTree = "<group>"; };
 		404B94BF215A5CC600640928 /* DispatchWorkerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DispatchWorkerTests.swift; sourceTree = "<group>"; };
+		405716C7217077EE00C79BE5 /* FuturaPerformanceTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FuturaPerformanceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		405716C9217077EE00C79BE5 /* FuturaPerformanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuturaPerformanceTests.swift; sourceTree = "<group>"; };
+		405716CB217077EE00C79BE5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		40750C4F217A3FFC00067852 /* FilteringStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilteringStream.swift; sourceTree = "<group>"; };
 		40750C51217A423B00067852 /* StreamWorkLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamWorkLog.swift; sourceTree = "<group>"; };
 		4075C52321624F8100B40806 /* TestWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestWorker.swift; sourceTree = "<group>"; };
-		408B60FB2163630300C1A948 /* WorkLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkLog.swift; sourceTree = "<group>"; };
+		407AA543216E174F0030C433 /* Mutex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mutex.swift; sourceTree = "<group>"; };
+		408B60FB2163630300C1A948 /* FutureWorkLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureWorkLog.swift; sourceTree = "<group>"; };
 		40AFB89B216B72BC00ABB5BB /* FutureZipTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureZipTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -90,6 +104,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				404B9499215A351100640928 /* Futura.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		405716C4217077EE00C79BE5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				405716CC217077EE00C79BE5 /* Futura.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -117,6 +139,7 @@
 			children = (
 				404B9491215A351100640928 /* Futura */,
 				404B949C215A351100640928 /* FuturaTests */,
+				405716C8217077EE00C79BE5 /* FuturaPerformanceTests */,
 				404B9490215A351100640928 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -126,6 +149,7 @@
 			children = (
 				404B948F215A351100640928 /* Futura.framework */,
 				404B9498215A351100640928 /* FuturaTests.xctest */,
+				405716C7217077EE00C79BE5 /* FuturaPerformanceTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -134,14 +158,11 @@
 			isa = PBXGroup;
 			children = (
 				40258CA52175C3C4008EE920 /* Stream */,
-				404B9493215A351100640928 /* Info.plist */,
+				407AA551216E48670030C433 /* Future */,
+				407AA555216E4CD60030C433 /* Synchronization */,
+				407AA550216E481B0030C433 /* Worker */,
 				404B94AB215A354000640928 /* Result.swift */,
-				404B94AF215A356B00640928 /* Future.swift */,
-				404B94B7215A35E700640928 /* Promise.swift */,
-				404B94A9215A352D00640928 /* Lock.swift */,
-				404B94B3215A35AF00640928 /* Worker.swift */,
-				404B94B5215A35C700640928 /* DispatchWorker.swift */,
-				404B94B1215A358900640928 /* ExecutionContext.swift */,
+				404B9493215A351100640928 /* Info.plist */,
 			);
 			path = Futura;
 			sourceTree = "<group>";
@@ -149,18 +170,71 @@
 		404B949C215A351100640928 /* FuturaTests */ = {
 			isa = PBXGroup;
 			children = (
-				4075C52321624F8100B40806 /* TestWorker.swift */,
-				408B60FB2163630300C1A948 /* WorkLog.swift */,
-				404B949D215A351100640928 /* FuturaTests.swift */,
 				404B949F215A351100640928 /* Info.plist */,
-				404B94B9215A364100640928 /* LockTests.swift */,
+				407AA552216E4B840030C433 /* Support */,
 				404B94BB215A365100640928 /* PromiseAndFutureTests.swift */,
-				404B94BF215A5CC600640928 /* DispatchWorkerTests.swift */,
 				40AFB89B216B72BC00ABB5BB /* FutureZipTests.swift */,
 				40258CB62175CE79008EE920 /* StreamTests.swift */,
-				40750C51217A423B00067852 /* StreamWorkLog.swift */,
+				404B94B9215A364100640928 /* RecursiveLockTests.swift */,
+				404B94BF215A5CC600640928 /* DispatchWorkerTests.swift */,
 			);
 			path = FuturaTests;
+			sourceTree = "<group>";
+		};
+		405716C8217077EE00C79BE5 /* FuturaPerformanceTests */ = {
+			isa = PBXGroup;
+			children = (
+				405716C9217077EE00C79BE5 /* FuturaPerformanceTests.swift */,
+				405716CB217077EE00C79BE5 /* Info.plist */,
+			);
+			path = FuturaPerformanceTests;
+			sourceTree = "<group>";
+		};
+		407AA550216E481B0030C433 /* Worker */ = {
+			isa = PBXGroup;
+			children = (
+				404B94B3215A35AF00640928 /* Worker.swift */,
+				407AA553216E4C9B0030C433 /* Dispatch */,
+			);
+			path = Worker;
+			sourceTree = "<group>";
+		};
+		407AA551216E48670030C433 /* Future */ = {
+			isa = PBXGroup;
+			children = (
+				404B94AF215A356B00640928 /* Future.swift */,
+				404B94B7215A35E700640928 /* Promise.swift */,
+				404B94B1215A358900640928 /* ExecutionContext.swift */,
+			);
+			path = Future;
+			sourceTree = "<group>";
+		};
+		407AA552216E4B840030C433 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				4075C52321624F8100B40806 /* TestWorker.swift */,
+				408B60FB2163630300C1A948 /* FutureWorkLog.swift */,
+				40750C51217A423B00067852 /* StreamWorkLog.swift */,
+				404B949D215A351100640928 /* FuturaTests.swift */,
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
+		407AA553216E4C9B0030C433 /* Dispatch */ = {
+			isa = PBXGroup;
+			children = (
+				404B94B5215A35C700640928 /* DispatchWorker.swift */,
+			);
+			path = Dispatch;
+			sourceTree = "<group>";
+		};
+		407AA555216E4CD60030C433 /* Synchronization */ = {
+			isa = PBXGroup;
+			children = (
+				407AA543216E174F0030C433 /* Mutex.swift */,
+				404B94A9215A352D00640928 /* RecursiveLock.swift */,
+			);
+			path = Synchronization;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -212,6 +286,24 @@
 			productReference = 404B9498215A351100640928 /* FuturaTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		405716C6217077EE00C79BE5 /* FuturaPerformanceTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 405716D1217077EE00C79BE5 /* Build configuration list for PBXNativeTarget "FuturaPerformanceTests" */;
+			buildPhases = (
+				405716C3217077EE00C79BE5 /* Sources */,
+				405716C4217077EE00C79BE5 /* Frameworks */,
+				405716C5217077EE00C79BE5 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				405716CE217077EE00C79BE5 /* PBXTargetDependency */,
+			);
+			name = FuturaPerformanceTests;
+			productName = FuturaPerformanceTests;
+			productReference = 405716C7217077EE00C79BE5 /* FuturaPerformanceTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -227,6 +319,9 @@
 						LastSwiftMigration = 1000;
 					};
 					404B9497215A351100640928 = {
+						CreatedOnToolsVersion = 10.0;
+					};
+					405716C6217077EE00C79BE5 = {
 						CreatedOnToolsVersion = 10.0;
 					};
 				};
@@ -245,6 +340,7 @@
 			targets = (
 				404B948E215A351100640928 /* Futura */,
 				404B9497215A351100640928 /* FuturaTests */,
+				405716C6217077EE00C79BE5 /* FuturaPerformanceTests */,
 			);
 		};
 /* End PBXProject section */
@@ -258,6 +354,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		404B9496215A351100640928 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		405716C5217077EE00C79BE5 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -283,10 +386,11 @@
 				40258CB12175C6E5008EE920 /* FlatMappingStream.swift in Sources */,
 				40258CAF2175C64F008EE920 /* MappingStream.swift in Sources */,
 				404B94B6215A35C700640928 /* DispatchWorker.swift in Sources */,
-				404B94AA215A352D00640928 /* Lock.swift in Sources */,
 				40258CA92175C40F008EE920 /* Stream.swift in Sources */,
 				40258CAD2175C60C008EE920 /* ForwardingStream.swift in Sources */,
+				404B94AA215A352D00640928 /* RecursiveLock.swift in Sources */,
 				404B94B8215A35E700640928 /* Promise.swift in Sources */,
+				407AA544216E174F0030C433 /* Mutex.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -294,7 +398,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				404B94BA215A364100640928 /* LockTests.swift in Sources */,
+				404B94BA215A364100640928 /* RecursiveLockTests.swift in Sources */,
 				40AFB89C216B72BC00ABB5BB /* FutureZipTests.swift in Sources */,
 				4075C52421624F8100B40806 /* TestWorker.swift in Sources */,
 				40258CB72175CE79008EE920 /* StreamTests.swift in Sources */,
@@ -302,7 +406,16 @@
 				404B94BC215A365100640928 /* PromiseAndFutureTests.swift in Sources */,
 				404B94C0215A5CC600640928 /* DispatchWorkerTests.swift in Sources */,
 				40750C52217A423B00067852 /* StreamWorkLog.swift in Sources */,
-				408B60FC2163630300C1A948 /* WorkLog.swift in Sources */,
+				408B60FC2163630300C1A948 /* FutureWorkLog.swift in Sources */,
+				408B60FC2163630300C1A948 /* FutureWorkLog.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		405716C3217077EE00C79BE5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				405716CA217077EE00C79BE5 /* FuturaPerformanceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -313,6 +426,11 @@
 			isa = PBXTargetDependency;
 			target = 404B948E215A351100640928 /* Futura */;
 			targetProxy = 404B949A215A351100640928 /* PBXContainerItemProxy */;
+		};
+		405716CE217077EE00C79BE5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 404B948E215A351100640928 /* Futura */;
+			targetProxy = 405716CD217077EE00C79BE5 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -530,6 +648,40 @@
 			};
 			name = Release;
 		};
+		405716CF217077EE00C79BE5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = FuturaPerformanceTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.miquido.FuturaPerformanceTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		405716D0217077EE00C79BE5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = FuturaPerformanceTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.miquido.FuturaPerformanceTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -556,6 +708,15 @@
 			buildConfigurations = (
 				404B94A7215A351100640928 /* Debug */,
 				404B94A8215A351100640928 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		405716D1217077EE00C79BE5 /* Build configuration list for PBXNativeTarget "FuturaPerformanceTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				405716CF217077EE00C79BE5 /* Debug */,
+				405716D0217077EE00C79BE5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

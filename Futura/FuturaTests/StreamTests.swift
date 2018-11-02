@@ -660,9 +660,9 @@ class StreamTests: XCTestCase {
         })
         { complete in
             let dispatchQueue: DispatchQueue = DispatchQueue(label: "test", qos: .default, attributes: .concurrent)
-            let lock_1: Lock = Lock()
-            let lock_2: Lock = Lock()
-            let lock_3: Lock = Lock()
+            let lock_1: RecursiveLock = .init()
+            let lock_2: RecursiveLock = .init()
+            let lock_3: RecursiveLock = .init()
             var counter_1 = 0
             var counter_2 = 0
             var counter_3 = 0
