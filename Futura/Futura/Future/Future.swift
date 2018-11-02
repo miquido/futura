@@ -16,15 +16,17 @@
 /// Cancels automatically on deinit when not completed before.
 public final class Future<Value> {
     
-    private let lock: Lock = Lock()
+    private let lock: RecursiveLock = RecursiveLock()
     private let executionContext: ExecutionContext
     private var observers: [(State) -> Void] = []
     private var state: State
     
+    /// Creates already completed instance of future with given value.
     public convenience init(succeededWith result: Value, executionContext: ExecutionContext = .undefined) {
         self.init(with: .success(result), executionContext: executionContext)
     }
     
+    /// Creates already completed instance of future with given error.
     public convenience init(failedWith reason: Error, executionContext: ExecutionContext = .undefined) {
         self.init(with: .error(reason), executionContext: executionContext)
     }
@@ -303,7 +305,7 @@ public func zip<T, U>(_ f1: Future<T>, _ f2: Future<U>) -> Future<(T, U)> {
     #if FUTURA_DEBUG
     os_log("Zipping on %{public}@ & %{public}@ => %{public}@", log: logger, type: .debug, f1.debugDescriptionSynchronized, f2.debugDescriptionSynchronized, future.debugDescriptionSynchronized)
     #endif
-    let lock = Lock()
+    let lock = RecursiveLock()
     var results: (T?, U?)
     
     f1.observe { state in
@@ -352,7 +354,7 @@ public func zip<T>(_ farr: [Future<T>]) -> Future<[T]> {
     #if FUTURA_DEBUG
     os_log("Zipping array on %{public}@", log: logger, type: .debug, future.debugDescriptionSynchronized)
     #endif
-    let lock = Lock()
+    let lock = RecursiveLock()
     let count = farr.count
     var results: [T] = []
     

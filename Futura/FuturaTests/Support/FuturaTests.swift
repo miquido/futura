@@ -20,8 +20,6 @@ struct TestError : Error {}
 let testError: TestError = TestError()
 let testErrorDescription: String = testDescription(of: testError)
 
-let performanceTestIterations = 10_000_000
-
 let markedQueueKey = DispatchSpecificKey<Void>()
 let markedQueue: DispatchQueue = {
     let queue = DispatchQueue(label: "MarkedQueue")
@@ -60,7 +58,7 @@ extension XCTestCase {
 
 extension Future {
     @discardableResult
-    func logResults(with workLog: WorkLog) -> Self {
+    func logResults(with workLog: FutureWorkLog) -> Self {
         self
             .then { value in
                 workLog.log(.then(testDescription(of: value)))

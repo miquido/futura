@@ -17,7 +17,7 @@ func make(request: URLRequest) -> Future<(URLResponse, Data?)> {
         } else {
             promise.break(with: Errors.invalidState) // this is invalid state that should be covered with some nice error
         }
-    }.resume()
+        }.resume()
     return promise.future
 }
 
@@ -45,11 +45,11 @@ make(request: githubRequest)
     }
     .fail { reason in
         print("There was an error when getting github: \(reason)")
-    }
+}
 
 // similar to String extension we can define JSONDecoder extension for easy decoding
 extension JSONDecoder {
-   
+    
     func decoder<T: Decodable>(for type: T.Type) -> (Data) throws -> T {
         return { data in
             return try self.decode(type, from: data)
@@ -76,5 +76,5 @@ make(request: jsonRequest)
     }
     .fail { reason in
         print("There was an error when getting json: \(reason)")
-    }
+}
 
