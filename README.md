@@ -8,15 +8,15 @@ Futura is a library that provides simple yet powerful tools for working with asy
 
 ## What it is about?
 
-The main goal of Futura is to keep things simple. This means that it provides easy to use tools that have compact and understandable implementation. You should not be worried about fixing and extending any of those because of massive code base or complicated architecture. This also means that Futura does not provide ultimate solution to all concurrency problems. It only simplifies many of them with proper tool for each problem. If certain tool does not work in your case, do not try to hack it, just use the other one or propose a new one if needed.
+The main goal of Futura is to keep things simple. This means that it provides easy to use yet flexible tools that have compact and understandable implementation. You should not be worried about fixing and extending any of those because of massive code base or complicated architecture. This also means that Futura does not provide ultimate solution to all concurrency problems. It only simplifies many of them with proper tool for each problem.
 
 ## What it is not about?
 
-Futura is not any kind of framework or complete solution. It does not provide single universal tool for all problems. It also does not try to pack extra features where it not fits or feels right. It also does not provide multilayer abstraction connecting and organizing all internals. It just keeps things simple :) This repository does not contain any platform or library specific extensions too. It should be developed outside to provide reasonable small library for asynchronity and concurrency that have wide usage.
+Futura is not any kind of framework. It does not provide single universal solution for all problems yet available tools are flexible enough to cover most cases. It also does not try to pack extra features where it not fits or feels right. This repository does not contain any platform or library specific extensions too.
 
 ## Is that for me?
 
-If you are wondering if you should use Futura in your code base please take a minute and look at sample code below. One of basic tools provided with this library is implementation of promises. With promises you can convert single asynchronous task to be more predictable and better handled. In example you can change URLSession requests like this:
+If you are wondering if you should use Futura in your code base or what it is actually about please take a minute and look at sample code below. One of basic tools provided with this library is implementation of promises. With promises you can convert single asynchronous task to be more predictable and better handled. In example you can change URLSession requests like this:
 ``` swift
 make(request: URLRequest.init(url: "www.github.com"), using: URLSession.shared) { (data, response, error) in
     if let error = error {
@@ -75,7 +75,7 @@ futureData
     .then {
         present(text: $0)
     }
-    .fail {
+    .failure {
         present(error: $0)
     }
 futureData
@@ -87,6 +87,11 @@ futureData
     }
 ```
 This conversion not only simplifies the code keeping the same functionality and multithreading execution but it also splits things to be more manageable and testable. Each part - database, presentation and logs - is clearly separated from each other and may be applied in different more suitable places.
+
+One more example - in this case we will cover second important feature which is Signal. Signals provide api for dealing with continous streams of data and errors emited by some source. It might be user interactions, status observation or even socket.
+``` swift
+TODO: to complete
+```
 
 For more examples and tools overview please go to "What exactly it is?" section.
 
@@ -110,9 +115,9 @@ pod 'Futura', :git => 'https://github.com/miquido/futura.git', :tag => '2.0.0'
 
 ## What it will be in future?
 
-Basic tools are already here. It is all tested and documented in simpliest way. This is not the end though. There are some extensions and features that will be developed in future.
+Basic tools are already here. It is all tested and documented. This is not the end though. There are some extensions and features that will be developed in future.
 
-- [x] Worker
+- [x] DispatchWorker
 - [x] Recursive lock
 - [x] Promise and future
 - [ ] Promise and future debug system
@@ -125,7 +130,7 @@ Basic tools are already here. It is all tested and documented in simpliest way. 
 - [ ] Stream randomized test sets TODO: naming
 - [ ] Swift Package Manager support
 - [ ] Linux support
-- [ ] Custom worker implementation optimized for futures
+- [ ] FuturaWorker (custom worker implementation optimized for futures)
  
 ## What exactly it is? TODO: to complete
 
@@ -149,7 +154,7 @@ It supports both success and failure that can be accessed and handled wit ease.
 future.then { value in
     print("There was a success: \(value)")
 }
-future.fail { reason in
+future.failure { reason in
 	print("There was an error: \(reason)")
 }
 ```
@@ -161,7 +166,7 @@ promise.future.then { value in
 }
 promise.fulfill(with: "Success") // completes with value
 promise.break(with: Errors.someError) // completes with error
-// calling fulfill or break on finished promise has no effect
+// calling fulfill or break on finished (completed or canceled) promise has no effect
 ```
 If for any reason you need to drop handling and cancel all scheduled tasks without executing it you can to do so.
 ``` swift
@@ -179,7 +184,7 @@ future.flatMap { // can change not only type but also join two futures to one
 	return someAsyncTask(with: $0) // needs to return Future
 }
 
-future.completed { ... } // when completed with value or error but not canceled
+future.complete { ... } // when completed with value or error but not canceled
 future.always { ... }  // when finished (completed or canceled)
 future.catch { ... } // when error but not propagates further
 future.recover { ... } // when error allowing to provide valid value
@@ -188,7 +193,9 @@ It also gives you full control about thread on which your code will be executed.
 ``` swift
 future
 .switch(to: DispatchWorker.main)
-.then { _ in
+.then { _ in 
+    // it is guaranteed that it will be executed by worker selected before
+	// event if adding handler on already completed future
 	print("Executed on main thread")
 }
 ```
@@ -211,10 +218,51 @@ func make(request: URLRequest, using session: URLSession) -> Future<(URLResponse
 }
 ```
 
-### Stream TODO: to complete and naming
+You can also make simplified futures without promise. Just like this:
+``` swift
+future { // it will be performed on selected worker - dafault is DispatchWorker.default
+	// some task that will be done in future
+	return result // or throw to mark error
+}.complete {
+	// future completed
+}
+```
 
-### Lock and mutex TODO: to complete
+### Signal TODO: to complete and naming
 
-## License TODO: to complete
-### Code license
-### Logo license
+### Lock and Mutex
+
+In case you need some sychronization in your code you can use custom recursive lock implementation based on pthread_mutex.
+``` swift
+let lock: RecursiveLock = .init()
+lock.synchronized {
+	// all operations inside are synchronized by this lock
+}
+```
+If you need to use mutex directly you can do it simple using nice wrapper. It is not recommended though. If you still for some reason will use this remember that it is only functions wrapper, you need to dealocate it manually.
+``` swift
+let mutex = Mutex.create() // returns pointer to instance of pthread_mutex
+Mutex.lock(mutex)
+Mutex.unlock(mutex)
+Mutex.destroy(mutex) // since it is just function wrapper, not object you have to deallocate it manually
+```
+
+## How to get involved?
+
+Since Futura is open source project you can feel invited to make it even better. If you have found any kind of bug please make an issue. If any part of documentation is missing or not comperhensive propose some change or describe it as an issue. If you feel that there is smoething can be done better just fork this repository and propose some changes!
+
+## License
+
+Copyright 2018 Miquido
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
