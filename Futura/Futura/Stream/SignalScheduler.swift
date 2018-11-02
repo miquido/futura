@@ -26,14 +26,7 @@ internal final class SignalScheduler<Value> : SignalForwarder<Value, Value> {
     internal init(source: Signal<Value>, worker: Worker) {
         self.associatedWorker = worker
         super.init(source: source, collector: source.collector)
-        collect(source.subscribe({
-            switch $0 {
-            case let .right(token):
-                self.broadcast(token)
-            case let .left(reason):
-                self.finish(reason)
-            }
-        }))
+        source.forward(to: self)
     }
     
     internal override func broadcast(_ token: Token) {

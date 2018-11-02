@@ -14,7 +14,7 @@
 
 internal class SignalForwarder<V1, V2> : Signal<V2> {
     
-    private weak var source: Signal<V1>?
+    fileprivate weak var source: Signal<V1>?
     
     internal init(source: Signal<V1>, collector: SubscriptionCollector?) {
         self.source = source
@@ -24,5 +24,19 @@ internal class SignalForwarder<V1, V2> : Signal<V2> {
     override var isSuspended: Bool {
         return super.isSuspended || source?.isSuspended ?? false
     }
+}
+
+extension Signal {
     
+    internal func forward(to destination: SignalForwarder<Value, Value>) {
+        precondition(destination.source === self)
+        destination.collect(subscribe({
+            switch $0 {
+            case let .right(token):
+                destination.broadcast(token)
+            case let .left(reason):
+                destination.finish(reason)
+            }
+        }))
+    }
 }

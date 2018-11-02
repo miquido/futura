@@ -17,20 +17,20 @@ public final class SubscriptionCollector {
     private let lock: RecursiveLock = .init()
     private var subscriptions: [Subscription] = .init()
     
-    internal var finished: Bool = false
+    internal var isFinished: Bool = false
     
     public init() {}
     
     internal func collect(_ subscription: Subscription) {
         lock.synchronized {
-            guard !finished else { return }
+            guard !isFinished else { return }
             subscriptions.append(subscription)
         }
     }
     
     deinit {
         lock.synchronized {
-            finished = true
+            isFinished = true
             subscriptions = .init()
         }
     }
@@ -40,14 +40,7 @@ extension Signal {
     
     public func collect(with collector: SubscriptionCollector) -> Signal {
         let next = SignalForwarder<Value, Value>.init(source: self, collector: collector)
-        next.collect(subscribe {
-            switch $0 {
-            case let .right(token):
-                next.broadcast(token)
-            case let .left(reason):
-                next.finish(reason)
-            }
-        })
+        forward(to: next)
         return next
     }
 }

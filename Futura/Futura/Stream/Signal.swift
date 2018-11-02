@@ -78,7 +78,7 @@ public class Signal<Value> {
     // i.e. in the middle of removing subscription
     // prevents a lot of crashes...
     internal var isSuspended: Bool {
-        return isUnsubscribing || collector?.finished ?? false || privateCollector.finished
+        return isUnsubscribing || collector?.isFinished ?? false || privateCollector.isFinished
     }
     
     deinit { finish() }
