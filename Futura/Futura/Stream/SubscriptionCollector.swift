@@ -17,22 +17,22 @@ public final class SubscriptionCollector {
     private let lock: RecursiveLock = .init()
     private var subscriptions: [Subscription] = .init()
     
-    internal var isSuspended: Bool = false
+    internal var finished: Bool = false
     
     public init() {}
     
     internal func collect(_ subscription: Subscription) {
         lock.synchronized {
-            guard !isSuspended else { return }
+            guard !finished else { return }
             subscriptions.append(subscription)
         }
     }
     
     deinit {
         lock.synchronized {
-            isSuspended = true
+            finished = true
             subscriptions = .init()
-        } // leaves suspended since it is deinit
+        }
     }
 }
 

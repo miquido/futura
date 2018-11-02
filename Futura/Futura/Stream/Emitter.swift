@@ -26,7 +26,7 @@ public final class Emitter<Value> : Signal<Value> {
         broadcast(.left(error))
     }
     
-    public func close() {
+    public func end() {
         finish()
     }
     

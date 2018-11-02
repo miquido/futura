@@ -78,7 +78,7 @@ public class Signal<Value> {
     // i.e. in the middle of removing subscription
     // prevents a lot of crashes...
     internal var isSuspended: Bool {
-        return isUnsubscribing || collector?.isSuspended ?? false || privateCollector.isSuspended
+        return isUnsubscribing || collector?.finished ?? false || privateCollector.finished
     }
     
     deinit { finish() }
@@ -107,7 +107,7 @@ public extension Signal {
     // TODO: tokens - either value or error without reference
     
     @discardableResult
-    func closed(_ observer: @escaping () -> Void) -> Signal {
+    func ended(_ observer: @escaping () -> Void) -> Signal {
         collect(subscribe { (event) in
             guard case .left(.none) = event else { return }
             observer()

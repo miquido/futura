@@ -37,8 +37,8 @@ class StreamTests: XCTestCase {
             .failures {
                 self.workLog.log(.failures(testDescription(of: $0)))
             }
-            .closed {
-                self.workLog.log(.closed)
+            .ended {
+                self.workLog.log(.ended)
             }
             .terminated {
                 self.workLog.log(.terminated(testDescription(of: $0)))
@@ -56,8 +56,8 @@ class StreamTests: XCTestCase {
             .failures {
                 self.workLog.log(.failures(testDescription(of: $0)))
             }
-            .closed {
-                self.workLog.log(.closed)
+            .ended {
+                self.workLog.log(.ended)
             }
             .terminated {
                 self.workLog.log(.terminated(testDescription(of: $0)))
@@ -75,15 +75,15 @@ class StreamTests: XCTestCase {
             .failures {
                 self.workLog.log(.failures(testDescription(of: $0)))
             }
-            .closed {
-                self.workLog.log(.closed)
+            .ended {
+                self.workLog.log(.ended)
             }
             .terminated {
                 self.workLog.log(.terminated(testDescription(of: $0)))
         }
         
-        emitter.close()
-        XCTAssertEqual(workLog, [.closed])
+        emitter.end()
+        XCTAssertEqual(workLog, [.ended])
     }
     
     func testShouldHandleTermination_WhenTerminating() {
@@ -94,8 +94,8 @@ class StreamTests: XCTestCase {
             .failures {
                 self.workLog.log(.failures(testDescription(of: $0)))
             }
-            .closed {
-                self.workLog.log(.closed)
+            .ended {
+                self.workLog.log(.ended)
             }
             .terminated {
                 self.workLog.log(.terminated(testDescription(of: $0)))
@@ -113,15 +113,15 @@ class StreamTests: XCTestCase {
             .failures {
                 self.workLog.log(.failures(testDescription(of: $0)))
             }
-            .closed {
-                self.workLog.log(.closed)
+            .ended {
+                self.workLog.log(.ended)
             }
             .terminated {
                 self.workLog.log(.terminated(testDescription(of: $0)))
         }
         
         emitter = nil
-        XCTAssertEqual(workLog, [.closed])
+        XCTAssertEqual(workLog, [.ended])
     }
     
     func testShouldNotHandle_AfterClosing() {
@@ -132,19 +132,19 @@ class StreamTests: XCTestCase {
             .failures {
                 self.workLog.log(.failures(testDescription(of: $0)))
             }
-            .closed {
-                self.workLog.log(.closed)
+            .ended {
+                self.workLog.log(.ended)
             }
             .terminated {
                 self.workLog.log(.terminated(testDescription(of: $0)))
         }
         
-        emitter.close()
+        emitter.end()
         emitter.emit(0)
         emitter.emit(testError)
-        emitter.close()
+        emitter.end()
         emitter.terminate(testError)
-        XCTAssertEqual(workLog, [.closed])
+        XCTAssertEqual(workLog, [.ended])
     }
     
     func testShouldNotHandle_AfterTerminating() {
@@ -155,8 +155,8 @@ class StreamTests: XCTestCase {
             .failures {
                 self.workLog.log(.failures(testDescription(of: $0)))
             }
-            .closed {
-                self.workLog.log(.closed)
+            .ended {
+                self.workLog.log(.ended)
             }
             .terminated {
                 self.workLog.log(.terminated(testDescription(of: $0)))
@@ -165,7 +165,7 @@ class StreamTests: XCTestCase {
         emitter.terminate(testError)
         emitter.emit(0)
         emitter.emit(testError)
-        emitter.close()
+        emitter.end()
         emitter.terminate(testError)
         XCTAssertEqual(workLog, [.terminated(testErrorDescription)])
     }
@@ -218,8 +218,8 @@ class StreamTests: XCTestCase {
             .logResults(with: workLog)
         
         
-        emitter.close()
-        XCTAssertEqual(workLog, [.closed])
+        emitter.end()
+        XCTAssertEqual(workLog, [.ended])
     }
     
     func testShouldHandleTerminate_WhenTerminating_WithMap() {
@@ -244,7 +244,7 @@ class StreamTests: XCTestCase {
         
         
         emitter = nil
-        XCTAssertEqual(workLog, [.closed])
+        XCTAssertEqual(workLog, [.ended])
     }
     
     // MARK: -
@@ -282,7 +282,7 @@ class StreamTests: XCTestCase {
         XCTAssertEqual(workLog, [.flatMap, .failures(testErrorDescription)])
     }
     
-    func testShouldHandleClosed_WhenBroadcastingValue_WithFlatMap_WithClose() {
+    func testShouldHandleended_WhenBroadcastingValue_WithFlatMap_WithClose() {
         let otherEmitter = Emitter<Int>()
         
         emitter
@@ -293,10 +293,10 @@ class StreamTests: XCTestCase {
             .logResults(with: workLog)
         
         emitter.emit(0)
-        otherEmitter.close()
+        otherEmitter.end()
         emitter.emit(0)
         otherEmitter.emit(0)
-        XCTAssertEqual(workLog, [.flatMap, .closed, .flatMap])
+        XCTAssertEqual(workLog, [.flatMap, .ended, .flatMap])
     }
     
     func testShouldHandleTerminated_WhenBroadcastingValue_WithFlatMap_WithTerminate() {
@@ -359,9 +359,9 @@ class StreamTests: XCTestCase {
             .logResults(with: workLog)
         
         otherEmitter.emit(2)
-        emitter.close()
+        emitter.end()
         otherEmitter.emit(1)
-        XCTAssertEqual(workLog, [.closed])
+        XCTAssertEqual(workLog, [.ended])
     }
     
     func testShouldHandleTerminate_WhenTerminating_WithFlatMap() {
@@ -393,7 +393,7 @@ class StreamTests: XCTestCase {
         otherEmitter.emit(2)
         emitter = nil
         otherEmitter.emit(1)
-        XCTAssertEqual(workLog, [.closed])
+        XCTAssertEqual(workLog, [.ended])
     }
     
     // MARK: -
@@ -433,9 +433,9 @@ class StreamTests: XCTestCase {
             .logResults(with: workLog)
         
         
-        emitter.close()
+        emitter.end()
         collector = nil
-        XCTAssertEqual(workLog, [.closed])
+        XCTAssertEqual(workLog, [.ended])
     }
     
     func testShouldHandleTerminate_WhenTerminating_WithCollector() {
@@ -458,7 +458,7 @@ class StreamTests: XCTestCase {
         
         
         emitter = nil
-        XCTAssertEqual(workLog, [.closed])
+        XCTAssertEqual(workLog, [.ended])
     }
     
     func testShouldNotHandle_WhenClosing_WithCollector() {
@@ -469,7 +469,7 @@ class StreamTests: XCTestCase {
             .logResults(with: workLog)
         
         collector = nil
-        emitter.close()
+        emitter.end()
         XCTAssertEqual(workLog, [])
     }
     
@@ -533,10 +533,10 @@ class StreamTests: XCTestCase {
             .switch(to: worker)
             .logResults(with: workLog)
         
-        emitter.close()
+        emitter.end()
         XCTAssertEqual(workLog, [])
         worker.execute()
-        XCTAssertEqual(workLog, [.closed])
+        XCTAssertEqual(workLog, [.ended])
     }
     
     func testShouldHandleTerminate_WhenTerminating_WithWorkerSwitch() {
@@ -563,7 +563,7 @@ class StreamTests: XCTestCase {
         emitter = nil
         XCTAssertEqual(workLog, [])
         worker.execute()
-        XCTAssertEqual(workLog, [.closed])
+        XCTAssertEqual(workLog, [.ended])
     }
     
     // MARK: -
@@ -619,8 +619,8 @@ class StreamTests: XCTestCase {
             .logResults(with: workLog)
         
         
-        emitter.close()
-        XCTAssertEqual(workLog, [.closed])
+        emitter.end()
+        XCTAssertEqual(workLog, [.ended])
     }
     
     func testShouldHandleTerminate_WhenTerminating_WithFilter() {
@@ -647,7 +647,7 @@ class StreamTests: XCTestCase {
         
         
         emitter = nil
-        XCTAssertEqual(workLog, [.closed])
+        XCTAssertEqual(workLog, [.ended])
     }
     
     // MARK: -
