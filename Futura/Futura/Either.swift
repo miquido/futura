@@ -16,3 +16,9 @@ internal enum Result<T> {
     case success(T)
     case error(Error)
 }
+
+// TODO: remove Result in favor of Either
+internal enum Either<T, U> {
+    case left(T)
+    case right(U)
+}

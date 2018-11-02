@@ -12,26 +12,28 @@
  See the License for the specific language governing permissions and
  limitations under the License. */
 
-/// Stream is read only object for accessing data provided as stream.
-public class Stream<Value> {
+public class Signal<Value> {
+    
+    internal typealias Token = Either<Error, Value>
+    internal typealias Subscriber = (Either<Error?, Token>) -> Void
 
-    private var nextSubscriptionID: Subscription.ID = 0
-    private let privateCollector: SubscribtionCollector = .init()
+    private var subscriptionID: Subscription.ID = 0
+    private let privateCollector: SubscriptionCollector = .init()
     
     internal let lock: RecursiveLock = .init()
-    internal var subscribers: [Subscription.ID : (Event) -> Void] = [:]
-    internal weak var collector: SubscribtionCollector?
-    internal var isClosed: Bool = false
+    internal var subscribers: [Subscription.ID : Subscriber] = .init()
+    internal weak var collector: SubscriptionCollector? = nil
+    internal var isFinished: Bool = false
     internal var isUnsubscribing: Bool = false
     
-    internal init(collector: SubscribtionCollector?) {
+    internal init(collector: SubscriptionCollector?) {
         self.collector = collector
     }
     
-    internal func subscribe(_ subscriber: @escaping (Event) -> Void) -> Subscription? {
+    internal func subscribe(_ subscriber: @escaping Subscriber) -> Subscription? {
         return lock.synchronized {
-            guard !isClosed else { return nil }
-            let id = nextSubscriptionID.getThenIterate()
+            guard !isFinished else { return nil }
+            let id = subscriptionID.next()
             subscribers[id] = subscriber
             return Subscription.init { [weak self] in
                 guard let self = self else { return }
@@ -44,23 +46,22 @@ public class Stream<Value> {
         }
     }
     
-    internal func broadcast(_ event: Event) {
+    internal func broadcast(_ token: Token) {
         lock.synchronized {
             guard !isSuspended else { return }
-            subscribers.forEach { $0.1(event) }
-            cleanupIfNeeded(after: event)
+            subscribers.forEach { $0.1(.right(token)) }
         }
     }
     
-    internal func cleanupIfNeeded(after event: Event) {
-        switch event {
-        case .close, .terminate:
-            isClosed = true
+    internal func finish(_ reason: Error? = nil) {
+        lock.synchronized {
+            guard !isSuspended else { return } // TODO: this suspended may prevent braodcasting finish - to check
+            subscribers.forEach { $0.1(.left(reason)) }
+            isFinished = true
             var sub = subscribers
             // cache until end of scope to prevent deallocation of subscribers while making changes in subscribers dictionary - prevents crash
-            subscribers = [:]
+            subscribers = .init()
             sub.removeAll() // TODO: to check performance
-        default: break
         }
     }
     
@@ -73,62 +74,55 @@ public class Stream<Value> {
         }
     }
     
+    // prevents broadcasting if internal state not allows this
+    // i.e. in the middle of removing subscription
+    // prevents a lot of crashes...
     internal var isSuspended: Bool {
         return isUnsubscribing || collector?.isSuspended ?? false || privateCollector.isSuspended
     }
     
-    deinit { broadcast(.close) }
+    deinit { finish() }
 }
 
-extension Stream {
+public extension Signal {
     
-    public enum Event {
-        case value(Value)
-        case error(Error)
-        case close
-        case terminate(Error)
-    }
-}
-
-public extension Stream {
-    
-    /// Access each value passed by this stream
     @discardableResult
-    func next(_ observer: @escaping (Value) -> Void) -> Stream {
+    func values(_ observer: @escaping (Value) -> Void) -> Signal {
         collect(subscribe { (event) in
-            guard case let .value(value) = event else { return }
+            guard case let .right(.right(value)) = event else { return }
             observer(value)
         })
         return self
     }
     
-    /// Access each error passed by this stream
     @discardableResult
-    func fail(_ observer: @escaping (Error) -> Void) -> Stream {
+    func failures(_ observer: @escaping (Error) -> Void) -> Signal {
         collect(subscribe { (event) in
-            guard case let .error(value) = event else { return }
+            guard case let .right(.left(value)) = event else { return }
             observer(value)
         })
         return self
     }
     
-    /// Access stream closing information
+    // TODO: tokens - either value or error without reference
+    
     @discardableResult
-    func closed(_ observer: @escaping () -> Void) -> Stream {
+    func closed(_ observer: @escaping () -> Void) -> Signal {
         collect(subscribe { (event) in
-            guard case .close = event else { return }
+            guard case .left(.none) = event else { return }
             observer()
         })
         return self
     }
     
-    /// Access stream termination information
     @discardableResult
-    func terminated(_ observer: @escaping (Error) -> Void) -> Stream {
+    func terminated(_ observer: @escaping (Error) -> Void) -> Signal {
         collect(subscribe { (event) in
-            guard case let .terminate(reason) = event else { return }
+            guard case let .left(.some(reason)) = event else { return }
             observer(reason)
         })
         return self
     }
+    
+    // TODO: finished - either closed or terminated without reference
 }

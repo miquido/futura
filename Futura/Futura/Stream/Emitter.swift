@@ -12,22 +12,29 @@
  See the License for the specific language governing permissions and
  limitations under the License. */
 
-internal final class Subscription {
-    internal typealias ID = UInt64
+public final class Emitter<Value> : Signal<Value> {
     
-    private let unsubscribe: () -> Void
-    
-    internal init(_ unsubscribe: @escaping () -> Void) {
-        self.unsubscribe = unsubscribe
+    public init() {
+        super.init(collector: nil)
     }
     
-    deinit { unsubscribe() }
-}
-
-extension Subscription.ID {
+    public func emit(_ value: Value) {
+        broadcast(.right(value))
+    }
     
-    internal mutating func next() -> Subscription.ID {
-        defer { self += 1 }
+    public func emit(_ error: Error) {
+        broadcast(.left(error))
+    }
+    
+    public func close() {
+        finish()
+    }
+    
+    public func terminate(_ reason: Error) {
+        finish(reason)
+    }
+    
+    public var signal: Signal<Value> {
         return self
     }
 }

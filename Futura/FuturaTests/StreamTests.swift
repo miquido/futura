@@ -18,24 +18,24 @@ import Futura
 class StreamTests: XCTestCase {
     
     var workLog: StreamWorkLog = .init()
-    var channel: Channel<Int>! = .init()
+    var emitter: Emitter<Int>! = .init()
     
     override func setUp() {
         super.setUp()
         workLog = .init()
-        channel = .init()
+        emitter = .init()
     }
     
     // MARK: -
     // MARK: Access
     
     func testShouldHandleValue_WhenBroadcastingValue() {
-        channel.stream
-            .next {
-                self.workLog.log(.next(testDescription(of: $0)))
+        emitter.signal
+            .values {
+                self.workLog.log(.values(testDescription(of: $0)))
             }
-            .fail {
-                self.workLog.log(.fail(testDescription(of: $0)))
+            .failures {
+                self.workLog.log(.failures(testDescription(of: $0)))
             }
             .closed {
                 self.workLog.log(.closed)
@@ -44,17 +44,17 @@ class StreamTests: XCTestCase {
                 self.workLog.log(.terminated(testDescription(of: $0)))
         }
         
-        channel.broadcast(0)
-        XCTAssertEqual(workLog, [.next(testDescription(of: 0))])
+        emitter.emit(0)
+        XCTAssertEqual(workLog, [.values(testDescription(of: 0))])
     }
     
     func testShouldHandleError_WhenBroadcastingError() {
-        channel.stream
-            .next {
-                self.workLog.log(.next(testDescription(of: $0)))
+        emitter.signal
+            .values {
+                self.workLog.log(.values(testDescription(of: $0)))
             }
-            .fail {
-                self.workLog.log(.fail(testDescription(of: $0)))
+            .failures {
+                self.workLog.log(.failures(testDescription(of: $0)))
             }
             .closed {
                 self.workLog.log(.closed)
@@ -63,17 +63,17 @@ class StreamTests: XCTestCase {
                 self.workLog.log(.terminated(testDescription(of: $0)))
         }
         
-        channel.broadcast(testError)
-        XCTAssertEqual(workLog, [.fail(testErrorDescription)])
+        emitter.emit(testError)
+        XCTAssertEqual(workLog, [.failures(testErrorDescription)])
     }
     
     func testShouldHandleClose_WhenClosing() {
-        channel.stream
-            .next {
-                self.workLog.log(.next(testDescription(of: $0)))
+        emitter.signal
+            .values {
+                self.workLog.log(.values(testDescription(of: $0)))
             }
-            .fail {
-                self.workLog.log(.fail(testDescription(of: $0)))
+            .failures {
+                self.workLog.log(.failures(testDescription(of: $0)))
             }
             .closed {
                 self.workLog.log(.closed)
@@ -82,17 +82,17 @@ class StreamTests: XCTestCase {
                 self.workLog.log(.terminated(testDescription(of: $0)))
         }
         
-        channel.close()
+        emitter.close()
         XCTAssertEqual(workLog, [.closed])
     }
     
     func testShouldHandleTermination_WhenTerminating() {
-        channel.stream
-            .next {
-                self.workLog.log(.next(testDescription(of: $0)))
+        emitter.signal
+            .values {
+                self.workLog.log(.values(testDescription(of: $0)))
             }
-            .fail {
-                self.workLog.log(.fail(testDescription(of: $0)))
+            .failures {
+                self.workLog.log(.failures(testDescription(of: $0)))
             }
             .closed {
                 self.workLog.log(.closed)
@@ -101,17 +101,17 @@ class StreamTests: XCTestCase {
                 self.workLog.log(.terminated(testDescription(of: $0)))
         }
         
-        channel.terminate(testError)
+        emitter.terminate(testError)
         XCTAssertEqual(workLog, [.terminated(testErrorDescription)])
     }
     
     func testShouldHandleClose_WhenDeallocating() {
-        channel.stream
-            .next {
-                self.workLog.log(.next(testDescription(of: $0)))
+        emitter.signal
+            .values {
+                self.workLog.log(.values(testDescription(of: $0)))
             }
-            .fail {
-                self.workLog.log(.fail(testDescription(of: $0)))
+            .failures {
+                self.workLog.log(.failures(testDescription(of: $0)))
             }
             .closed {
                 self.workLog.log(.closed)
@@ -120,17 +120,17 @@ class StreamTests: XCTestCase {
                 self.workLog.log(.terminated(testDescription(of: $0)))
         }
         
-        channel = nil
+        emitter = nil
         XCTAssertEqual(workLog, [.closed])
     }
     
     func testShouldNotHandle_AfterClosing() {
-        channel.stream
-            .next {
-                self.workLog.log(.next(testDescription(of: $0)))
+        emitter.signal
+            .values {
+                self.workLog.log(.values(testDescription(of: $0)))
             }
-            .fail {
-                self.workLog.log(.fail(testDescription(of: $0)))
+            .failures {
+                self.workLog.log(.failures(testDescription(of: $0)))
             }
             .closed {
                 self.workLog.log(.closed)
@@ -139,21 +139,21 @@ class StreamTests: XCTestCase {
                 self.workLog.log(.terminated(testDescription(of: $0)))
         }
         
-        channel.close()
-        channel.broadcast(0)
-        channel.broadcast(testError)
-        channel.close()
-        channel.terminate(testError)
+        emitter.close()
+        emitter.emit(0)
+        emitter.emit(testError)
+        emitter.close()
+        emitter.terminate(testError)
         XCTAssertEqual(workLog, [.closed])
     }
     
     func testShouldNotHandle_AfterTerminating() {
-        channel.stream
-            .next {
-                self.workLog.log(.next(testDescription(of: $0)))
+        emitter.signal
+            .values {
+                self.workLog.log(.values(testDescription(of: $0)))
             }
-            .fail {
-                self.workLog.log(.fail(testDescription(of: $0)))
+            .failures {
+                self.workLog.log(.failures(testDescription(of: $0)))
             }
             .closed {
                 self.workLog.log(.closed)
@@ -162,11 +162,11 @@ class StreamTests: XCTestCase {
                 self.workLog.log(.terminated(testDescription(of: $0)))
         }
         
-        channel.terminate(testError)
-        channel.broadcast(0)
-        channel.broadcast(testError)
-        channel.close()
-        channel.terminate(testError)
+        emitter.terminate(testError)
+        emitter.emit(0)
+        emitter.emit(testError)
+        emitter.close()
+        emitter.terminate(testError)
         XCTAssertEqual(workLog, [.terminated(testErrorDescription)])
     }
     
@@ -174,43 +174,43 @@ class StreamTests: XCTestCase {
     // MARK: Map
     
     func testShouldHandleValue_WhenBroadcastingValue_WithMap() {
-        channel
+        emitter
             .map { (val: Int) -> Int in
                 self.workLog.log(.map)
                 return val
             }
             .logResults(with: workLog)
         
-        channel.broadcast(0)
-        XCTAssertEqual(workLog, [.map, .next(testDescription(of: 0))])
+        emitter.emit(0)
+        XCTAssertEqual(workLog, [.map, .values(testDescription(of: 0))])
     }
     
     func testShouldHandleError_WhenBroadcastingError_WithMap() {
-        channel
+        emitter
             .map { (val: Int) -> Int in
                 self.workLog.log(.map)
                 return val
             }
             .logResults(with: workLog)
         
-        channel.broadcast(testError)
-        XCTAssertEqual(workLog, [.fail(testErrorDescription)])
+        emitter.emit(testError)
+        XCTAssertEqual(workLog, [.failures(testErrorDescription)])
     }
     
     func testShouldHandleError_WhenBroadcastingValue_WithThrowingMap() {
-        channel
+        emitter
             .map { (val: Int) -> Int in
                 self.workLog.log(.map)
                 throw testError
             }
             .logResults(with: workLog)
         
-        channel.broadcast(0)
-        XCTAssertEqual(workLog, [.map, .fail(testErrorDescription)])
+        emitter.emit(0)
+        XCTAssertEqual(workLog, [.map, .failures(testErrorDescription)])
     }
     
     func testShouldHandleClose_WhenClosing_WithMap() {
-        channel
+        emitter
             .map { (val: Int) -> Int in
                 self.workLog.log(.map)
                 return val
@@ -218,24 +218,24 @@ class StreamTests: XCTestCase {
             .logResults(with: workLog)
         
         
-        channel.close()
+        emitter.close()
         XCTAssertEqual(workLog, [.closed])
     }
     
     func testShouldHandleTerminate_WhenTerminating_WithMap() {
-        channel
+        emitter
             .map { (val: Int) -> Int in
                 self.workLog.log(.map)
                 return val
             }
             .logResults(with: workLog)
         
-        channel.terminate(testError)
+        emitter.terminate(testError)
         XCTAssertEqual(workLog, [.terminated(testErrorDescription)])
     }
     
     func testShouldHandleClose_WhenDeallocating_WithMap() {
-        channel
+        emitter
             .map { (val: Int) -> Int in
                 self.workLog.log(.map)
                 return val
@@ -243,7 +243,7 @@ class StreamTests: XCTestCase {
             .logResults(with: workLog)
         
         
-        channel = nil
+        emitter = nil
         XCTAssertEqual(workLog, [.closed])
     }
     
@@ -251,148 +251,148 @@ class StreamTests: XCTestCase {
     // MARK: FlatMap
     
     func testShouldHandleValue_WhenBroadcastingValue_WithFlatMap_WithValue() {
-        let otherChannel = Channel<Int>()
+        let otherEmitter = Emitter<Int>()
         
-        channel
-            .flatMap({ (val: Int) -> Futura.Stream<Int> in
+        emitter
+            .flatMap({ (val: Int) -> Futura.Signal<Int> in
                 self.workLog.log(.flatMap)
-                return otherChannel
+                return otherEmitter
             })
             .logResults(with: workLog)
         
-        otherChannel.broadcast(2)
-        channel.broadcast(0)
-        otherChannel.broadcast(1)
-        XCTAssertEqual(workLog, [.flatMap, .next(testDescription(of: 1))])
+        otherEmitter.emit(2)
+        emitter.emit(0)
+        otherEmitter.emit(1)
+        XCTAssertEqual(workLog, [.flatMap, .values(testDescription(of: 1))])
     }
     
     func testShouldHandleError_WhenBroadcastingValue_WithFlatMap_WithError() {
-        let otherChannel = Channel<Int>()
+        let otherEmitter = Emitter<Int>()
         
-        channel
-            .flatMap({ (val: Int) -> Futura.Stream<Int> in
+        emitter
+            .flatMap({ (val: Int) -> Futura.Signal<Int> in
                 self.workLog.log(.flatMap)
-                return otherChannel
+                return otherEmitter
             })
             .logResults(with: workLog)
         
-        otherChannel.broadcast(testError)
-        channel.broadcast(0)
-        otherChannel.broadcast(testError)
-        XCTAssertEqual(workLog, [.flatMap, .fail(testErrorDescription)])
+        otherEmitter.emit(testError)
+        emitter.emit(0)
+        otherEmitter.emit(testError)
+        XCTAssertEqual(workLog, [.flatMap, .failures(testErrorDescription)])
     }
     
     func testShouldHandleClosed_WhenBroadcastingValue_WithFlatMap_WithClose() {
-        let otherChannel = Channel<Int>()
+        let otherEmitter = Emitter<Int>()
         
-        channel
-            .flatMap({ (val: Int) -> Futura.Stream<Int> in
+        emitter
+            .flatMap({ (val: Int) -> Futura.Signal<Int> in
                 self.workLog.log(.flatMap)
-                return otherChannel
+                return otherEmitter
             })
             .logResults(with: workLog)
         
-        channel.broadcast(0)
-        otherChannel.close()
-        channel.broadcast(0)
-        otherChannel.broadcast(0)
+        emitter.emit(0)
+        otherEmitter.close()
+        emitter.emit(0)
+        otherEmitter.emit(0)
         XCTAssertEqual(workLog, [.flatMap, .closed, .flatMap])
     }
     
     func testShouldHandleTerminated_WhenBroadcastingValue_WithFlatMap_WithTerminate() {
-        let otherChannel = Channel<Int>()
+        let otherEmitter = Emitter<Int>()
         
-        channel
-            .flatMap({ (val: Int) -> Futura.Stream<Int> in
+        emitter
+            .flatMap({ (val: Int) -> Futura.Signal<Int> in
                 self.workLog.log(.flatMap)
-                return otherChannel
+                return otherEmitter
             })
             .logResults(with: workLog)
         
-        channel.broadcast(0)
-        otherChannel.terminate(testError)
-        channel.broadcast(0)
-        otherChannel.broadcast(0)
+        emitter.emit(0)
+        otherEmitter.terminate(testError)
+        emitter.emit(0)
+        otherEmitter.emit(0)
         XCTAssertEqual(workLog, [.flatMap, .terminated(testErrorDescription), .flatMap])
     }
     
     func testShouldHandleError_WhenBroadcastingError_WithFlatMap() {
-        let otherChannel = Channel<Int>()
+        let otherEmitter = Emitter<Int>()
         
-        channel
-            .flatMap({ (val: Int) -> Futura.Stream<Int> in
+        emitter
+            .flatMap({ (val: Int) -> Futura.Signal<Int> in
                 self.workLog.log(.flatMap)
-                return otherChannel
+                return otherEmitter
             })
             .logResults(with: workLog)
         
-        otherChannel.broadcast(2)
-        channel.broadcast(testError)
-        otherChannel.broadcast(1)
-        XCTAssertEqual(workLog, [.fail(testErrorDescription)])
+        otherEmitter.emit(2)
+        emitter.emit(testError)
+        otherEmitter.emit(1)
+        XCTAssertEqual(workLog, [.failures(testErrorDescription)])
     }
     
     func testShouldHandleError_WhenBroadcastingValue_WithThrowingFlatMap() {
-        let otherChannel = Channel<Int>()
+        let otherEmitter = Emitter<Int>()
         
-        channel
-            .flatMap({ (val: Int) -> Futura.Stream<Int> in
+        emitter
+            .flatMap({ (val: Int) -> Futura.Signal<Int> in
                 self.workLog.log(.flatMap)
                 throw testError
             })
             .logResults(with: workLog)
         
-        otherChannel.broadcast(2)
-        channel.broadcast(0)
-        otherChannel.broadcast(1)
-        XCTAssertEqual(workLog, [.flatMap, .fail(testErrorDescription)])
+        otherEmitter.emit(2)
+        emitter.emit(0)
+        otherEmitter.emit(1)
+        XCTAssertEqual(workLog, [.flatMap, .failures(testErrorDescription)])
     }
     
     func testShouldHandleClose_WhenClosing_WithFlatMap() {
-        let otherChannel = Channel<Int>()
+        let otherEmitter = Emitter<Int>()
         
-        channel
-            .flatMap({ (val: Int) -> Futura.Stream<Int> in
+        emitter
+            .flatMap({ (val: Int) -> Futura.Signal<Int> in
                 self.workLog.log(.flatMap)
-                return otherChannel
+                return otherEmitter
             })
             .logResults(with: workLog)
         
-        otherChannel.broadcast(2)
-        channel.close()
-        otherChannel.broadcast(1)
+        otherEmitter.emit(2)
+        emitter.close()
+        otherEmitter.emit(1)
         XCTAssertEqual(workLog, [.closed])
     }
     
     func testShouldHandleTerminate_WhenTerminating_WithFlatMap() {
-        let otherChannel = Channel<Int>()
+        let otherEmitter = Emitter<Int>()
         
-        channel
-            .flatMap({ (val: Int) -> Futura.Stream<Int> in
+        emitter
+            .flatMap({ (val: Int) -> Futura.Signal<Int> in
                 self.workLog.log(.flatMap)
-                return otherChannel
+                return otherEmitter
             })
             .logResults(with: workLog)
         
-        otherChannel.broadcast(2)
-        channel.terminate(testError)
-        otherChannel.broadcast(1)
+        otherEmitter.emit(2)
+        emitter.terminate(testError)
+        otherEmitter.emit(1)
         XCTAssertEqual(workLog, [.terminated(testErrorDescription)])
     }
     
     func testShouldHandleClose_WhenDeallocating_WithFlatMap() {
-        let otherChannel = Channel<Int>()
+        let otherEmitter = Emitter<Int>()
         
-        channel
-            .flatMap({ (val: Int) -> Futura.Stream<Int> in
+        emitter
+            .flatMap({ (val: Int) -> Futura.Signal<Int> in
                 self.workLog.log(.flatMap)
-                return otherChannel
+                return otherEmitter
             })
             .logResults(with: workLog)
         
-        otherChannel.broadcast(2)
-        channel = nil
-        otherChannel.broadcast(1)
+        otherEmitter.emit(2)
+        emitter = nil
+        otherEmitter.emit(1)
         XCTAssertEqual(workLog, [.closed])
     }
     
@@ -400,100 +400,100 @@ class StreamTests: XCTestCase {
     // MARK: Collector
     
     func testShouldHandleValue_WhenBroadcastingValue_WithCollector() {
-        var collector: SubscribtionCollector! = .init()
+        var collector: SubscriptionCollector! = .init()
         
-        channel
+        emitter
             .collect(with: collector)
             .logResults(with: workLog)
         
-        channel.broadcast(0)
+        emitter.emit(0)
         collector = nil
-        channel.broadcast(0)
-        XCTAssertEqual(workLog, [.next(testDescription(of: 0))])
+        emitter.emit(0)
+        XCTAssertEqual(workLog, [.values(testDescription(of: 0))])
     }
     
     func testShouldHandleError_WhenBroadcastingError_WithCollector() {
-        var collector: SubscribtionCollector! = .init()
+        var collector: SubscriptionCollector! = .init()
         
-        channel
+        emitter
             .collect(with: collector)
             .logResults(with: workLog)
         
-        channel.broadcast(testError)
+        emitter.emit(testError)
         collector = nil
-        channel.broadcast(testError)
-        XCTAssertEqual(workLog, [.fail(testErrorDescription)])
+        emitter.emit(testError)
+        XCTAssertEqual(workLog, [.failures(testErrorDescription)])
     }
     
     func testShouldHandleClose_WhenClosing_WithCollector() {
-        var collector: SubscribtionCollector! = .init()
+        var collector: SubscriptionCollector! = .init()
         
-        channel
+        emitter
             .collect(with: collector)
             .logResults(with: workLog)
         
         
-        channel.close()
+        emitter.close()
         collector = nil
         XCTAssertEqual(workLog, [.closed])
     }
     
     func testShouldHandleTerminate_WhenTerminating_WithCollector() {
-        let collector: SubscribtionCollector! = .init()
+        let collector: SubscriptionCollector! = .init()
         
-        channel
+        emitter
             .collect(with: collector)
             .logResults(with: workLog)
         
-        channel.terminate(testError)
+        emitter.terminate(testError)
         XCTAssertEqual(workLog, [.terminated(testErrorDescription)])
     }
     
     func testShouldHandleClose_WhenDeallocating_WithCollector() {
-        let collector: SubscribtionCollector! = .init()
+        let collector: SubscriptionCollector! = .init()
         
-        channel
+        emitter
             .collect(with: collector)
             .logResults(with: workLog)
         
         
-        channel = nil
+        emitter = nil
         XCTAssertEqual(workLog, [.closed])
     }
     
     func testShouldNotHandle_WhenClosing_WithCollector() {
-        var collector: SubscribtionCollector! = .init()
+        var collector: SubscriptionCollector! = .init()
         
-        channel
+        emitter
             .collect(with: collector)
             .logResults(with: workLog)
         
         collector = nil
-        channel.close()
+        emitter.close()
         XCTAssertEqual(workLog, [])
     }
     
     func testShouldNotHandle_WhenTerminating_WithCollector() {
-        var collector: SubscribtionCollector! = .init()
+        var collector: SubscriptionCollector! = .init()
         
-        channel
+        emitter
             .collect(with: collector)
             .logResults(with: workLog)
         
         collector = nil
-        channel.terminate(testError)
+        emitter.terminate(testError)
         XCTAssertEqual(workLog, [])
     }
     
     func testShouldNotHandle_WhenDeallocating_WithCollector() {
-        var collector: SubscribtionCollector! = .init()
+        var collector: SubscriptionCollector! = .init()
         
-        channel
+        emitter
             .collect(with: collector)
             .logResults(with: workLog)
         
         collector = nil
-        channel = nil
+        emitter = nil
         XCTAssertEqual(workLog, [])
     }
     
@@ -503,37 +503,37 @@ class StreamTests: XCTestCase {
     func testShouldHandleValue_WhenBroadcastingValue_WithWorkerSwitch() {
         let worker: TestWorker = .init()
         
-        channel
+        emitter
             .switch(to: worker)
             .logResults(with: workLog)
         
-        channel.broadcast(0)
+        emitter.emit(0)
         XCTAssertEqual(workLog, [])
         worker.execute()
-        XCTAssertEqual(workLog, [.next(testDescription(of: 0))])
+        XCTAssertEqual(workLog, [.values(testDescription(of: 0))])
     }
     
     func testShouldHandleError_WhenBroadcastingError_WithWorkerSwitch() {
         let worker: TestWorker = .init()
         
-        channel
+        emitter
             .switch(to: worker)
             .logResults(with: workLog)
         
-        channel.broadcast(testError)
+        emitter.emit(testError)
         XCTAssertEqual(workLog, [])
         worker.execute()
-        XCTAssertEqual(workLog, [.fail(testErrorDescription)])
+        XCTAssertEqual(workLog, [.failures(testErrorDescription)])
     }
     
     func testShouldHandleClose_WhenClosing_WithWorkerSwitch() {
         let worker: TestWorker = .init()
         
-        channel
+        emitter
             .switch(to: worker)
             .logResults(with: workLog)
         
-        channel.close()
+        emitter.close()
         XCTAssertEqual(workLog, [])
         worker.execute()
         XCTAssertEqual(workLog, [.closed])
@@ -542,11 +542,11 @@ class StreamTests: XCTestCase {
     func testShouldHandleTerminate_WhenTerminating_WithWorkerSwitch() {
         let worker: TestWorker = .init()
         
-        channel
+        emitter
             .switch(to: worker)
             .logResults(with: workLog)
         
-        channel.terminate(testError)
+        emitter.terminate(testError)
         XCTAssertEqual(workLog, [])
         worker.execute()
         XCTAssertEqual(workLog, [.terminated(testErrorDescription)])
@@ -555,12 +555,12 @@ class StreamTests: XCTestCase {
     func testShouldHandleClose_WhenDeallocating_WithWorkerSwitch() {
         let worker: TestWorker = .init()
         
-        channel
+        emitter
             .switch(to: worker)
             .logResults(with: workLog)
         
         
-        channel = nil
+        emitter = nil
         XCTAssertEqual(workLog, [])
         worker.execute()
         XCTAssertEqual(workLog, [.closed])
@@ -570,7 +570,7 @@ class StreamTests: XCTestCase {
     // MARK: Filter
     
     func testShouldHandleValue_WhenBroadcastingValue_WithFilterPassing() {
-        channel
+        emitter
             .filter {
                 let result = $0 == 0
                 self.workLog.log(.filter(result))
@@ -578,12 +578,12 @@ class StreamTests: XCTestCase {
             }
             .logResults(with: workLog)
         
-        channel.broadcast(0)
-        XCTAssertEqual(workLog, [.filter(true), .next(testDescription(of: 0))])
+        emitter.emit(0)
+        XCTAssertEqual(workLog, [.filter(true), .values(testDescription(of: 0))])
     }
     
     func testShouldNotHandle_WhenBroadcastingValue_WithFilterNotPassing() {
-        channel
+        emitter
             .filter {
                 let result = $0 != 0
                 self.workLog.log(.filter(result))
@@ -591,12 +591,12 @@ class StreamTests: XCTestCase {
             }
             .logResults(with: workLog)
         
-        channel.broadcast(0)
+        emitter.emit(0)
         XCTAssertEqual(workLog, [.filter(false)])
     }
     
     func testShouldHandleError_WhenBroadcastingError_WithFilter() {
-        channel
+        emitter
             .filter {
                 let result = $0 != 0
                 self.workLog.log(.filter(result))
@@ -604,13 +604,13 @@ class StreamTests: XCTestCase {
             }
             .logResults(with: workLog)
         
-        channel.broadcast(testError)
-        XCTAssertEqual(workLog, [.fail(testErrorDescription)])
+        emitter.emit(testError)
+        XCTAssertEqual(workLog, [.failures(testErrorDescription)])
     }
     
     
     func testShouldHandleClose_WhenClosing_WithFilter() {
-        channel
+        emitter
             .filter {
                 let result = $0 != 0
                 self.workLog.log(.filter(result))
@@ -619,12 +619,12 @@ class StreamTests: XCTestCase {
             .logResults(with: workLog)
         
         
-        channel.close()
+        emitter.close()
         XCTAssertEqual(workLog, [.closed])
     }
     
     func testShouldHandleTerminate_WhenTerminating_WithFilter() {
-        channel
+        emitter
             .filter {
                 let result = $0 != 0
                 self.workLog.log(.filter(result))
@@ -632,12 +632,12 @@ class StreamTests: XCTestCase {
             }
             .logResults(with: workLog)
         
-        channel.terminate(testError)
+        emitter.terminate(testError)
         XCTAssertEqual(workLog, [.terminated(testErrorDescription)])
     }
     
     func testShouldHandleClose_WhenDeallocating_WithFilter() {
-        channel
+        emitter
             .filter {
                 let result = $0 != 0
                 self.workLog.log(.filter(result))
@@ -646,7 +646,7 @@ class StreamTests: XCTestCase {
             .logResults(with: workLog)
         
         
-        channel = nil
+        emitter = nil
         XCTAssertEqual(workLog, [.closed])
     }
     
@@ -670,21 +670,21 @@ class StreamTests: XCTestCase {
             dispatchQueue.async {
                 lock_1.lock()
                 for _ in 0..<100 {
-                    self.channel.next { _ in counter_1 += 1 }
+                    self.emitter.values { _ in counter_1 += 1 }
                 }
                 lock_1.unlock()
             }
             dispatchQueue.async {
                 lock_2.lock()
                 for _ in 0..<100 {
-                    self.channel.next { _ in counter_2 += 1 }
+                    self.emitter.values { _ in counter_2 += 1 }
                 }
                 lock_2.unlock()
             }
             dispatchQueue.async {
                 lock_3.lock()
                 for _ in 0..<100 {
-                    self.channel.next { _ in counter_3 += 1 }
+                    self.emitter.values { _ in counter_3 += 1 }
                 }
                 lock_3.unlock()
             }
@@ -693,7 +693,7 @@ class StreamTests: XCTestCase {
             lock_1.lock()
             lock_2.lock()
             lock_3.lock()
-            self.channel.broadcast(0)
+            self.emitter.emit(0)
             
             XCTAssertEqual(counter_1 + counter_2 + counter_3, 300, "Calls count not matching expected")
             complete()

@@ -76,15 +76,15 @@ extension Future {
     }
 }
 
-extension Futura.Stream {
+extension Futura.Signal {
     @discardableResult
     func logResults(with workLog: StreamWorkLog) -> Self {
         self
-            .next {
-                workLog.log(.next(testDescription(of: $0)))
+            .values {
+                workLog.log(.values(testDescription(of: $0)))
             }
-            .fail {
-                workLog.log(.fail(testDescription(of: $0)))
+            .failures {
+                workLog.log(.failures(testDescription(of: $0)))
             }
             .closed {
                 workLog.log(.closed)

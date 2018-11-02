@@ -12,11 +12,11 @@
  See the License for the specific language governing permissions and
  limitations under the License. */
 
-internal class ForwardingStream<V1, V2> : Stream<V2> {
+internal class SignalForwarder<V1, V2> : Signal<V2> {
     
-    private weak var source: Stream<V1>?
+    private weak var source: Signal<V1>?
     
-    internal init(source: Stream<V1>, collector: SubscribtionCollector?) {
+    internal init(source: Signal<V1>, collector: SubscriptionCollector?) {
         self.source = source
         super.init(collector: collector)
     }
