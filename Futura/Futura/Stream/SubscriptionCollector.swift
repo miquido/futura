@@ -1,11 +1,11 @@
 /* Copyright 2018 Miquido
- 
+
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
- 
+
  http://www.apache.org/licenses/LICENSE-2.0
- 
+
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,31 +13,29 @@
  limitations under the License. */
 
 public final class SubscriptionCollector {
-    
     private let lock: RecursiveLock = .init()
     private var subscriptions: [Subscription] = .init()
-    
-    internal var isFinished: Bool = false
-    
+
+    internal var isActive: Bool = true
+
     public init() {}
-    
+
     internal func collect(_ subscription: Subscription) {
         lock.synchronized {
-            guard !isFinished else { return }
+            guard isActive else { return }
             subscriptions.append(subscription)
         }
     }
-    
+
     deinit {
         lock.synchronized {
-            isFinished = true
+            isActive = false
             subscriptions = .init()
         }
     }
 }
 
 extension Signal {
-    
     public func collect(with collector: SubscriptionCollector) -> Signal {
         let next = SignalForwarder<Value, Value>.init(source: self, collector: collector)
         forward(to: next)

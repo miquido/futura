@@ -1,11 +1,11 @@
 /* Copyright 2018 Miquido
- 
+
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
- 
+
  http://www.apache.org/licenses/LICENSE-2.0
- 
+
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,23 +13,22 @@
  limitations under the License. */
 
 public class Signal<Value> {
-    
     internal typealias Token = Either<Error, Value>
     internal typealias Subscriber = (Either<Error?, Token>) -> Void
 
     private var subscriptionID: Subscription.ID = 0
     private let privateCollector: SubscriptionCollector = .init()
-    
+
     internal let lock: RecursiveLock = .init()
-    internal var subscribers: [Subscription.ID : Subscriber] = .init()
-    internal weak var collector: SubscriptionCollector? = nil
+    internal var subscribers: [Subscription.ID: Subscriber] = .init()
+    internal weak var collector: SubscriptionCollector?
     internal var isFinished: Bool = false
     internal var isUnsubscribing: Bool = false
-    
+
     internal init(collector: SubscriptionCollector?) {
         self.collector = collector
     }
-    
+
     internal func subscribe(_ subscriber: @escaping Subscriber) -> Subscription? {
         return lock.synchronized {
             guard !isFinished else { return nil }
@@ -45,14 +44,14 @@ public class Signal<Value> {
             }
         }
     }
-    
+
     internal func broadcast(_ token: Token) {
         lock.synchronized {
             guard !isSuspended else { return }
             subscribers.forEach { $0.1(.right(token)) }
         }
     }
-    
+
     internal func finish(_ reason: Error? = nil) {
         lock.synchronized {
             guard !isSuspended else { return } // TODO: this suspended may prevent braodcasting finish - to check
@@ -64,7 +63,7 @@ public class Signal<Value> {
             sub.removeAll() // TODO: to check performance
         }
     }
-    
+
     internal func collect(_ subscribtion: Subscription?) {
         guard let subscribtion = subscribtion else { return }
         if let collector = collector {
@@ -73,56 +72,62 @@ public class Signal<Value> {
             privateCollector.collect(subscribtion)
         }
     }
-    
+
     // prevents broadcasting if internal state not allows this
     // i.e. in the middle of removing subscription
     // prevents a lot of crashes...
     internal var isSuspended: Bool {
-        return isUnsubscribing || collector?.isFinished ?? false || privateCollector.isFinished
+        return isUnsubscribing || !(collector?.isActive ?? true) || !privateCollector.isActive
     }
-    
+
     deinit { finish() }
 }
 
 public extension Signal {
-    
     @discardableResult
     func values(_ observer: @escaping (Value) -> Void) -> Signal {
-        collect(subscribe { (event) in
+        collect(subscribe { event in
             guard case let .right(.right(value)) = event else { return }
             observer(value)
         })
         return self
     }
-    
+
     @discardableResult
     func failures(_ observer: @escaping (Error) -> Void) -> Signal {
-        collect(subscribe { (event) in
+        collect(subscribe { event in
             guard case let .right(.left(value)) = event else { return }
             observer(value)
         })
         return self
     }
-    
+
     // TODO: tokens - either value or error without reference
-    
+
     @discardableResult
     func ended(_ observer: @escaping () -> Void) -> Signal {
-        collect(subscribe { (event) in
+        collect(subscribe { event in
             guard case .left(.none) = event else { return }
             observer()
         })
         return self
     }
-    
+
     @discardableResult
     func terminated(_ observer: @escaping (Error) -> Void) -> Signal {
-        collect(subscribe { (event) in
+        collect(subscribe { event in
             guard case let .left(.some(reason)) = event else { return }
             observer(reason)
         })
         return self
     }
-    
-    // TODO: finished - either closed or terminated without reference
+
+    @discardableResult
+    func finished(_ observer: @escaping () -> Void) -> Signal {
+        collect(subscribe { event in
+            guard case .left = event else { return }
+            observer()
+        })
+        return self
+    }
 }

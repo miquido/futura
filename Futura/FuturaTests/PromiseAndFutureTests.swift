@@ -1382,7 +1382,8 @@ class PromiseAndFutureTestsTests: XCTestCase {
     
     // make sure that tests run with thread sanitizer enabled
     func testShouldWorkProperly_WhenAccessingOnManyThreads() {
-        asyncTest(timeoutBody: {
+        asyncTest(iterationTimeout: 5,
+                  timeoutBody: {
             XCTFail("Not in time - possible deadlock or fail")
         })
         { complete in
@@ -1434,7 +1435,8 @@ class PromiseAndFutureTestsTests: XCTestCase {
     
     // make sure that tests run with thread sanitizer enabled
     func testShouldWorkProperly_WhenTransformingOnManyThreads() {
-        asyncTest(timeoutBody: {
+        asyncTest(iterationTimeout: 5,
+                  timeoutBody: {
             XCTFail("Not in time - possible deadlock or fail")
         })
         { complete in
