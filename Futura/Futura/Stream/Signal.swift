@@ -48,14 +48,14 @@ public class Signal<Value> {
     internal func broadcast(_ token: Token) {
         lock.synchronized {
             guard !isSuspended else { return }
-            subscribers.forEach { $0.1(.right(token)) }
+            subscribers.sorted { $0.0 < $1.0 }.forEach { $0.1(.right(token)) } // TODO: sorted for tests? ensures calls in same order as adding handlers
         }
     }
 
     internal func finish(_ reason: Error? = nil) {
         lock.synchronized {
             guard !isSuspended else { return } // TODO: this suspended may prevent braodcasting finish - to check
-            subscribers.forEach { $0.1(.left(reason)) }
+            subscribers.sorted { $0.0 < $1.0 }.forEach { $0.1(.left(reason)) } // TODO: sorted for tests? ensures calls in same order as adding handlers
             isFinished = true
             var sub = subscribers
             // cache until end of scope to prevent deallocation of subscribers while making changes in subscribers dictionary - prevents crash
