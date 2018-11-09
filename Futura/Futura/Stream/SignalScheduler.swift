@@ -30,7 +30,7 @@ internal final class SignalScheduler<Value>: SignalForwarder<Value, Value> {
     internal override func broadcast(_ token: Token) {
         lock.synchronized {
             guard !isSuspended else { return }
-            let subscribers = self.subscribers.sorted { $0.0 < $1.0 } // TODO: sorted for tests? ensures calls in same order as adding handlers
+            let subscribers = self.subscribers
             associatedWorker.schedule {
                 subscribers.forEach { $0.1(.right(token)) }
             }
@@ -40,7 +40,7 @@ internal final class SignalScheduler<Value>: SignalForwarder<Value, Value> {
     internal override func finish(_ reason: Error? = nil) {
         lock.synchronized {
             guard !isSuspended else { return } // TODO: this suspended may prevent braodcasting finish - to check
-            let subscribers = self.subscribers.sorted { $0.0 < $1.0 } // TODO: sorted for tests? ensures calls in same order as adding handlers
+            let subscribers = self.subscribers
             associatedWorker.schedule {
                 subscribers.forEach { $0.1(.left(reason)) }
             }

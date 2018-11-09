@@ -20,7 +20,7 @@ public class Signal<Value> {
     private let privateCollector: SubscriptionCollector = .init()
 
     internal let lock: RecursiveLock = .init()
-    internal var subscribers: [Subscription.ID: Subscriber] = .init()
+    internal var subscribers: [(id: Subscription.ID, subscriber: Subscriber)] = .init()
     internal weak var collector: SubscriptionCollector?
     internal var isFinished: Bool = false
     internal var isUnsubscribing: Bool = false
@@ -33,12 +33,14 @@ public class Signal<Value> {
         return lock.synchronized {
             guard !isFinished else { return nil }
             let id = subscriptionID.next()
-            subscribers[id] = subscriber
+            subscribers.append((id: id, subscriber: subscriber))
             return Subscription.init { [weak self] in
                 guard let self = self else { return }
                 self.lock.synchronized {
                     self.isUnsubscribing = true
-                    self.subscribers[id] = nil
+                    if let idx = self.subscribers.firstIndex(where: { $0.id == id }) {
+                        self.subscribers.remove(at: idx)
+                    } else { /* do nothing */ }
                     self.isUnsubscribing = false
                 }
             }
@@ -48,14 +50,14 @@ public class Signal<Value> {
     internal func broadcast(_ token: Token) {
         lock.synchronized {
             guard !isSuspended else { return }
-            subscribers.sorted { $0.0 < $1.0 }.forEach { $0.1(.right(token)) } // TODO: sorted for tests? ensures calls in same order as adding handlers
+            subscribers.forEach { $0.1(.right(token)) }
         }
     }
 
     internal func finish(_ reason: Error? = nil) {
         lock.synchronized {
             guard !isSuspended else { return } // TODO: this suspended may prevent braodcasting finish - to check
-            subscribers.sorted { $0.0 < $1.0 }.forEach { $0.1(.left(reason)) } // TODO: sorted for tests? ensures calls in same order as adding handlers
+            subscribers.forEach { $0.1(.left(reason)) }
             isFinished = true
             var sub = subscribers
             // cache until end of scope to prevent deallocation of subscribers while making changes in subscribers dictionary - prevents crash
