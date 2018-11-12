@@ -16,15 +16,17 @@
 /// Cancels automatically on deinit when not completed before.
 public final class Future<Value> {
     
-    private let lock: Lock = Lock()
+    private let lock: RecursiveLock = RecursiveLock()
     private let executionContext: ExecutionContext
     private var observers: [(State) -> Void] = []
     private var state: State
     
+    /// Creates already completed instance of future with given value.
     public convenience init(succeededWith result: Value, executionContext: ExecutionContext = .undefined) {
         self.init(with: .success(result), executionContext: executionContext)
     }
     
+    /// Creates already completed instance of future with given error.
     public convenience init(failedWith reason: Error, executionContext: ExecutionContext = .undefined) {
         self.init(with: .error(reason), executionContext: executionContext)
     }
@@ -303,7 +305,7 @@ public func zip<T, U>(_ f1: Future<T>, _ f2: Future<U>) -> Future<(T, U)> {
     #if FUTURA_DEBUG
     os_log("Zipping on %{public}@ & %{public}@ => %{public}@", log: logger, type: .debug, f1.debugDescriptionSynchronized, f2.debugDescriptionSynchronized, future.debugDescriptionSynchronized)
     #endif
-    let lock = Lock()
+    let lock = RecursiveLock()
     var results: (T?, U?)
     
     f1.observe { state in
@@ -338,6 +340,55 @@ public func zip<T, U>(_ f1: Future<T>, _ f2: Future<U>) -> Future<(T, U)> {
         case .canceled:
             future.become(.canceled)
         case .waiting: break
+        }
+    }
+    return future
+}
+
+/// Zip futures. Returns new Future instance.
+/// Execution context of returned Future is undefined. It will be inherited from completion of last of provided Futures.
+/// If you need explicit execution context use switch(to:) to ensure usage of specific Worker.
+/// Result Future will fail or become canceled if any of provided Futures fails or becomes canceled without waiting for other results.
+public func zip<T>(_ farr: [Future<T>]) -> Future<[T]> {
+    let future = Future<[T]>(executionContext: .undefined)
+    #if FUTURA_DEBUG
+    os_log("Zipping array on %{public}@", log: logger, type: .debug, future.debugDescriptionSynchronized)
+    #endif
+    let lock = RecursiveLock()
+    let count = farr.count
+    var results: [T] = []
+    
+    farr.forEach {
+        $0.observe { state in
+            switch state {
+            case let .resulted(.success(value)):
+                lock.synchronized {
+                    results.append(value)
+                    guard results.count == count else { return }
+                    future.become(.resulted(with: .success(results)))
+                }
+            case let .resulted(.error(reason)):
+                future.become(.resulted(with: .error(reason)))
+            case .canceled:
+                future.become(.canceled)
+            case .waiting: break
+            }
+        }
+    }
+    
+    return future
+}
+
+/// Schedules task using selected worker.
+/// Returned Future represents result of passed body function.
+/// Default worker used for execution is DispatchWorker.default.
+public func future<T>(on worker: Worker = DispatchWorker.default, _ body: @escaping () throws -> T) -> Future<T> {
+    let future = Future<T>(executionContext: .explicit(worker))
+    worker.schedule {
+        do {
+            future.become(.resulted(with: .success(try body())))
+        } catch {
+            future.become(.resulted(with: .error(error)))
         }
     }
     return future

@@ -18,7 +18,7 @@ import Futura
 class PromiseAndFutureTestsTests: XCTestCase {
     
     var worker: TestWorker = .init()
-    var workLog: WorkLog = .init()
+    var workLog: FutureWorkLog = .init()
     var promise: Promise<Int> = .init()
     
     override func setUp() {
@@ -478,6 +478,50 @@ class PromiseAndFutureTestsTests: XCTestCase {
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(otherWorker.execute(), 1)
         XCTAssertEqual(workLog, [.always])
+    }
+    
+    func testShouldHandleValue_WhenReturningValue() {
+        future(on: worker) {
+            return 0
+        }
+        .then { value in
+            self.workLog.log(.then(testDescription(of: value)))
+        }
+        .fail { reason in
+            self.workLog.log(.fail(testDescription(of: reason)))
+        }
+        .resulted {
+            self.workLog.log(.resulted)
+        }
+        .always {
+            self.workLog.log(.always)
+        }
+        
+        XCTAssert(workLog.isEmpty)
+        XCTAssertEqual(worker.execute(), 2)
+        XCTAssertEqual(workLog, [.then(testDescription(of: 0)), .resulted, .always])
+    }
+    
+    func testShouldHandleError_WhenThrowingError() {
+        future(on: worker) {
+            throw testError
+        }
+        .then { value in
+            self.workLog.log(.then(testDescription(of: value)))
+        }
+        .fail { reason in
+            self.workLog.log(.fail(testDescription(of: reason)))
+        }
+        .resulted {
+            self.workLog.log(.resulted)
+        }
+        .always {
+            self.workLog.log(.always)
+        }
+        
+        XCTAssert(workLog.isEmpty)
+        XCTAssertEqual(worker.execute(), 2)
+        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
     }
     
     // MARK: -
@@ -1345,9 +1389,9 @@ class PromiseAndFutureTestsTests: XCTestCase {
             let future: Future<Int> = Future<Int>(succeededWith: 0)
             
             let dispatchQueue: DispatchQueue = DispatchQueue(label: "test", qos: .default, attributes: .concurrent)
-            let lock_1: Lock = Lock()
-            let lock_2: Lock = Lock()
-            let lock_3: Lock = Lock()
+            let lock_1: RecursiveLock = RecursiveLock()
+            let lock_2: RecursiveLock = RecursiveLock()
+            let lock_3: RecursiveLock = RecursiveLock()
             var counter = 0
             
             dispatchQueue.async {
@@ -1397,9 +1441,9 @@ class PromiseAndFutureTestsTests: XCTestCase {
             let future: Future<Int> = Future<Int>(succeededWith: 0)
             
             let dispatchQueue: DispatchQueue = DispatchQueue(label: "test", qos: .default, attributes: .concurrent)
-            let lock_1: Lock = Lock()
-            let lock_2: Lock = Lock()
-            let lock_3: Lock = Lock()
+            let lock_1: RecursiveLock = RecursiveLock()
+            let lock_2: RecursiveLock = RecursiveLock()
+            let lock_3: RecursiveLock = RecursiveLock()
             var counter_1 = 0
             var counter_2 = 0
             var counter_3 = 0
