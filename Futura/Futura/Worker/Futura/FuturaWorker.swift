@@ -18,30 +18,27 @@ import Darwin
 /// It guarantees that on each schedule call the same thread will be reused.
 /// It is not recommended to create a lot of FuturaWorker instances or recreating those often.
 /// Sincie each instance spawns new pthread it may produce unnecesary overhead.
-/// 
+/// FuturaWorker executes tasks immediately if schedule is called already on running instance.
 public final class FuturaWorker : Worker {
     
-    fileprivate let thread = FuturaThread()
+    private let thread = FuturaThread()
     
+    /// Creates new instance with associated system thread instance
     public init() {}
     
-    deinit {
-        thread.endAfterCompleting()
-    }
+    deinit { thread.end() }
     
     /// Assigns given work at the end of queue or executes it immediately if already is current.
     public func schedule(_ work: @escaping () -> Void) {
         if isCurrent {
             work()
         } else {
-            Mutex.lock(thread.context.taskMutex)
-            defer { Mutex.unlock(thread.context.taskMutex) }
-            thread.context.tasks.append(work) // TODO: appending and array is bottleneck now
-            ThreadCond.signal(thread.context.cond)
+            thread.append(task: work)
         }
     }
     
+    /// Returns true if currently on this Worker
     public var isCurrent: Bool {
-        return pthread_equal(thread.pthread, pthread_self()) != 0
+        return thread.isCurrent
     }
 }

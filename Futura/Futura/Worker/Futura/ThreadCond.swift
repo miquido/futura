@@ -37,6 +37,6 @@ internal enum ThreadCond {
     
     @inline(__always)
     internal static func signal(_ pointer: UnsafeMutablePointer<_opaque_pthread_cond_t>) {
-        pthread_cond_signal(pointer)
+        pthread_cond_broadcast(pointer)
     }
 }

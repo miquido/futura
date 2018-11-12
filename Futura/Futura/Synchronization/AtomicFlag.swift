@@ -22,6 +22,11 @@ internal enum AtomicFlag {
         return pointer
     }
     
+    internal static func destroy(_ flag: UnsafeMutablePointer<atomic_flag>) {
+        flag.deinitialize(count: 1)
+        flag.deallocate()
+    }
+    
     @discardableResult @inline(__always)
     internal static func readAndSet(_ flag: UnsafeMutablePointer<atomic_flag>) -> Bool {
         return atomic_flag_test_and_set(flag)
