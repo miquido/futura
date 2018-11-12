@@ -7,12 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4025EFB72199BEC200B9CB1F /* ExecutionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4025EFB62199BEC200B9CB1F /* ExecutionContext.swift */; };
 		404B9499215A351100640928 /* Futura.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 404B948F215A351100640928 /* Futura.framework */; };
 		404B949E215A351100640928 /* FuturaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404B949D215A351100640928 /* FuturaTests.swift */; };
 		404B94AA215A352D00640928 /* RecursiveLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404B94A9215A352D00640928 /* RecursiveLock.swift */; };
 		404B94AC215A354000640928 /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404B94AB215A354000640928 /* Result.swift */; };
 		404B94B0215A356B00640928 /* Future.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404B94AF215A356B00640928 /* Future.swift */; };
-		404B94B2215A358900640928 /* ExecutionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404B94B1215A358900640928 /* ExecutionContext.swift */; };
 		404B94B4215A35AF00640928 /* Worker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404B94B3215A35AF00640928 /* Worker.swift */; };
 		404B94B6215A35C700640928 /* DispatchWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404B94B5215A35C700640928 /* DispatchWorker.swift */; };
 		404B94B8215A35E700640928 /* Promise.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404B94B7215A35E700640928 /* Promise.swift */; };
@@ -28,8 +28,6 @@
 		407AA54B216E34B40030C433 /* AtomicFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 407AA54A216E34B40030C433 /* AtomicFlag.swift */; };
 		407AA54D216E34DA0030C433 /* ThreadCond.swift in Sources */ = {isa = PBXBuildFile; fileRef = 407AA54C216E34DA0030C433 /* ThreadCond.swift */; };
 		407AA54F216E44B70030C433 /* FuturaThread.swift in Sources */ = {isa = PBXBuildFile; fileRef = 407AA54E216E44B70030C433 /* FuturaThread.swift */; };
-		408B60FC2163630300C1A948 /* WorkLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 408B60FB2163630300C1A948 /* WorkLog.swift */; };
-		407AA544216E174F0030C433 /* Mutex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 407AA543216E174F0030C433 /* Mutex.swift */; };
 		408B60FC2163630300C1A948 /* FutureWorkLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 408B60FB2163630300C1A948 /* FutureWorkLog.swift */; };
 		40AFB89C216B72BC00ABB5BB /* FutureZipTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40AFB89B216B72BC00ABB5BB /* FutureZipTests.swift */; };
 /* End PBXBuildFile section */
@@ -52,6 +50,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		4025EFB62199BEC200B9CB1F /* ExecutionContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExecutionContext.swift; sourceTree = "<group>"; };
 		404B948F215A351100640928 /* Futura.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Futura.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		404B9493215A351100640928 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		404B9498215A351100640928 /* FuturaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FuturaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -60,7 +59,6 @@
 		404B94A9215A352D00640928 /* RecursiveLock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecursiveLock.swift; sourceTree = "<group>"; };
 		404B94AB215A354000640928 /* Result.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
 		404B94AF215A356B00640928 /* Future.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Future.swift; sourceTree = "<group>"; };
-		404B94B1215A358900640928 /* ExecutionContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExecutionContext.swift; sourceTree = "<group>"; };
 		404B94B3215A35AF00640928 /* Worker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Worker.swift; sourceTree = "<group>"; };
 		404B94B5215A35C700640928 /* DispatchWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DispatchWorker.swift; sourceTree = "<group>"; };
 		404B94B7215A35E700640928 /* Promise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Promise.swift; sourceTree = "<group>"; };
@@ -77,8 +75,6 @@
 		407AA54A216E34B40030C433 /* AtomicFlag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AtomicFlag.swift; sourceTree = "<group>"; };
 		407AA54C216E34DA0030C433 /* ThreadCond.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadCond.swift; sourceTree = "<group>"; };
 		407AA54E216E44B70030C433 /* FuturaThread.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuturaThread.swift; sourceTree = "<group>"; };
-		408B60FB2163630300C1A948 /* WorkLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkLog.swift; sourceTree = "<group>"; };
-		407AA543216E174F0030C433 /* Mutex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mutex.swift; sourceTree = "<group>"; };
 		408B60FB2163630300C1A948 /* FutureWorkLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureWorkLog.swift; sourceTree = "<group>"; };
 		40AFB89B216B72BC00ABB5BB /* FutureZipTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureZipTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -169,7 +165,6 @@
 			isa = PBXGroup;
 			children = (
 				404B94B3215A35AF00640928 /* Worker.swift */,
-				404B94B1215A358900640928 /* ExecutionContext.swift */,
 				407AA554216E4CA20030C433 /* Futura */,
 				407AA553216E4C9B0030C433 /* Dispatch */,
 			);
@@ -181,7 +176,7 @@
 			children = (
 				404B94AF215A356B00640928 /* Future.swift */,
 				404B94B7215A35E700640928 /* Promise.swift */,
-				404B94B1215A358900640928 /* ExecutionContext.swift */,
+				4025EFB62199BEC200B9CB1F /* ExecutionContext.swift */,
 			);
 			path = Future;
 			sourceTree = "<group>";
@@ -190,7 +185,6 @@
 			isa = PBXGroup;
 			children = (
 				4075C52321624F8100B40806 /* TestWorker.swift */,
-				408B60FB2163630300C1A948 /* WorkLog.swift */,
 				408B60FB2163630300C1A948 /* FutureWorkLog.swift */,
 				404B949D215A351100640928 /* FuturaTests.swift */,
 			);
@@ -220,7 +214,6 @@
 			children = (
 				407AA543216E174F0030C433 /* Mutex.swift */,
 				407AA54A216E34B40030C433 /* AtomicFlag.swift */,
-				404B94A9215A352D00640928 /* Lock.swift */,
 				404B94A9215A352D00640928 /* RecursiveLock.swift */,
 			);
 			path = Synchronization;
@@ -363,13 +356,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4025EFB72199BEC200B9CB1F /* ExecutionContext.swift in Sources */,
 				404B94AC215A354000640928 /* Result.swift in Sources */,
 				407AA54D216E34DA0030C433 /* ThreadCond.swift in Sources */,
 				404B94B4215A35AF00640928 /* Worker.swift in Sources */,
-				404B94B2215A358900640928 /* ExecutionContext.swift in Sources */,
 				404B94B0215A356B00640928 /* Future.swift in Sources */,
 				404B94B6215A35C700640928 /* DispatchWorker.swift in Sources */,
-				404B94AA215A352D00640928 /* Lock.swift in Sources */,
+				404B94AA215A352D00640928 /* RecursiveLock.swift in Sources */,
 				407AA54B216E34B40030C433 /* AtomicFlag.swift in Sources */,
 				407AA54F216E44B70030C433 /* FuturaThread.swift in Sources */,
 				407AA4A3216BDF350030C433 /* FuturaWorker.swift in Sources */,
@@ -390,16 +383,8 @@
 				404B94BC215A365100640928 /* PromiseAndFutureTests.swift in Sources */,
 				404B94C0215A5CC600640928 /* DispatchWorkerTests.swift in Sources */,
 				407AA542216DE7920030C433 /* FuturaWorkerTests.swift in Sources */,
-				408B60FC2163630300C1A948 /* WorkLog.swift in Sources */,
 				408B60FC2163630300C1A948 /* FutureWorkLog.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		405716C3217077EE00C79BE5 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				405716CA217077EE00C79BE5 /* FuturaPerformanceTests.swift in Sources */,
+				408B60FC2163630300C1A948 /* FutureWorkLog.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
