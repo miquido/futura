@@ -21,7 +21,7 @@ internal class SignalForwarder<V1, V2>: Signal<V2> {
     }
 
     override var isSuspended: Bool {
-        return super.isSuspended || source?.isSuspended ?? false
+        return super.isSuspended || (source?.isSuspended ?? false)
     }
 }
 

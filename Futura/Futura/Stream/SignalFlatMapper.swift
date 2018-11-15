@@ -13,6 +13,17 @@
  limitations under the License. */
 
 public extension Signal {
+    /// Transforms Signal into new Signal instance using provided function.
+    /// Flattens and maps Signal to other type or transforms
+    /// its value using other Signal.
+    /// Returns new instance of Signal that will pass tokens
+    /// transformed with given function combined with returned Signal.
+    /// It might throw to indicate error - throwed error will
+    /// be automatically switched to Signal error.
+    ///
+    /// - Parameter transform: Value transformation function.
+    /// Returned Signal will be flattened. Might throw to pass errors.
+    /// - Returns: New Signal instance passing transformed tokens.
     func flatMap<T>(_ transform: @escaping (Value) throws -> Signal<T>) -> Signal<T> {
         return SignalFlatMapper(source: self, transform: transform)
     }

@@ -13,6 +13,13 @@
  limitations under the License. */
 
 public extension Signal {
+    /// Transforms Signal into new Signal instance using provided filter.
+    /// Filters values passed by Signal.
+    /// Returns new instance of Signal that will pass only matching values.
+    /// Filter does not affect error flow.
+    ///
+    /// - Parameter filter: Filtering function returning true for values that can be passed/
+    /// - Returns: New Signal instance passing filtered values and all errors.
     func filter(_ filter: @escaping (Value) -> Bool) -> Signal<Value> {
         return SignalFilter(source: self, filter: filter)
     }

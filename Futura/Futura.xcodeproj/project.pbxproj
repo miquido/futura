@@ -578,6 +578,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.miquido.Futura;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				Resilience = "-enable-resilience";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = FUTURA_DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -606,6 +607,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.miquido.Futura;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				Resilience = "-enable-resilience";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";

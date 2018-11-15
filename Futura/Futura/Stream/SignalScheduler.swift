@@ -13,6 +13,15 @@
  limitations under the License. */
 
 public extension Signal {
+    /// Transforms Signal into new Signal instance using provided Worker.
+    /// Given Worker will be used to execute all subscriptions made
+    /// on new Signal instance.
+    /// It will be used without propagation for all subsequent transformations
+    /// and and handlers in chain until next switch call.
+    ///
+    /// - Parameter worker: Worker that will be used to execute
+    /// transformations and handlers of new Signal.
+    /// - Returns: New Signal instance operating on provided Worker.
     func `switch`(to worker: Worker) -> Signal<Value> {
         return SignalScheduler(source: self, worker: worker)
     }
@@ -39,7 +48,8 @@ internal final class SignalScheduler<Value>: SignalForwarder<Value, Value> {
 
     internal override func finish(_ reason: Error? = nil) {
         lock.synchronized {
-            guard !isSuspended else { return } // TODO: this suspended may prevent braodcasting finish - to check
+            guard !isSuspended else { return }
+            #warning("TODO: this suspended may prevent braodcasting finish - to check")
             let subscribers = self.subscribers
             associatedWorker.schedule {
                 subscribers.forEach { $0.1(.left(reason)) }
@@ -48,7 +58,8 @@ internal final class SignalScheduler<Value>: SignalForwarder<Value, Value> {
             var sub = subscribers
             // cache until end of scope to prevent deallocation of subscribers while making changes in subscribers dictionary - prevents crash
             self.subscribers = .init()
-            sub.removeAll() // TODO: to check performance
+            sub.removeAll() // only to silence warning about unused value `sub`
+            #warning("TODO: to check performance of removeAll")
         }
     }
 }
