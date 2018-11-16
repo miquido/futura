@@ -15,7 +15,7 @@
 import XCTest
 import Futura
 
-class LockTests: XCTestCase {
+class RecursiveLockTests: XCTestCase {
     
     func testShouldNotCrash_When_ReleasingLocked() {
         RecursiveLock().lock()
@@ -27,7 +27,7 @@ class LockTests: XCTestCase {
             XCTFail("Not in time - possible deadlock or fail")
         })
         { complete in
-            let lock = RecursiveLock()
+            let lock: RecursiveLock = .init()
             var completed: Bool = false
             
             lock.lock()
@@ -47,7 +47,7 @@ class LockTests: XCTestCase {
             XCTFail("Not in time - possible deadlock or fail")
         })
         { complete in
-            let lock = RecursiveLock()
+            let lock: RecursiveLock = .init()
             
             lock.lock()
             lock.lock()
@@ -61,7 +61,7 @@ class LockTests: XCTestCase {
     }
     
     func testShouldSucceedTryLock_WhenUnlocked() {
-        let lock = RecursiveLock()
+        let lock: RecursiveLock = .init()
         
         guard lock.tryLock() else {
             return XCTFail("Lock failed to lock")
@@ -69,7 +69,7 @@ class LockTests: XCTestCase {
     }
     
     func testShouldSucceedTryLock_WhenLockedOnSameThread() {
-        let lock = RecursiveLock()
+        let lock: RecursiveLock = .init()
         lock.lock()
         
         guard lock.tryLock() else {
@@ -83,7 +83,7 @@ class LockTests: XCTestCase {
             XCTFail("Not in time - possible deadlock or fail")
         })
         { complete in
-            let lock = RecursiveLock()
+            let lock: RecursiveLock = .init()
             lock.lock()
             
             DispatchQueue.global().async {
@@ -102,7 +102,7 @@ class LockTests: XCTestCase {
             XCTFail("Not in time - possible deadlock or fail")
         })
         { complete in
-            let lock = RecursiveLock()
+            let lock: RecursiveLock = .init()
             var testValue = 0
             
             DispatchQueue.global().async {
@@ -128,7 +128,7 @@ class LockTests: XCTestCase {
                     XCTFail("Not in time - possible deadlock or fail")
         })
         { complete in
-            let lock = RecursiveLock()
+            let lock: RecursiveLock = .init()
             var completed: Bool = false
             
             lock.synchronized {
@@ -149,7 +149,7 @@ class LockTests: XCTestCase {
     }
     
     func testShouldThrowInSynchronizedWithoutChangingError() {
-        let lock = RecursiveLock()
+        let lock: RecursiveLock = .init()
         let expectedResult = TestError()
         
         do {

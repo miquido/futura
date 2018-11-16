@@ -12,7 +12,21 @@
  See the License for the specific language governing permissions and
  limitations under the License. */
 
-internal enum Result<T> {
-    case value(T)
-    case error(Error)
+internal final class Subscription {
+    internal typealias ID = UInt64
+
+    private let unsubscribe: () -> Void
+
+    internal init(_ unsubscribe: @escaping () -> Void) {
+        self.unsubscribe = unsubscribe
+    }
+
+    deinit { unsubscribe() }
+}
+
+extension Subscription.ID {
+    internal mutating func next() -> Subscription.ID {
+        defer { self += 1 }
+        return self
+    }
 }

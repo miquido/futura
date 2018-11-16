@@ -43,6 +43,7 @@ class TestWorker : Worker {
         }
     }
     
+    @discardableResult
     func execute() -> Int {
         return lock.synchronized {
             var count: Int = 0
