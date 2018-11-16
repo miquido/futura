@@ -12,10 +12,13 @@
  See the License for the specific language governing permissions and
  limitations under the License. */
 
+#warning("to complete docs")
 /// ExecutionContext enables to describe how to execute things
 public enum ExecutionContext {
+    #warning("to complete docs")
     /// Context will inherit worker from completing task or use current thread
     case undefined
+    #warning("to complete docs")
     /// Context will switch to provided worker or continue if already on it
     case explicit(Worker)
 }

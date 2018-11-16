@@ -12,8 +12,10 @@
  See the License for the specific language governing permissions and
  limitations under the License. */
 
-/// Read only container for async value. Future will remain in memory until its parent (Promise or other Future) completes.
-/// Cancels automatically on deinit when not completed before.
+/// Read only container for async or delayed value.
+/// Future will remain in memory at least until its parent Future completes.
+/// It caches result until deallocated.
+/// Cancels automatically on deinit when not completed or cancelled before.
 public final class Future<Value> {
     
     private let lock: RecursiveLock = RecursiveLock()
@@ -21,12 +23,20 @@ public final class Future<Value> {
     private var observers: [(State) -> Void] = []
     private var state: State
     
-    /// Creates already completed instance of future with given value.
+    /// Creates already finished Future with given value and context.
+    ///
+    /// - Parameter value: Value finishing this Promise.
+    /// - Parameter executionContext: ExecutionContext that will be used for all
+    /// transformations and handlers made on this Future. Default is .undefined.
     public convenience init(succeededWith result: Value, executionContext: ExecutionContext = .undefined) {
         self.init(with: .value(result), executionContext: executionContext)
     }
     
-    /// Creates already completed instance of future with given error.
+    /// Creates already finished Future with given error and context.
+    ///
+    /// - Parameter value: Value finishing this Promise.
+    /// - Parameter executionContext: ExecutionContext that will be used for all
+    /// transformations and handlers made on this Future. Default is .undefined.
     public convenience init(failedWith reason: Error, executionContext: ExecutionContext = .undefined) {
         self.init(with: .error(reason), executionContext: executionContext)
     }
@@ -42,9 +52,6 @@ public final class Future<Value> {
     
     deinit {
         guard case .waiting = state else { return }
-        #if FUTURA_DEBUG
-        os_log("Deallocating %{public}@", log: logger, type: .debug, debugDescription)
-        #endif
         let observers = self.observers
         executionContext.execute {
             observers.forEach { $0(.canceled) }
@@ -54,12 +61,14 @@ public final class Future<Value> {
 
 public extension Future {
     
-    /// Access value when future completes with success
+    /// Access Future value when finishes with value or already finished with value.
+    /// Given handler will be cached until Future finishes or called immediately
+    /// if already finished with value. If it have already finished without value it will
+    /// be discarded without calling or keeping in memory.
+    ///
+    /// - Parameter handler: Function that will be called when finished with value.
     @discardableResult
-    func then(_ handler: @escaping (Value) -> Void) -> Self {
-        #if FUTURA_DEBUG
-        os_log("Handling value on %{public}@", log: logger, type: .debug, debugDescriptionSynchronized)
-        #endif
+    func value(_ handler: @escaping (Value) -> Void) -> Self {
         handle { result in
             switch result {
             case let .value(value):
@@ -70,12 +79,14 @@ public extension Future {
         return self
     }
     
-    /// Access error when future completes with error
+    /// Access Future error when finishes with error or already finished with error.
+    /// Given handler will be cached until Future finishes or called immediately
+    /// if already finished with error. If it have already finished without error it will
+    /// be discarded without calling or keeping in memory.
+    ///
+    /// - Parameter handler: Function that will be called when finished with error.
     @discardableResult
-    func fail(_ handler: @escaping (Error) -> Void) -> Self {
-        #if FUTURA_DEBUG
-        os_log("Handling error on %{public}@", log: logger, type: .debug, debugDescriptionSynchronized)
-        #endif
+    func error(_ handler: @escaping (Error) -> Void) -> Self {
         handle { result in
             switch result {
             case .value: break
@@ -86,13 +97,11 @@ public extension Future {
         return self
     }
     
+    #warning("to complete docs")
     /// Access error when future completes with error. Returns new Future instance.
     /// If it handles error without throwing it cancels all further futures preventing error propagation.
     func `catch`(_ handler: @escaping (Error) throws -> Void) -> Future<Value> {
         let future = Future(executionContext: executionContext)
-        #if FUTURA_DEBUG
-        os_log("Catching error on %{public}@", log: logger, type: .debug, debugDescriptionSynchronized)
-        #endif
         observe { state in
             switch state {
             case let .resulted(.value(value)):
@@ -112,12 +121,10 @@ public extension Future {
         return future
     }
     
+    #warning("to complete docs")
     /// Try recover from error providing valid value. Returns new Future instance.
     func recover(_ transformation: @escaping (Error) throws -> Value) -> Future {
         let future = Future(executionContext: executionContext)
-        #if FUTURA_DEBUG
-        os_log("Recoverable on %{public}@ => %{public}@", log: logger, type: .debug, debugDescriptionSynchronized, future.debugDescriptionSynchronized)
-        #endif
         observe { state in
             switch state {
             case let .resulted(.value(value)):
@@ -136,37 +143,31 @@ public extension Future {
         return future
     }
     
+    #warning("to complete docs")
     /// Execute when future completes with result. It is omited when future is canceled.
     @discardableResult
     func resulted(_ handler: @escaping () -> Void) -> Self {
-        #if FUTURA_DEBUG
-        os_log("Handling done on %{public}@", log: logger, type: .debug, debugDescriptionSynchronized)
-        #endif
         handle { _ in
             handler()
         }
         return self
     }
     
+    #warning("to complete docs")
     /// Execute always when future completes. Includes completion by cancelation.
     @discardableResult
     func always(_ handler: @escaping () -> ()) -> Self {
-        #if FUTURA_DEBUG
-        os_log("Handling always on %{public}@", log: logger, type: .debug, debugDescriptionSynchronized)
-        #endif
         observe { _ in
             handler()
         }
         return self
     }
     
+    #warning("to complete docs")
     /// Map container to other type or do some value changes. Returns new Future instance.
     /// Transformation may throw to propagate error instad of value.
     func map<T>(_ transformation: @escaping (Value) throws -> (T)) -> Future<T> {
         let future = Future<T>(executionContext: executionContext)
-        #if FUTURA_DEBUG
-        os_log("Mapping on %{public}@ => %{public}@", log: logger, type: .debug, debugDescriptionSynchronized, future.debugDescriptionSynchronized)
-        #endif
         observe { state in
             switch state {
             case let .resulted(.value(value)):
@@ -185,13 +186,11 @@ public extension Future {
         return future
     }
     
+    #warning("to complete docs")
     /// Map container to other type or do some value changes flattening future inside. Returns new Future instance.
     /// Transformation may throw to propagate error instad of value.
     func flatMap<T>(_ transformation: @escaping (Value) throws -> (Future<T>)) -> Future<T> {
         let future = Future<T>(executionContext: executionContext)
-        #if FUTURA_DEBUG
-        os_log("Flat mapping on %{public}@ => %{public}@", log: logger, type: .debug, debugDescriptionSynchronized, future.debugDescriptionSynchronized)
-        #endif
         observe { state in
             switch state {
             case let .resulted(.value(value)):
@@ -212,26 +211,23 @@ public extension Future {
         return future
     }
     
+    #warning("to complete docs")
     /// Returns new Future instance with given execution context. Futures inherit execution context by default.
     func `switch`(to worker: Worker) -> Future<Value> {
         let future = Future(executionContext: .explicit(worker))
-        #if FUTURA_DEBUG
-        os_log("Switching to %{public}@ on %{public}@", log: logger, type: .debug, String(describing: worker) as! CVarArg, debugDescriptionSynchronized)
-        #endif
         observe { future.become($0) }
         return future
     }
     
+    #warning("to complete docs")
     /// Returns new Future instance with same parameters as cloned future. Result future is a child of cloned future instead of child of same parent.
     func clone() -> Future<Value> {
         let future = Future(executionContext: executionContext)
-        #if FUTURA_DEBUG
-        os_log("Cloning on %{public}@ => %{public}@", log: logger, type: .debug, debugDescriptionSynchronized, future.debugDescriptionSynchronized)
-        #endif
         observe { future.become($0) }
         return future
     }
     
+    #warning("to complete docs")
     /// Cancels future without triggering any handlers (except always). Cancellation is propagated.
     func cancel() {
         become(.canceled)
@@ -250,21 +246,12 @@ internal extension Future {
         lock.synchronized {
             switch self.state {
             case .resulted, .canceled:
-                #if FUTURA_DEBUG
-                os_log("Ignoring completion with %{public}@ on %{public}@", log: logger, type: .debug, String(describing: state) as! CVarArg, debugDescription)
-                #endif
                 return
             case .waiting:
-                #if FUTURA_DEBUG
-                os_log("Completing with %{public}@ on %{public}@", log: logger, type: .debug, String(describing: state) as! CVarArg, debugDescription)
-                #endif
                 self.state = state
                 executionContext.execute {
                     self.observers.forEach { $0(state) }
                     self.observers.removeAll()
-                    #if FUTURA_DEBUG
-                    os_log("Finished completing with %{public}@ on %{public}@", log: logger, type: .debug, String(describing: state) as! CVarArg, self.debugDescription)
-                    #endif
                 }
             }
         }
@@ -296,15 +283,13 @@ fileprivate extension Future {
     }
 }
 
+#warning("to complete docs")
 /// Zip futures. Returns new Future instance.
 /// Execution context of returned Future is undefined. It will be inherited from completion of last of provided Futures.
 /// If you need explicit execution context use switch(to:) to ensure usage of specific Worker.
 /// Result Future will fail or become canceled if any of provided Futures fails or becomes canceled without waiting for other results.
 public func zip<T, U>(_ f1: Future<T>, _ f2: Future<U>) -> Future<(T, U)> {
     let future = Future<(T, U)>(executionContext: .undefined)
-    #if FUTURA_DEBUG
-    os_log("Zipping on %{public}@ & %{public}@ => %{public}@", log: logger, type: .debug, f1.debugDescriptionSynchronized, f2.debugDescriptionSynchronized, future.debugDescriptionSynchronized)
-    #endif
     let lock = RecursiveLock()
     var results: (T?, U?)
     
@@ -345,15 +330,13 @@ public func zip<T, U>(_ f1: Future<T>, _ f2: Future<U>) -> Future<(T, U)> {
     return future
 }
 
+#warning("to complete docs")
 /// Zip futures. Returns new Future instance.
 /// Execution context of returned Future is undefined. It will be inherited from completion of last of provided Futures.
 /// If you need explicit execution context use switch(to:) to ensure usage of specific Worker.
 /// Result Future will fail or become canceled if any of provided Futures fails or becomes canceled without waiting for other results.
 public func zip<T>(_ farr: [Future<T>]) -> Future<[T]> {
     let future = Future<[T]>(executionContext: .undefined)
-    #if FUTURA_DEBUG
-    os_log("Zipping array on %{public}@", log: logger, type: .debug, future.debugDescriptionSynchronized)
-    #endif
     let lock = RecursiveLock()
     let count = farr.count
     var results: [T] = []
@@ -379,6 +362,7 @@ public func zip<T>(_ farr: [Future<T>]) -> Future<[T]> {
     return future
 }
 
+#warning("to complete docs")
 /// Schedules task using selected worker.
 /// Returned Future represents result of passed body function.
 /// Default worker used for execution is DispatchWorker.default.
@@ -393,41 +377,3 @@ public func future<T>(on worker: Worker = DispatchWorker.default, _ body: @escap
     }
     return future
 }
-
-#if FUTURA_DEBUG
-
-import os.log
-
-let logger = OSLog(subsystem: "Futura", category: "Async")
-
-fileprivate extension Future {
-    
-    var debugDescription: CVarArg {
-        return "\(statusDescription) Future<\(typeDescription)>[0x\(memoryAddress)]" as! CVarArg
-    }
-    
-    var debugDescriptionSynchronized: CVarArg {
-        return lock.synchronized { debugDescription }
-    }
-    
-    var statusDescription: String {
-        switch state {
-        case .resulted:
-            return "COMPLETED"
-        case .waiting:
-            return "WAITING"
-        case .canceled:
-            return "CANCELED"
-        }
-    }
-    
-    var memoryAddress: String {
-        return String(unsafeBitCast(self, to: Int.self), radix: 16)
-    }
-    
-    var typeDescription: String {
-        return String(describing: Value.self)
-    }
-}
-
-#endif

@@ -56,11 +56,11 @@ extension Future {
     @discardableResult
     func logResults(with workLog: FutureWorkLog) -> Self {
         self
-            .then { value in
-                workLog.log(.then(testDescription(of: value)))
+            .value { value in
+                workLog.log(.value(testDescription(of: value)))
             }
-            .fail { reason in
-                workLog.log(.fail(testDescription(of: reason)))
+            .error { reason in
+                workLog.log(.error(testDescription(of: reason)))
             }
             .resulted {
                 workLog.log(.resulted)

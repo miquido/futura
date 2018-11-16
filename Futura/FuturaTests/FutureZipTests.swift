@@ -46,7 +46,7 @@ class FutureZipTests: XCTestCase {
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 1)
         
-        XCTAssertEqual(workLog, [.then(testDescription(of: (0, 0))), .resulted, .always])
+        XCTAssertEqual(workLog, [.value(testDescription(of: (0, 0))), .resulted, .always])
     }
     
     func testShouldHandleValue_WhenCompletingWithValueOnBothReversed() {
@@ -62,7 +62,7 @@ class FutureZipTests: XCTestCase {
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 1)
         
-        XCTAssertEqual(workLog, [.then(testDescription(of: (0, 0))), .resulted, .always])
+        XCTAssertEqual(workLog, [.value(testDescription(of: (0, 0))), .resulted, .always])
     }
     
     func testShouldHandleError_WhenCompletingWithErrorOnFirst_WhileSecondWaiting() {
@@ -73,11 +73,11 @@ class FutureZipTests: XCTestCase {
         promise_1.break(with: testError)
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 1)
-        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.error(testErrorDescription), .resulted, .always])
         
         promise_2.fulfill(with: 0)
         XCTAssertEqual(worker.execute(), 1)
-        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleError_WhenCompletingWithErrorOnSecond_WhileFirstWaiting() {
@@ -88,11 +88,11 @@ class FutureZipTests: XCTestCase {
         promise_2.break(with: testError)
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 1)
-        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.error(testErrorDescription), .resulted, .always])
         
         promise_1.fulfill(with: 0)
         XCTAssertEqual(worker.execute(), 1)
-        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleError_WhenCompletingWithErrorOnFirst_WhileSecondSucceeded() {
@@ -107,7 +107,7 @@ class FutureZipTests: XCTestCase {
         promise_1.break(with: testError)
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 1)
-        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleError_WhenCompletingWithErrorOnSecond_WhileFirstSucceeded() {
@@ -122,7 +122,7 @@ class FutureZipTests: XCTestCase {
         promise_2.break(with: testError)
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 1)
-        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleCancel_WhenCompletingWithCancelOnFirst_WhileSecondWaiting() {
@@ -198,7 +198,7 @@ class FutureZipTests: XCTestCase {
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 1)
         
-        XCTAssertEqual(workLog, [.then(testDescription(of: [0, 0])), .resulted, .always])
+        XCTAssertEqual(workLog, [.value(testDescription(of: [0, 0])), .resulted, .always])
     }
     
     func testShouldHandleValue_WhenCompletingWithValueOnBothReversed_UsingArray() {
@@ -214,7 +214,7 @@ class FutureZipTests: XCTestCase {
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 1)
         
-        XCTAssertEqual(workLog, [.then(testDescription(of: [0, 0])), .resulted, .always])
+        XCTAssertEqual(workLog, [.value(testDescription(of: [0, 0])), .resulted, .always])
     }
     
     func testShouldHandleError_WhenCompletingWithErrorOnFirst_WhileSecondWaiting_UsingArray() {
@@ -225,11 +225,11 @@ class FutureZipTests: XCTestCase {
         promise_1.break(with: testError)
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 1)
-        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.error(testErrorDescription), .resulted, .always])
         
         promise_2.fulfill(with: 0)
         XCTAssertEqual(worker.execute(), 1)
-        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleError_WhenCompletingWithErrorOnSecond_WhileFirstWaiting_UsingArray() {
@@ -240,11 +240,11 @@ class FutureZipTests: XCTestCase {
         promise_2.break(with: testError)
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 1)
-        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.error(testErrorDescription), .resulted, .always])
         
         promise_1.fulfill(with: 0)
         XCTAssertEqual(worker.execute(), 1)
-        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleError_WhenCompletingWithErrorOnFirst_WhileSecondSucceeded_UsingArray() {
@@ -259,7 +259,7 @@ class FutureZipTests: XCTestCase {
         promise_1.break(with: testError)
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 1)
-        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleError_WhenCompletingWithErrorOnSecond_WhileFirstSucceeded_UsingArray() {
@@ -274,7 +274,7 @@ class FutureZipTests: XCTestCase {
         promise_2.break(with: testError)
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 1)
-        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleCancel_WhenCompletingWithCancelOnFirst_WhileSecondWaiting_UsingArray() {
@@ -351,7 +351,7 @@ class FutureZipTests: XCTestCase {
 
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 2)
-        XCTAssertEqual(workLog, [.then(testDescription(of: (0, 0))), .resulted, .always])
+        XCTAssertEqual(workLog, [.value(testDescription(of: (0, 0))), .resulted, .always])
     }
     
     func testShouldHandleError_WhenAlreadyCompletedWithErrorOnFirst_WhileSecondWaiting() {
@@ -364,7 +364,7 @@ class FutureZipTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 1)
-        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleError_WhenAlreadyCompletedWithErrorOnSecond_WhileFirstWaiting() {
@@ -377,7 +377,7 @@ class FutureZipTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 1)
-        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleError_WhenAlreadyCompletedWithErrorOnFirst_WhileSecondSucceeded() {
@@ -391,7 +391,7 @@ class FutureZipTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 2)
-        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleError_WhenAlreadyCompletedWithErrorOnSecond_WhileFirstSucceeded() {
@@ -405,7 +405,7 @@ class FutureZipTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 2)
-        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleCancel_WhenAlreadyCompletedWithCancelOnFirst_WhileSecondWaiting() {
@@ -473,7 +473,7 @@ class FutureZipTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 2)
-        XCTAssertEqual(workLog, [.then(testDescription(of: [0, 0])), .resulted, .always])
+        XCTAssertEqual(workLog, [.value(testDescription(of: [0, 0])), .resulted, .always])
     }
     
     func testShouldHandleError_WhenAlreadyCompletedWithErrorOnFirst_WhileSecondWaiting_UsingArray() {
@@ -486,7 +486,7 @@ class FutureZipTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 1)
-        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleError_WhenAlreadyCompletedWithErrorOnSecond_WhileFirstWaiting_UsingArray() {
@@ -499,7 +499,7 @@ class FutureZipTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 1)
-        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleError_WhenAlreadyCompletedWithErrorOnFirst_WhileSecondSucceeded_UsingArray() {
@@ -513,7 +513,7 @@ class FutureZipTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 2)
-        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleError_WhenAlreadyCompletedWithErrorOnSecond_WhileFirstSucceeded_UsingArray() {
@@ -527,7 +527,7 @@ class FutureZipTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 2)
-        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleCancel_WhenAlreadyCompletedWithCancelOnFirst_WhileSecondWaiting_UsingArray() {

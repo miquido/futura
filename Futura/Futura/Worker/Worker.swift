@@ -12,8 +12,10 @@
  See the License for the specific language governing permissions and
  limitations under the License. */
 
+#warning("to complete docs")
 /// Protocol used to describe worker behaviour. This abstraction allows to use DispatchQueue and other threading solutions for performing tasks on different threads.
 public protocol Worker {
+    #warning("to complete docs")
     /// Schedule assigns given work to worker for execution.
     /// Depending on worker implementation it might be executed immediately or in some point in future.
     /// Schedule is not blocking current thread.

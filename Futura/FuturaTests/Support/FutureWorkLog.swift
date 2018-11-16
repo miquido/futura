@@ -17,8 +17,8 @@ final class FutureWorkLog : Equatable {
     private var log: [Event]
     
     enum Event {
-        case then(String)
-        case fail(String)
+        case value(String)
+        case error(String)
         case resulted
         case always
         case recover
@@ -58,10 +58,10 @@ extension FutureWorkLog.Event : CustomStringConvertible {
 extension FutureWorkLog.Event : CustomDebugStringConvertible {
     var debugDescription: String {
         switch self {
-        case let .then(value):
-            return "then(\(value))"
-        case let .fail(error):
-            return "fail(\(error))"
+        case let .value(value):
+            return "value(\(value))"
+        case let .error(error):
+            return "error(\(error))"
         case .resulted:
             return "resulted"
         case .always:

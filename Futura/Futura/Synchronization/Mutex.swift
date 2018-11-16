@@ -14,12 +14,15 @@
 
 import Darwin.POSIX
 
+#warning("to complete docs")
 /// pthread_mutex api wrapper
 public enum Mutex {
     
+    #warning("to complete docs")
     /// pthread_mutex_t pointer type
     public typealias Pointer = UnsafeMutablePointer<pthread_mutex_t>
     
+    #warning("to complete docs")
     /// Creates new instance of pthread_mutex
     @inline(__always)
     public static func make(recursive: Bool) -> Pointer {
@@ -35,6 +38,7 @@ public enum Mutex {
         return pointer
     }
     
+    #warning("to complete docs")
     /// Deallocates instance of pthread_mutex
     @inline(__always)
     public static func destroy(_ pointer: Pointer) {
@@ -43,18 +47,21 @@ public enum Mutex {
         pointer.deallocate()
     }
     
+    #warning("to complete docs")
     /// Locks on instance of pthread_mutex
     @inline(__always)
     public static func lock(_ pointer: Pointer) {
         pthread_mutex_lock(pointer)
     }
     
+    #warning("to complete docs")
     /// Tries to lock on instance of pthread_mutex
     @inline(__always)
     public static func tryLock(_ pointer: Pointer) -> Bool {
         return pthread_mutex_trylock(pointer) == 0
     }
     
+    #warning("to complete docs")
     /// Unlocks on instance of pthread_mutex
     @inline(__always)
     public static func unlock(_ pointer: Pointer) {

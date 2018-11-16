@@ -14,6 +14,7 @@
 
 import Dispatch
 
+#warning("to complete docs")
 /// Worker wrapper for DispatchQueue
 public enum DispatchWorker {
     case main
@@ -25,6 +26,7 @@ public enum DispatchWorker {
 
 extension DispatchWorker : Worker {
     
+    #warning("to complete docs")
     /// Assigns given work at the end of queue.
     /// Depending on queue type (serial or concurrent) behaviour may be different.
     /// It simple calls DispatchQueue.async for task execution.

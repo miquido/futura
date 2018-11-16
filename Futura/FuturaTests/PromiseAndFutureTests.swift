@@ -33,11 +33,11 @@ class PromiseAndFutureTestsTests: XCTestCase {
     
     func testShouldHandleValue_WhenCompletingWithValue() {
         promise.future
-            .then { value in
-                self.workLog.log(.then(testDescription(of: value)))
+            .value { value in
+                self.workLog.log(.value(testDescription(of: value)))
             }
-            .fail { reason in
-                self.workLog.log(.fail(testDescription(of: reason)))
+            .error { error in
+                self.workLog.log(.error(testDescription(of: error)))
             }
             .resulted {
                 self.workLog.log(.resulted)
@@ -51,16 +51,16 @@ class PromiseAndFutureTestsTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 1)
-        XCTAssertEqual(workLog, [.then(testDescription(of: 0)), .resulted, .always])
+        XCTAssertEqual(workLog, [.value(testDescription(of: 0)), .resulted, .always])
     }
     
     func testShouldHandleError_WhenCompletingWithError() {
         promise.future
-            .then { value in
-                self.workLog.log(.then(testDescription(of: value)))
+            .value { value in
+                self.workLog.log(.value(testDescription(of: value)))
             }
-            .fail { reason in
-                self.workLog.log(.fail(testDescription(of: reason)))
+            .error { error in
+                self.workLog.log(.error(testDescription(of: error)))
             }
             .resulted {
                 self.workLog.log(.resulted)
@@ -74,16 +74,16 @@ class PromiseAndFutureTestsTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 1)
-        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleCancel_WhenCompletingWithCancel() {
         promise.future
-            .then { value in
-                self.workLog.log(.then(testDescription(of: value)))
+            .value { value in
+                self.workLog.log(.value(testDescription(of: value)))
             }
-            .fail { reason in
-                self.workLog.log(.fail(testDescription(of: reason)))
+            .error { error in
+                self.workLog.log(.error(testDescription(of: error)))
             }
             .resulted {
                 self.workLog.log(.resulted)
@@ -113,7 +113,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 2)
-        XCTAssertEqual(workLog, [.then(testDescription(of: 0)), .resulted, .always])
+        XCTAssertEqual(workLog, [.value(testDescription(of: 0)), .resulted, .always])
     }
     
     func testShouldHandleValue_WhenCompletingWithError_UsingRecovery() {
@@ -129,7 +129,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 2)
-        XCTAssertEqual(workLog, [.recover, .then(testDescription(of: 0)), .resulted, .always])
+        XCTAssertEqual(workLog, [.recover, .value(testDescription(of: 0)), .resulted, .always])
     }
     
     func testShouldHandleError_WhenCompletingWithError_UsingThrowingRecovery() {
@@ -145,7 +145,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 2)
-        XCTAssertEqual(workLog, [.recover, .fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.recover, .error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleCancel_WhenCompletingWithCancel_UsingRecovery() {
@@ -176,7 +176,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 2)
-        XCTAssertEqual(workLog, [.then(testDescription(of: 0)), .resulted, .always])
+        XCTAssertEqual(workLog, [.value(testDescription(of: 0)), .resulted, .always])
     }
     
     func testShouldHandleCancel_WhenCompletingWithError_UsingCatch() {
@@ -207,7 +207,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 2)
-        XCTAssertEqual(workLog, [.catch, .fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.catch, .error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleCancel_WhenCompletingWithCancel_UsingCatch() {
@@ -238,7 +238,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 2)
-        XCTAssertEqual(workLog, [.map, .then(testDescription(of: 1)), .resulted, .always])
+        XCTAssertEqual(workLog, [.map, .value(testDescription(of: 1)), .resulted, .always])
     }
     
     func testShouldHandleError_WhenCompletingWithValue_UsingThrowingMap() {
@@ -254,7 +254,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 2)
-        XCTAssertEqual(workLog, [.map, .fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.map, .error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleError_WhenCompletingWithError_UsingMap() {
@@ -270,7 +270,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 2)
-        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleCancel_WhenCompletingWithCancel_UsingMap() {
@@ -302,7 +302,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 2)
-        XCTAssertEqual(workLog, [.flatMap, .then(testDescription(of: 1)), .resulted, .always])
+        XCTAssertEqual(workLog, [.flatMap, .value(testDescription(of: 1)), .resulted, .always])
     }
     
     func testShouldHandleError_WhenCompletingWithValue_UsingThrowingFlatMap() {
@@ -318,7 +318,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 2)
-        XCTAssertEqual(workLog, [.flatMap, .fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.flatMap, .error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleError_WhenCompletingWithValue_UsingFlatMapWithError() {
@@ -334,7 +334,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 2)
-        XCTAssertEqual(workLog, [.flatMap, .fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.flatMap, .error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleCancel_WhenCompletingWithValue_UsingFlatMapWithCancel() {
@@ -368,7 +368,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 2)
-        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleCancel_WhenCompletingWithCancel_UsingFlatMap() {
@@ -397,7 +397,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 2)
-        XCTAssertEqual(workLog, [.then(testDescription(of: 0)), .resulted, .always])
+        XCTAssertEqual(workLog, [.value(testDescription(of: 0)), .resulted, .always])
     }
     
     func testShouldHandleError_WhenCompletingWithError_UsingClone() {
@@ -410,7 +410,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 2)
-        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleCancel_WhenCompletingWithCancel_UsingClone() {
@@ -441,7 +441,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         XCTAssertEqual(worker.execute(), 1)
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(otherWorker.execute(), 1)
-        XCTAssertEqual(workLog, [.then(testDescription(of: 0)), .resulted, .always])
+        XCTAssertEqual(workLog, [.value(testDescription(of: 0)), .resulted, .always])
     }
     
     func testShouldHandleError_WhenCompletingWithError_UsingContextSwitch() {
@@ -459,7 +459,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         XCTAssertEqual(worker.execute(), 1)
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(otherWorker.execute(), 1)
-        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleCancel_WhenCompletingWithCancel_UsingContextSwitch() {
@@ -484,11 +484,11 @@ class PromiseAndFutureTestsTests: XCTestCase {
         future(on: worker) {
             return 0
         }
-        .then { value in
-            self.workLog.log(.then(testDescription(of: value)))
+        .value { value in
+            self.workLog.log(.value(testDescription(of: value)))
         }
-        .fail { reason in
-            self.workLog.log(.fail(testDescription(of: reason)))
+        .error { error in
+            self.workLog.log(.error(testDescription(of: error)))
         }
         .resulted {
             self.workLog.log(.resulted)
@@ -499,18 +499,18 @@ class PromiseAndFutureTestsTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 2)
-        XCTAssertEqual(workLog, [.then(testDescription(of: 0)), .resulted, .always])
+        XCTAssertEqual(workLog, [.value(testDescription(of: 0)), .resulted, .always])
     }
     
     func testShouldHandleError_WhenThrowingError() {
         future(on: worker) {
             throw testError
         }
-        .then { value in
-            self.workLog.log(.then(testDescription(of: value)))
+        .value { value in
+            self.workLog.log(.value(testDescription(of: value)))
         }
-        .fail { reason in
-            self.workLog.log(.fail(testDescription(of: reason)))
+        .error { error in
+            self.workLog.log(.error(testDescription(of: error)))
         }
         .resulted {
             self.workLog.log(.resulted)
@@ -521,7 +521,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 2)
-        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.error(testErrorDescription), .resulted, .always])
     }
     
     // MARK: -
@@ -533,11 +533,11 @@ class PromiseAndFutureTestsTests: XCTestCase {
         XCTAssert(workLog.isEmpty)
         
         promise.future
-            .then { value in
-                self.workLog.log(.then(testDescription(of: value)))
+            .value { value in
+                self.workLog.log(.value(testDescription(of: value)))
             }
-            .fail { reason in
-                self.workLog.log(.fail(testDescription(of: reason)))
+            .error { error in
+                self.workLog.log(.error(testDescription(of: error)))
             }
             .resulted {
                 self.workLog.log(.resulted)
@@ -548,7 +548,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 4)
-        XCTAssertEqual(workLog, [.then(testDescription(of: 0)), .resulted, .always])
+        XCTAssertEqual(workLog, [.value(testDescription(of: 0)), .resulted, .always])
     }
     
     func testShouldHandleError_WhenAlreadyCompletedWithError() {
@@ -557,11 +557,11 @@ class PromiseAndFutureTestsTests: XCTestCase {
         XCTAssert(workLog.isEmpty)
         
         promise.future
-            .then { value in
-                self.workLog.log(.then(testDescription(of: value)))
+            .value { value in
+                self.workLog.log(.value(testDescription(of: value)))
             }
-            .fail { reason in
-                self.workLog.log(.fail(testDescription(of: reason)))
+            .error { error in
+                self.workLog.log(.error(testDescription(of: error)))
             }
             .resulted {
                 self.workLog.log(.resulted)
@@ -572,7 +572,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 4)
-        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleCancel_WhenAlreadyCompletedWithCancel() {
@@ -581,11 +581,11 @@ class PromiseAndFutureTestsTests: XCTestCase {
         XCTAssert(workLog.isEmpty)
         
         promise.future
-            .then { value in
-                self.workLog.log(.then(testDescription(of: value)))
+            .value { value in
+                self.workLog.log(.value(testDescription(of: value)))
             }
-            .fail { reason in
-                self.workLog.log(.fail(testDescription(of: reason)))
+            .error { error in
+                self.workLog.log(.error(testDescription(of: error)))
             }
             .resulted {
                 self.workLog.log(.resulted)
@@ -613,7 +613,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 2)
-        XCTAssertEqual(workLog, [.then(testDescription(of: 0)), .resulted, .always])
+        XCTAssertEqual(workLog, [.value(testDescription(of: 0)), .resulted, .always])
     }
     
     func testShouldHandleValue_WhenAlreadyCompletedWithError_UsingRecovery() {
@@ -630,7 +630,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 2)
-        XCTAssertEqual(workLog, [.recover, .then(testDescription(of: 0)), .resulted, .always])
+        XCTAssertEqual(workLog, [.recover, .value(testDescription(of: 0)), .resulted, .always])
     }
     
     func testShouldHandleError_WhenAlreadyCompletedWithError_UsingThrowingRecovery() {
@@ -647,7 +647,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 2)
-        XCTAssertEqual(workLog, [.recover, .fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.recover, .error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleCancel_WhenAlreadyCompletedWithCancel_UsingRecovery() {
@@ -680,7 +680,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 2)
-        XCTAssertEqual(workLog, [.then(testDescription(of: 0)), .resulted, .always])
+        XCTAssertEqual(workLog, [.value(testDescription(of: 0)), .resulted, .always])
     }
     
     func testShouldHandleCancel_WhenAlreadyCompletedWithError_UsingCatch() {
@@ -713,7 +713,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 2)
-        XCTAssertEqual(workLog, [.catch, .fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.catch, .error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleCancel_WhenAlreadyCompletedWithCancel_UsingCatch() {
@@ -746,7 +746,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 2)
-        XCTAssertEqual(workLog, [.map, .then(testDescription(of: 1)), .resulted, .always])
+        XCTAssertEqual(workLog, [.map, .value(testDescription(of: 1)), .resulted, .always])
     }
     
     func testShouldHandleError_WhenAlreadyCompletedWithValue_UsingThrowingMap() {
@@ -763,7 +763,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 2)
-        XCTAssertEqual(workLog, [.map, .fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.map, .error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleError_WhenAlreadyCompletedWithError_UsingMap() {
@@ -780,7 +780,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 2)
-        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleCancel_WhenAlreadyCompletedWithCancel_UsingMap() {
@@ -814,7 +814,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 2)
-        XCTAssertEqual(workLog, [.flatMap, .then(testDescription(of: 1)), .resulted, .always])
+        XCTAssertEqual(workLog, [.flatMap, .value(testDescription(of: 1)), .resulted, .always])
     }
     
     func testShouldHandleError_WhenAlreadyCompletedWithValue_UsingThrowingFlatMap() {
@@ -831,7 +831,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 2)
-        XCTAssertEqual(workLog, [.flatMap, .fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.flatMap, .error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleError_WhenAlreadyCompletedWithValue_UsingFlatMapWithError() {
@@ -848,7 +848,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 2)
-        XCTAssertEqual(workLog, [.flatMap, .fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.flatMap, .error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleCancel_WhenAlreadyCompletedWithValue_UsingFlatMapWithCancel() {
@@ -884,7 +884,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 2)
-        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleCancel_WhenAlreadyCompletedWithCancel_UsingFlatMap() {
@@ -915,7 +915,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 2)
-        XCTAssertEqual(workLog, [.then(testDescription(of: 0)), .resulted, .always])
+        XCTAssertEqual(workLog, [.value(testDescription(of: 0)), .resulted, .always])
     }
     
     func testShouldHandleError_WhenAlreadyCompletedWithError_UsingClone() {
@@ -929,7 +929,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(worker.execute(), 2)
-        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleCancel_WhenAlreadyCompletedWithCancel_UsingClone() {
@@ -962,7 +962,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         XCTAssertEqual(worker.execute(), 1)
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(otherWorker.execute(), 1)
-        XCTAssertEqual(workLog, [.then(testDescription(of: 0)), .resulted, .always])
+        XCTAssertEqual(workLog, [.value(testDescription(of: 0)), .resulted, .always])
     }
     
     func testShouldHandleError_WhenAlreadyCompletedWithError_UsingContextSwitch() {
@@ -981,7 +981,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
         XCTAssertEqual(worker.execute(), 1)
         XCTAssert(workLog.isEmpty)
         XCTAssertEqual(otherWorker.execute(), 1)
-        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldHandleCancel_WhenAlreadyCompletedWithCancel_UsingContextSwitch() {
@@ -1283,28 +1283,28 @@ class PromiseAndFutureTestsTests: XCTestCase {
         let promise: Promise<Int> = Promise<Int>(succeededWith: 0)
         promise.future.logResults(with: workLog)
         
-        XCTAssertEqual(workLog, [.then(testDescription(of: 0)), .resulted, .always])
+        XCTAssertEqual(workLog, [.value(testDescription(of: 0)), .resulted, .always])
         
         workLog = .init()
         
         let future: Future<Int> = Future<Int>(succeededWith: 0)
         future.logResults(with: workLog)
         
-        XCTAssertEqual(workLog, [.then(testDescription(of: 0)), .resulted, .always])
+        XCTAssertEqual(workLog, [.value(testDescription(of: 0)), .resulted, .always])
     }
     
     func testShouldInitializeFailed() {
         let promise: Promise<Int> = Promise<Int>(failedWith: testError)
         promise.future.logResults(with: workLog)
         
-        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.error(testErrorDescription), .resulted, .always])
         
         workLog = .init()
         
         let future: Future<Int> = Future<Int>(failedWith: testError)
         future.logResults(with: workLog)
         
-        XCTAssertEqual(workLog, [.fail(testErrorDescription), .resulted, .always])
+        XCTAssertEqual(workLog, [.error(testErrorDescription), .resulted, .always])
     }
     
     func testShouldDeallocateWithoutHandlers() {
