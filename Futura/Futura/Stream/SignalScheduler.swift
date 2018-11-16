@@ -41,7 +41,7 @@ internal final class SignalScheduler<Value>: SignalForwarder<Value, Value> {
             guard !isSuspended else { return }
             let subscribers = self.subscribers
             associatedWorker.schedule {
-                subscribers.forEach { $0.1(.right(token)) }
+                subscribers.forEach { $0.1(.token(token)) }
             }
         }
     }
@@ -52,7 +52,7 @@ internal final class SignalScheduler<Value>: SignalForwarder<Value, Value> {
             #warning("TODO: this suspended may prevent braodcasting finish - to check")
             let subscribers = self.subscribers
             associatedWorker.schedule {
-                subscribers.forEach { $0.1(.left(reason)) }
+                subscribers.forEach { $0.1(.finish(reason)) }
             }
             isFinished = true
             var sub = subscribers

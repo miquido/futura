@@ -30,9 +30,9 @@ extension Signal {
         precondition(destination.source === self)
         destination.collect(subscribe({
             switch $0 {
-                case let .right(token):
+                case let .token(token):
                     destination.broadcast(token)
-                case let .left(reason):
+                case let .finish(reason):
                     destination.finish(reason)
             }
         }))

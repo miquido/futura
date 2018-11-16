@@ -20,8 +20,8 @@
 /// It does not use any cache or initial value mechanism so all tokens
 /// passed before observation will never occour.
 public class Signal<Value> {
-    internal typealias Token = Either<Error, Value>
-    internal typealias Subscriber = (Either<Error?, Token>) -> Void
+    internal typealias Token = Result<Value>
+    internal typealias Subscriber = (Event) -> Void
 
     private var subscriptionID: Subscription.ID = 0
     private let privateCollector: SubscriptionCollector = .init()
@@ -57,7 +57,7 @@ public class Signal<Value> {
     internal func broadcast(_ token: Token) {
         lock.synchronized {
             guard !isSuspended else { return }
-            subscribers.forEach { $0.1(.right(token)) }
+            subscribers.forEach { $0.1(.token(token)) }
         }
     }
 
@@ -65,7 +65,7 @@ public class Signal<Value> {
         lock.synchronized {
             guard !isSuspended else { return }
             #warning("TODO: this suspended may prevent braodcasting finish - to check")
-            subscribers.forEach { $0.1(.left(reason)) }
+            subscribers.forEach { $0.1(.finish(reason)) }
             isFinished = true
             var sub = subscribers
             // cache until end of scope to prevent deallocation of subscribers while making changes in subscribers dictionary - prevents crash
@@ -94,6 +94,13 @@ public class Signal<Value> {
     deinit { finish() }
 }
 
+extension Signal {
+    internal enum Event {
+        case token(Token)
+        case finish(Error?)
+    }
+}
+
 public extension Signal {
     
     /// Handler used to observe values passed through this Signal instance.
@@ -103,7 +110,7 @@ public extension Signal {
     @discardableResult
     func values(_ observer: @escaping (Value) -> Void) -> Signal {
         collect(subscribe { event in
-            guard case let .right(.right(value)) = event else { return }
+            guard case let .token(.value(value)) = event else { return }
             observer(value)
         })
         return self
@@ -116,7 +123,7 @@ public extension Signal {
     @discardableResult
     func failures(_ observer: @escaping (Error) -> Void) -> Signal {
         collect(subscribe { event in
-            guard case let .right(.left(value)) = event else { return }
+            guard case let .token(.error(value)) = event else { return }
             observer(value)
         })
         return self
@@ -132,7 +139,7 @@ public extension Signal {
     func ended(_ observer: @escaping () -> Void) -> Signal {
         #warning("Since this method waits for completion and can be called only once shouldn't it be called if Signal already finished?")
         collect(subscribe { event in
-            guard case .left(.none) = event else { return }
+            guard case .finish(.none) = event else { return }
             observer()
         })
         return self
@@ -146,7 +153,7 @@ public extension Signal {
     func terminated(_ observer: @escaping (Error) -> Void) -> Signal {
         #warning("Since this method waits for completion and can be called only once shouldn't it be called if Signal already finished?")
         collect(subscribe { event in
-            guard case let .left(.some(reason)) = event else { return }
+            guard case let .finish(.some(reason)) = event else { return }
             observer(reason)
         })
         return self
@@ -161,7 +168,7 @@ public extension Signal {
     func finished(_ observer: @escaping () -> Void) -> Signal {
         #warning("Since this method waits for completion and can be called only once shouldn't it be called if Signal already finished?")
         collect(subscribe { event in
-            guard case .left = event else { return }
+            guard case .finish = event else { return }
             observer()
         })
         return self

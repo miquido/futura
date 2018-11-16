@@ -23,7 +23,7 @@ public final class Future<Value> {
     
     /// Creates already completed instance of future with given value.
     public convenience init(succeededWith result: Value, executionContext: ExecutionContext = .undefined) {
-        self.init(with: .success(result), executionContext: executionContext)
+        self.init(with: .value(result), executionContext: executionContext)
     }
     
     /// Creates already completed instance of future with given error.
@@ -62,7 +62,7 @@ public extension Future {
         #endif
         handle { result in
             switch result {
-            case let .success(value):
+            case let .value(value):
                 handler(value)
             case .error: break
             }
@@ -78,7 +78,7 @@ public extension Future {
         #endif
         handle { result in
             switch result {
-            case .success: break
+            case .value: break
             case let .error(reason):
                 handler(reason)
             }
@@ -95,8 +95,8 @@ public extension Future {
         #endif
         observe { state in
             switch state {
-            case let .resulted(.success(value)):
-                future.become(.resulted(with: .success(value)))
+            case let .resulted(.value(value)):
+                future.become(.resulted(with: .value(value)))
             case let .resulted(.error(reason)):
                 do {
                     try handler(reason)
@@ -120,11 +120,11 @@ public extension Future {
         #endif
         observe { state in
             switch state {
-            case let .resulted(.success(value)):
-                future.become(.resulted(with: .success(value)))
+            case let .resulted(.value(value)):
+                future.become(.resulted(with: .value(value)))
             case let .resulted(.error(reason)):
                 do {
-                    try future.become(.resulted(with: .success(transformation(reason))))
+                    try future.become(.resulted(with: .value(transformation(reason))))
                 } catch {
                     future.become(.resulted(with: .error(error)))
                 }
@@ -169,9 +169,9 @@ public extension Future {
         #endif
         observe { state in
             switch state {
-            case let .resulted(.success(value)):
+            case let .resulted(.value(value)):
                 do {
-                    try future.become(.resulted(with: .success(transformation(value))))
+                    try future.become(.resulted(with: .value(transformation(value))))
                 } catch {
                     future.become(.resulted(with: .error(error)))
                 }
@@ -194,7 +194,7 @@ public extension Future {
         #endif
         observe { state in
             switch state {
-            case let .resulted(.success(value)):
+            case let .resulted(.value(value)):
                 do {
                     try transformation(value).observe {
                         future.become($0)
@@ -310,10 +310,10 @@ public func zip<T, U>(_ f1: Future<T>, _ f2: Future<U>) -> Future<(T, U)> {
     
     f1.observe { state in
         switch state {
-        case let .resulted(.success(value)):
+        case let .resulted(.value(value)):
             lock.synchronized {
                 if case let (_, r2?) = results {
-                    future.become(.resulted(with: .success((value, r2))))
+                    future.become(.resulted(with: .value((value, r2))))
                 } else {
                     results = (value, nil)
                 }
@@ -327,10 +327,10 @@ public func zip<T, U>(_ f1: Future<T>, _ f2: Future<U>) -> Future<(T, U)> {
     }
     f2.observe { state in
         switch state {
-        case let .resulted(.success(value)):
+        case let .resulted(.value(value)):
             lock.synchronized {
                 if case let (r1?, _) = results {
-                    future.become(.resulted(with: .success((r1, value))))
+                    future.become(.resulted(with: .value((r1, value))))
                 } else {
                     results = (nil, value)
                 }
@@ -361,11 +361,11 @@ public func zip<T>(_ farr: [Future<T>]) -> Future<[T]> {
     farr.forEach {
         $0.observe { state in
             switch state {
-            case let .resulted(.success(value)):
+            case let .resulted(.value(value)):
                 lock.synchronized {
                     results.append(value)
                     guard results.count == count else { return }
-                    future.become(.resulted(with: .success(results)))
+                    future.become(.resulted(with: .value(results)))
                 }
             case let .resulted(.error(reason)):
                 future.become(.resulted(with: .error(reason)))
@@ -386,7 +386,7 @@ public func future<T>(on worker: Worker = DispatchWorker.default, _ body: @escap
     let future = Future<T>(executionContext: .explicit(worker))
     worker.schedule {
         do {
-            future.become(.resulted(with: .success(try body())))
+            future.become(.resulted(with: .value(try body())))
         } catch {
             future.become(.resulted(with: .error(error)))
         }

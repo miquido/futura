@@ -30,12 +30,12 @@ internal final class SignalFilter<Value>: SignalForwarder<Value, Value> {
         super.init(source: source, collector: source.collector)
         collect(source.subscribe {
             switch $0 {
-                case let .right(.right(value)):
+                case let .token(.value(value)):
                     guard filter(value) else { return }
-                    self.broadcast(.right(value))
-                case let .right(.left(error)):
-                    self.broadcast(.left(error))
-                case let .left(reason):
+                    self.broadcast(.value(value))
+                case let .token(.error(error)):
+                    self.broadcast(.error(error))
+                case let .finish(reason):
                     self.finish(reason)
             }
         })

@@ -25,7 +25,7 @@ public final class Promise<Value> {
     /// Creates already succeeded promise with given value
     public convenience init(succeededWith value: Value, executionContext: ExecutionContext = .undefined) {
         self.init(executionContext: executionContext)
-        future.become(.resulted(with: .success(value)))
+        future.become(.resulted(with: .value(value)))
     }
     
     /// Creates already failed promise with given error
@@ -36,7 +36,7 @@ public final class Promise<Value> {
     
     /// Completes Promise with value. Will be ignored when already completed or canceled.
     public func fulfill(with value: Value){
-        future.become(.resulted(with: .success(value)))
+        future.become(.resulted(with: .value(value)))
     }
     
     /// Completes Promise with error. Will be ignored when already completed or canceled.

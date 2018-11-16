@@ -32,15 +32,15 @@ internal final class SignalMapper<SourceValue, Value>: SignalForwarder<SourceVal
         super.init(source: source, collector: source.collector)
         collect(source.subscribe {
             switch $0 {
-                case let .right(.right(value)):
+                case let .token(.value(value)):
                     do {
-                        try self.broadcast(.right(transform(value)))
+                        try self.broadcast(.value(transform(value)))
                     } catch {
-                        self.broadcast(.left(error))
+                        self.broadcast(.error(error))
                     }
-                case let .right(.left(error)):
-                    self.broadcast(.left(error))
-                case let .left(reason):
+                case let .token(.error(error)):
+                    self.broadcast(.error(error))
+                case let .finish(reason):
                     self.finish(reason)
             }
         })

@@ -37,26 +37,26 @@ internal final class SignalFlatMapper<SourceValue, Value>: SignalForwarder<Sourc
         collect(source.subscribe {
             self.mappedCollector = .init()
             switch $0 {
-                case let .right(.right(value)):
+                case let .token(.value(value)):
                     do {
                         let subscribtion = try transform(value).subscribe {
                             switch $0 {
-                                case let .right(.right(value)):
-                                    self.broadcast(.right(value))
-                                case let .right(.left(error)):
-                                    self.broadcast(.left(error))
-                                case let .left(reason):
+                                case let .token(.value(value)):
+                                    self.broadcast(.value(value))
+                                case let .token(.error(error)):
+                                    self.broadcast(.error(error))
+                                case let .finish(reason):
                                     self.finish(reason)
                             }
                         }
                         guard let sub = subscribtion else { return }
                         self.mappedCollector.collect(sub)
                     } catch {
-                        self.broadcast(.left(error))
+                        self.broadcast(.error(error))
                     }
-                case let .right(.left(error)):
-                    self.broadcast(.left(error))
-                case let .left(reason):
+                case let .token(.error(error)):
+                    self.broadcast(.error(error))
+                case let .finish(reason):
                     self.finish(reason)
             }
         })

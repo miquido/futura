@@ -13,12 +13,6 @@
  limitations under the License. */
 
 internal enum Result<T> {
-    case success(T)
+    case value(T)
     case error(Error)
-}
-
-// TODO: remove Result in favor of Either
-internal enum Either<T, U> {
-    case left(T)
-    case right(U)
 }
