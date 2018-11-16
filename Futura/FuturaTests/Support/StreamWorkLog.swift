@@ -17,7 +17,7 @@ final class StreamWorkLog: Equatable {
 
     enum Event {
         case values(String)
-        case failures(String)
+        case errors(String)
         case ended
         case terminated(String)
         case finished
@@ -58,8 +58,8 @@ extension StreamWorkLog.Event: CustomDebugStringConvertible {
         switch self {
             case let .values(value):
                 return "values(\(value))"
-            case let .failures(error):
-                return "failures(\(error))"
+            case let .errors(error):
+                return "errors(\(error))"
             case .map:
                 return "map"
             case .flatMap:

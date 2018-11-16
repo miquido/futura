@@ -121,7 +121,7 @@ public extension Signal {
     /// - Parameter observer: Handler called every time Signal gets error.
     /// - Returns: Same Signal instance for eventual further chaining.
     @discardableResult
-    func failures(_ observer: @escaping (Error) -> Void) -> Signal {
+    func errors(_ observer: @escaping (Error) -> Void) -> Signal {
         collect(subscribe { event in
             guard case let .token(.error(value)) = event else { return }
             observer(value)
