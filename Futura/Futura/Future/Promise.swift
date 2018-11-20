@@ -1,11 +1,11 @@
 /* Copyright 2018 Miquido
- 
+
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
- 
+
  http://www.apache.org/licenses/LICENSE-2.0
- 
+
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,18 +15,17 @@
 ///
 #warning("to complete docs")
 public final class Promise<Value> {
-    
     /// Future associated with this Promise instance.
     public let future: Future<Value>
-    
+
     /// Creates Promise with given context.
     ///
     /// - Parameter executionContext: ExecutionContext that will be used for all
     /// transformations and handlers made on associated Future. Default is .undefined.
     public init(executionContext: ExecutionContext = .undefined) {
-        self.future = Future(executionContext: executionContext)
+        self.future = .init(executionContext: executionContext)
     }
-    
+
     /// Creates already finished Promise with given value and context.
     ///
     /// - Parameter value: Value finishing this Promise.
@@ -36,7 +35,7 @@ public final class Promise<Value> {
         self.init(executionContext: executionContext)
         future.become(.resulted(with: .value(value)))
     }
-    
+
     /// Creates already finished Promise with given error and context.
     ///
     /// - Parameter error: Error finishing this Promise.
@@ -46,21 +45,21 @@ public final class Promise<Value> {
         self.init(executionContext: executionContext)
         future.become(.resulted(with: .error(error)))
     }
-    
+
     /// Finish Promise with given value. It will be ignored when already finished.
     ///
     /// - Parameter value: Value finishing this Promise.
-    public func fulfill(with value: Value){
+    public func fulfill(with value: Value) {
         future.become(.resulted(with: .value(value)))
     }
-    
+
     /// Finish Promise with given error. It will be ignored when already finished.
     ///
     /// - Parameter error: Error completing this Promise.
     public func `break`(with error: Error) {
         future.become(.resulted(with: .error(error)))
     }
-    
+
     /// Finish Promise without value or error. It will be ignored when already finished.
     public func cancel() {
         future.cancel()
