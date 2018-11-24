@@ -79,8 +79,8 @@ extension Futura.Signal {
             .values {
                 workLog.log(.values(testDescription(of: $0)))
             }
-            .failures {
-                workLog.log(.failures(testDescription(of: $0)))
+            .errors {
+                workLog.log(.errors(testDescription(of: $0)))
             }
             .ended {
                 workLog.log(.ended)

@@ -34,8 +34,8 @@ class StreamTests: XCTestCase {
             .values {
                 self.workLog.log(.values(testDescription(of: $0)))
             }
-            .failures {
-                self.workLog.log(.failures(testDescription(of: $0)))
+            .errors {
+                self.workLog.log(.errors(testDescription(of: $0)))
             }
             .ended {
                 self.workLog.log(.ended)
@@ -56,8 +56,8 @@ class StreamTests: XCTestCase {
             .values {
                 self.workLog.log(.values(testDescription(of: $0)))
             }
-            .failures {
-                self.workLog.log(.failures(testDescription(of: $0)))
+            .errors {
+                self.workLog.log(.errors(testDescription(of: $0)))
             }
             .ended {
                 self.workLog.log(.ended)
@@ -70,7 +70,7 @@ class StreamTests: XCTestCase {
             }
 
         emitter.emit(testError)
-        XCTAssertEqual(workLog, [.failures(testErrorDescription)])
+        XCTAssertEqual(workLog, [.errors(testErrorDescription)])
     }
 
     func testShouldHandleClose_WhenClosing() {
@@ -78,8 +78,8 @@ class StreamTests: XCTestCase {
             .values {
                 self.workLog.log(.values(testDescription(of: $0)))
             }
-            .failures {
-                self.workLog.log(.failures(testDescription(of: $0)))
+            .errors {
+                self.workLog.log(.errors(testDescription(of: $0)))
             }
             .ended {
                 self.workLog.log(.ended)
@@ -100,8 +100,8 @@ class StreamTests: XCTestCase {
             .values {
                 self.workLog.log(.values(testDescription(of: $0)))
             }
-            .failures {
-                self.workLog.log(.failures(testDescription(of: $0)))
+            .errors {
+                self.workLog.log(.errors(testDescription(of: $0)))
             }
             .ended {
                 self.workLog.log(.ended)
@@ -122,8 +122,8 @@ class StreamTests: XCTestCase {
             .values {
                 self.workLog.log(.values(testDescription(of: $0)))
             }
-            .failures {
-                self.workLog.log(.failures(testDescription(of: $0)))
+            .errors {
+                self.workLog.log(.errors(testDescription(of: $0)))
             }
             .ended {
                 self.workLog.log(.ended)
@@ -144,8 +144,8 @@ class StreamTests: XCTestCase {
             .values {
                 self.workLog.log(.values(testDescription(of: $0)))
             }
-            .failures {
-                self.workLog.log(.failures(testDescription(of: $0)))
+            .errors {
+                self.workLog.log(.errors(testDescription(of: $0)))
             }
             .ended {
                 self.workLog.log(.ended)
@@ -170,8 +170,8 @@ class StreamTests: XCTestCase {
             .values {
                 self.workLog.log(.values(testDescription(of: $0)))
             }
-            .failures {
-                self.workLog.log(.failures(testDescription(of: $0)))
+            .errors {
+                self.workLog.log(.errors(testDescription(of: $0)))
             }
             .ended {
                 self.workLog.log(.ended)
@@ -216,7 +216,7 @@ class StreamTests: XCTestCase {
             .logResults(with: workLog)
 
         emitter.emit(testError)
-        XCTAssertEqual(workLog, [.failures(testErrorDescription)])
+        XCTAssertEqual(workLog, [.errors(testErrorDescription)])
     }
 
     func testShouldHandleError_WhenBroadcastingValue_WithThrowingMap() {
@@ -228,7 +228,7 @@ class StreamTests: XCTestCase {
             .logResults(with: workLog)
 
         emitter.emit(0)
-        XCTAssertEqual(workLog, [.map, .failures(testErrorDescription)])
+        XCTAssertEqual(workLog, [.map, .errors(testErrorDescription)])
     }
 
     func testShouldHandleClose_WhenClosing_WithMap() {
@@ -300,7 +300,7 @@ class StreamTests: XCTestCase {
         otherEmitter.emit(testError)
         emitter.emit(0)
         otherEmitter.emit(testError)
-        XCTAssertEqual(workLog, [.flatMap, .failures(testErrorDescription)])
+        XCTAssertEqual(workLog, [.flatMap, .errors(testErrorDescription)])
     }
 
     func testShouldHandleended_WhenBroadcastingValue_WithFlatMap_WithClose() {
@@ -350,7 +350,7 @@ class StreamTests: XCTestCase {
         otherEmitter.emit(2)
         emitter.emit(testError)
         otherEmitter.emit(1)
-        XCTAssertEqual(workLog, [.failures(testErrorDescription)])
+        XCTAssertEqual(workLog, [.errors(testErrorDescription)])
     }
 
     func testShouldHandleError_WhenBroadcastingValue_WithThrowingFlatMap() {
@@ -366,7 +366,7 @@ class StreamTests: XCTestCase {
         otherEmitter.emit(2)
         emitter.emit(0)
         otherEmitter.emit(1)
-        XCTAssertEqual(workLog, [.flatMap, .failures(testErrorDescription)])
+        XCTAssertEqual(workLog, [.flatMap, .errors(testErrorDescription)])
     }
 
     func testShouldHandleClose_WhenClosing_WithFlatMap() {
@@ -444,7 +444,7 @@ class StreamTests: XCTestCase {
         emitter.emit(testError)
         collector = nil
         emitter.emit(testError)
-        XCTAssertEqual(workLog, [.failures(testErrorDescription)])
+        XCTAssertEqual(workLog, [.errors(testErrorDescription)])
     }
 
     func testShouldHandleClose_WhenClosing_WithCollector() {
@@ -544,7 +544,7 @@ class StreamTests: XCTestCase {
         emitter.emit(testError)
         XCTAssertEqual(workLog, [])
         worker.execute()
-        XCTAssertEqual(workLog, [.failures(testErrorDescription)])
+        XCTAssertEqual(workLog, [.errors(testErrorDescription)])
     }
 
     func testShouldHandleClose_WhenClosing_WithWorkerSwitch() {
@@ -626,7 +626,7 @@ class StreamTests: XCTestCase {
             .logResults(with: workLog)
 
         emitter.emit(testError)
-        XCTAssertEqual(workLog, [.failures(testErrorDescription)])
+        XCTAssertEqual(workLog, [.errors(testErrorDescription)])
     }
 
     func testShouldHandleClose_WhenClosing_WithFilter() {
