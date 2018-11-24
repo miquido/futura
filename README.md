@@ -108,7 +108,7 @@ pod 'Futura', :git => 'https://github.com/miquido/futura.git', :tag => '2.0.0'
  
 ## What it is exactly?
 
-Futura contans a set of tools that helps you manage asynchronous and concurrent code.
+Futura consists of a set of tools that helps you manage asynchronous and concurrent code.
 
 ### Lock
 
