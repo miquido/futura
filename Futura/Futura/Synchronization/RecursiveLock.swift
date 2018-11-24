@@ -12,17 +12,15 @@
  See the License for the specific language governing permissions and
  limitations under the License. */
 
-#warning("to complete docs")
 /// RecursiveLock is a simple pthread_mutex wrapper with basic recursive lock functionality.
 /// It should not be used to synchronize threads from multiple processes.
 public final class RecursiveLock {
-    #warning("to complete docs")
+
     /// Reference to underlying mutex.
     /// Should not be used - public only for optimizations.
     /// All operations on mutex should be performed via public interface of Lock.
     public let mtx: Mutex.Pointer = Mutex.make(recursive: true)
 
-    #warning("to complete docs")
     /// Creates instance of recursive lock.
     public init() {}
 
@@ -30,32 +28,29 @@ public final class RecursiveLock {
         Mutex.destroy(mtx)
     }
 
-    #warning("to complete docs")
-    /// Locks if available or waits until unlocked.
+    /// Locks if possible or waits until unlocked.
     /// Since RecursiveLock is recursive it will continue when already locked on same thread.
     @inline(__always)
     public func lock() {
         Mutex.lock(mtx)
     }
 
-    #warning("to complete docs")
-    /// Locks if available and returns true or returns false otherwise without locking.
+    /// Locks if possible and returns true or returns false otherwise without locking.
     /// Since RecursiveLock is recursive it will returns true when already locked on same thread.
     @inline(__always)
     public func tryLock() -> Bool {
         return Mutex.tryLock(mtx)
     }
 
-    #warning("to complete docs")
     /// Unlocks a lock.
     @inline(__always)
     public func unlock() {
         Mutex.unlock(mtx)
     }
 
-    #warning("to complete docs")
     /// Execute closure with synchronization on self as lock.
     /// Since RecursiveLock is recursive you can call synchronized recursively on same thread.
+    /// It will wait until unlocked if locked when calling.
     @inline(__always)
     public func synchronized<T>(_ block: () throws -> T) rethrows -> T {
         Mutex.lock(mtx)

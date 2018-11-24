@@ -15,7 +15,7 @@
 /// Read only container for async or delayed value.
 /// Future will remain in memory at least until its parent Future completes.
 /// It caches its result until deallocated.
-/// Cancels automatically on deinit when not completed or cancelled before.
+/// Cancels automatically on deinit when not completed or canceled before.
 public final class Future<Value> {
     private let mtx: Mutex.Pointer = Mutex.make(recursive: true)
     private let executionContext: ExecutionContext
@@ -66,8 +66,10 @@ public extension Future {
     /// Given handler will be cached until Future finishes or called immediately
     /// if already finished with value. If it have already finished without value it will
     /// be discarded without calling or keeping in memory.
+    /// It will be called exactly once or never in Future lifecycle.
     ///
     /// - Parameter handler: Function that will be called when finished with value.
+    /// - Returns: Same Future instance.
     @discardableResult
     func value(_ handler: @escaping (Value) -> Void) -> Self {
         observe { state in
@@ -81,8 +83,10 @@ public extension Future {
     /// Given handler will be cached until Future finishes or called immediately
     /// if already finished with error. If it have already finished without error it will
     /// be discarded without calling or keeping in memory.
+    /// It will be called exactly once or never in Future lifecycle.
     ///
     /// - Parameter handler: Function that will be called when finished with error.
+    /// - Returns: Same Future instance.
     @discardableResult
     func error(_ handler: @escaping (Error) -> Void) -> Self {
         observe { state in
@@ -91,55 +95,15 @@ public extension Future {
         }
         return self
     }
-
-    #warning("to complete docs")
-    /// Access error when future completes with error. Returns new Future instance.
-    /// If it handles error without throwing it cancels all further futures preventing error propagation.
-    func `catch`(_ handler: @escaping (Error) throws -> Void) -> Future<Value> {
-        let future: Future<Value> = .init(executionContext: executionContext)
-        observe { state in
-            switch state {
-                case let .resulted(.value(value)):
-                    future.become(.resulted(with: .value(value)))
-                case let .resulted(.error(reason)):
-                    do {
-                        try handler(reason)
-                        future.become(.canceled)
-                    } catch {
-                        future.become(.resulted(with: .error(error)))
-                    }
-                case .canceled:
-                    future.become(.canceled)
-                case .waiting: break
-            }
-        }
-        return future
-    }
-
-    #warning("to complete docs")
-    /// Try recover from error providing valid value. Returns new Future instance.
-    func recover(_ transformation: @escaping (Error) throws -> Value) -> Future<Value> {
-        let future: Future<Value> = .init(executionContext: executionContext)
-        observe { state in
-            switch state {
-                case let .resulted(.value(value)):
-                    future.become(.resulted(with: .value(value)))
-                case let .resulted(.error(reason)):
-                    do {
-                        try future.become(.resulted(with: .value(transformation(reason))))
-                    } catch {
-                        future.become(.resulted(with: .error(error)))
-                    }
-                case .canceled:
-                    future.become(.canceled)
-                case .waiting: break
-            }
-        }
-        return future
-    }
-
-    #warning("to complete docs")
-    /// Execute when future completes with result. It is omited when future is canceled.
+    
+    /// Execute when future finishes with any result (value or error) or already finished with result.
+    /// Given handler will be cached until Future finishes or called immediately
+    /// if already finished with either value or error. If it have already finished without value or error
+    /// it will be discarded without calling or keeping in memory.
+    /// It will be called exactly once or never in Future lifecycle.
+    ///
+    /// - Parameter handler: Function that will be called when finished with value or error.
+    /// - Returns: Same Future instance.
     @discardableResult
     func resulted(_ handler: @escaping () -> Void) -> Self {
         observe { state in
@@ -148,9 +112,14 @@ public extension Future {
         }
         return self
     }
-
-    #warning("to complete docs")
-    /// Execute always when future completes. Includes completion by cancelation.
+    
+    /// Execute when future finishes or already finished. It will be executed
+    /// even if Future was canceled.
+    /// Given handler will be cached until Future finishes or called immediately
+    /// if already finished. It will be called exactly once in Future lifecycle.
+    ///
+    /// - Parameter handler: Function that will be called always when finished.
+    /// - Returns: Same Future instance.
     @discardableResult
     func always(_ handler: @escaping () -> Void) -> Self {
         observe { _ in
@@ -159,9 +128,15 @@ public extension Future {
         return self
     }
 
-    #warning("to complete docs")
-    /// Map container to other type or do some value changes. Returns new Future instance.
+    /// Transforms Future value into a new one using given function.
     /// Transformation may throw to propagate error instad of value.
+    /// Given transformation will be cached until Future finishes or called immediately
+    /// if already finished with value. If it have already finished without value
+    /// it will be discarded without calling or keeping in memory.
+    /// It will be called exactly once or never in Future lifecycle.
+    ///
+    /// - Parameter transformation: Transformation that will be performed when finished with value.
+    /// - Returns: New Future instance with given transformation.
     func map<T>(_ transformation: @escaping (Value) throws -> T) -> Future<T> {
         let future: Future<T> = .init(executionContext: executionContext)
         observe { state in
@@ -182,9 +157,16 @@ public extension Future {
         return future
     }
 
-    #warning("to complete docs")
-    /// Map container to other type or do some value changes flattening future inside. Returns new Future instance.
+    /// Transforms Future value into a new one using given function that returns Future.
+    /// Result of returned Future will be flattened as result of Future returned by transformation.
     /// Transformation may throw to propagate error instad of value.
+    /// Given transformation will be cached until Future finishes or called immediately
+    /// if already finished with value. If it have already finished without value
+    /// it will be discarded without calling or keeping in memory.
+    /// It will be called exactly once or never in Future lifecycle.
+    ///
+    /// - Parameter transformation: Transformation that will be performed when finished with error.
+    /// - Returns: New Future instance with given transformation.
     func flatMap<T>(_ transformation: @escaping (Value) throws -> (Future<T>)) -> Future<T> {
         let future: Future<T> = .init(executionContext: executionContext)
         observe { state in
@@ -207,24 +189,92 @@ public extension Future {
         return future
     }
 
-    #warning("to complete docs")
-    /// Returns new Future instance with given execution context. Futures inherit execution context by default.
+    /// Transforms Future to a new one associated with given Worker.
+    /// If Future have associated worker it will be used on
+    /// all its handlers and propagated through all transformations of that Future.
+    ///
+    /// - Parameter worker: Worker assigned to execute further transformations and handlers.
+    /// - Returns: New Future instance associated with given Worker.
     func `switch`(to worker: Worker) -> Future<Value> {
         let future: Future<Value> = .init(executionContext: .explicit(worker))
         observe { future.become($0) }
         return future
     }
+    
+    /// Access Future error when finishes with error or already finished with error.
+    /// If transformation does not throw, error will not be propagated further
+    /// and Future will become canceled.
+    /// If transformation throws, thrown error will be propagated instead.
+    /// Given transformation will be cached until Future finishes or called immediately
+    /// if already finished with error. If it have already finished without error
+    /// it will be discarded without calling or keeping in memory.
+    /// It will be called exactly once or never in Future lifecycle.
+    ///
+    /// - Parameter transformation: Transformation that will be performed when finished with error.
+    /// - Returns: New Future instance with given transformation.
+    func `catch`(_ transformation: @escaping (Error) throws -> Void) -> Future<Value> {
+        let future: Future<Value> = .init(executionContext: executionContext)
+        observe { state in
+            switch state {
+            case let .resulted(.value(value)):
+                future.become(.resulted(with: .value(value)))
+            case let .resulted(.error(reason)):
+                do {
+                    try transformation(reason)
+                    future.become(.canceled)
+                } catch {
+                    future.become(.resulted(with: .error(error)))
+                }
+            case .canceled:
+                future.become(.canceled)
+            case .waiting: break
+            }
+        }
+        return future
+    }
+    
+    /// Access Future error when finishes with error or already finished with error.
+    /// Transformation may provide valid value and propagate it instead of error.
+    /// If transformation throws, thrown error will be propagated instead of original one.
+    /// Given transformation will be cached until Future finishes or called immediately
+    /// if already finished with error. If it have already finished without error
+    /// it will be discarded without calling or keeping in memory.
+    /// It will be called exactly once or never in Future lifecycle.
+    ///
+    /// - Parameter transformation: Transformation that will be performed when finished with error.
+    /// - Returns: New Future instance with given transformation.
+    func recover(_ transformation: @escaping (Error) throws -> Value) -> Future<Value> {
+        let future: Future<Value> = .init(executionContext: executionContext)
+        observe { state in
+            switch state {
+            case let .resulted(.value(value)):
+                future.become(.resulted(with: .value(value)))
+            case let .resulted(.error(reason)):
+                do {
+                    try future.become(.resulted(with: .value(transformation(reason))))
+                } catch {
+                    future.become(.resulted(with: .error(error)))
+                }
+            case .canceled:
+                future.become(.canceled)
+            case .waiting: break
+            }
+        }
+        return future
+    }
 
-    #warning("to complete docs")
-    /// Returns new Future instance with same parameters as cloned future. Result future is a child of cloned future instead of child of same parent.
+    /// Returns new Future instance with same execution context. 
+    /// Result future is a child of cloned future instead of child of same parent.
+    ///
+    /// - Returns: New Future instance.
     func clone() -> Future<Value> {
         let future: Future<Value> = .init(executionContext: executionContext)
         observe { future.become($0) }
         return future
     }
 
-    #warning("to complete docs")
-    /// Cancels future without triggering any handlers (except always). Cancellation is propagated.
+    /// Cancels Future without triggering any handlers (except always). Cancellation is propagated.
+    /// Cancelation is ignored by predecessors.
     func cancel() {
         become(.canceled)
     }
@@ -271,11 +321,14 @@ fileprivate extension Future {
     }
 }
 
-#warning("to complete docs")
-/// Zip futures. Returns new Future instance.
+/// Zip two futures to access joined both values.
 /// Execution context of returned Future is undefined. It will be inherited from completion of last of provided Futures.
 /// If you need explicit execution context use switch(to:) to ensure usage of specific Worker.
-/// Result Future will fail or become canceled if any of provided Futures fails or becomes canceled without waiting for other results.
+/// Result Future will fail or become canceled if any of provided Futures fails or becomes canceled without waiting for other result.
+///
+/// - Parameter f1: Future to zip.
+/// - Parameter f2: Future to zip.
+/// - Returns: New Future instance with that is combination of both Futures.
 public func zip<T, U>(_ f1: Future<T>, _ f2: Future<U>) -> Future<(T, U)> {
     let future: Future<(T, U)> = .init(executionContext: .undefined)
     let lock: RecursiveLock = .init()
@@ -318,11 +371,13 @@ public func zip<T, U>(_ f1: Future<T>, _ f2: Future<U>) -> Future<(T, U)> {
     return future
 }
 
-#warning("to complete docs")
-/// Zip futures. Returns new Future instance.
+/// Zip array of futures to access joined values.
 /// Execution context of returned Future is undefined. It will be inherited from completion of last of provided Futures.
 /// If you need explicit execution context use switch(to:) to ensure usage of specific Worker.
 /// Result Future will fail or become canceled if any of provided Futures fails or becomes canceled without waiting for other results.
+///
+/// - Parameter futures: Array of Futures to zip.
+/// - Returns: New Future instance with that is combination of all Futures.
 public func zip<T>(_ futures: [Future<T>]) -> Future<[T]> {
     let zippedFuture = Future<[T]>(executionContext: .undefined)
     let lock: RecursiveLock = .init()
@@ -349,11 +404,15 @@ public func zip<T>(_ futures: [Future<T>]) -> Future<[T]> {
     return zippedFuture
 }
 
-#warning("to complete docs")
-/// Schedules task using selected worker.
-/// Returned Future represents result of passed body function.
-/// Default worker used for execution is DispatchWorker.default.
-public func future<T>(on worker: Worker = DispatchWorker.default, _ body: @escaping () throws -> T) -> Future<T> {
+import Foundation
+
+/// Schedules task using selected worker. 
+/// Result of scheduled task becomes result of returned Future.
+///
+/// - Parameter worker: Worker used to execute task. Default is new instance of OperationQueue
+/// - Parameter body: Task to execute asynchronously.
+/// - Returns: New Future instance that will be result of passed function.
+public func future<T>(on worker: Worker = OperationQueue(), _ body: @escaping () throws -> T) -> Future<T> {
     let future: Future<T> = .init(executionContext: .explicit(worker))
     worker.schedule {
         do {

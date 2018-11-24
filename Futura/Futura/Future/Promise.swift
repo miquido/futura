@@ -12,8 +12,11 @@
  See the License for the specific language governing permissions and
  limitations under the License. */
 
-///
-#warning("to complete docs")
+/// Promise is container for Future that allows to set outcome of it.
+/// It is used to declare result of delayed/async work that will be done
+/// in future and fill the result of that action.
+/// If Promise was not finished and become deallocated it will automatically
+/// cancel contained Future by deallocating it.
 public final class Promise<Value> {
     /// Future associated with this Promise instance.
     public let future: Future<Value>

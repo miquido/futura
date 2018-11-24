@@ -12,14 +12,15 @@
  See the License for the specific language governing permissions and
  limitations under the License. */
 
-#warning("to complete docs")
-/// ExecutionContext enables to describe how to execute things
+/// ExecutionContext allows to define Worker associated with given task.
 public enum ExecutionContext {
-    #warning("to complete docs")
-    /// Context will inherit worker from completing task or use current thread
+    /// Task will be executed with Worker inherited from it predecessor
+    /// or use current thread to execute. It is undefined thich Worker/thread
+    /// will execute this task.
     case undefined
-    #warning("to complete docs")
-    /// Context will switch to provided worker or continue if already on it
+    /// Explicitly provided Worker instance will be responisble to execute
+    /// given task. Exact execution depends on Worker behaviour thus it is
+    /// guaranteed that provided Worker will execute task.
     case explicit(Worker)
 }
 

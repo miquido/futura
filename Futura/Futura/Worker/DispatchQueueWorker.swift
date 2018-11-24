@@ -12,11 +12,11 @@
  See the License for the specific language governing permissions and
  limitations under the License. */
 
-/// Protocol used to describe worker behaviour. This abstraction allows to use
-/// DispatchQueue, Operation Queue and other threading solutions for performing tasks on different threads.
-public protocol Worker {
-    /// Schedule assigns given work to worker for execution.
-    /// Depending on worker implementation it might be executed immediately or in some point in future.
-    /// Schedule is not blocking current thread.
-    func schedule(_ work: @escaping () -> Void) -> Void
+import Dispatch
+
+extension DispatchQueue: Worker {
+    /// OperationQueue as Worker assigns work to queue using async method.
+    public func schedule(_ work: @escaping () -> Void) {
+        async(execute: work)
+    }
 }
