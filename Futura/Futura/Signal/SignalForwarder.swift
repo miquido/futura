@@ -19,10 +19,6 @@ internal class SignalForwarder<V1, V2>: Signal<V2> {
         self.source = source
         super.init(collector: collector)
     }
-
-    override var isSuspended: Bool {
-        return super.isSuspended || (source?.isSuspended ?? false)
-    }
 }
 
 extension Signal {

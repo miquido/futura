@@ -15,7 +15,7 @@
 import Futura
 import XCTest
 
-class StreamTests: XCTestCase {
+class SignalTests: XCTestCase {
     var workLog: StreamWorkLog = .init()
     var emitter: Emitter<Int>! = .init()
 
@@ -516,6 +516,166 @@ class StreamTests: XCTestCase {
         emitter = nil
         XCTAssertEqual(workLog, [])
     }
+    
+    func testShouldHandleValue_WhenBroadcastingValue_WithCollectorAndTransformations() {
+        var collector: SubscriptionCollector! = .init()
+        
+        emitter
+            .map { (value) -> Int in
+                self.workLog.log(.map)
+                return value
+            }
+            .collect(with: collector)
+            .map { (value) -> Int in
+                self.workLog.log(.map)
+                return value
+            }
+            .logResults(with: workLog)
+        
+        emitter.emit(0)
+        collector = nil
+        emitter.emit(0)
+        XCTAssertEqual(workLog, [.map, .map, .values(testDescription(of: 0)), .map])
+    }
+    
+    func testShouldHandleError_WhenBroadcastingError_WithCollectorAndTransformations() {
+        var collector: SubscriptionCollector! = .init()
+        
+        emitter
+            .map { (value) -> Int in
+                self.workLog.log(.map)
+                return value
+            }
+            .collect(with: collector)
+            .map { (value) -> Int in
+                self.workLog.log(.map)
+                return value
+            }
+            .logResults(with: workLog)
+        
+        emitter.emit(testError)
+        collector = nil
+        emitter.emit(testError)
+        XCTAssertEqual(workLog, [.errors(testErrorDescription)])
+    }
+    
+    func testShouldHandleClose_WhenClosing_WithCollectorAndTransformations() {
+        var collector: SubscriptionCollector! = .init()
+        
+        emitter
+            .map { (value) -> Int in
+                self.workLog.log(.map)
+                return value
+            }
+            .collect(with: collector)
+            .map { (value) -> Int in
+                self.workLog.log(.map)
+                return value
+            }
+            .logResults(with: workLog)
+        
+        emitter.end()
+        collector = nil
+        XCTAssertEqual(workLog, [.ended, .finished])
+    }
+    
+    func testShouldHandleTerminate_WhenTerminating_WithCollectorAndTransformations() {
+        let collector: SubscriptionCollector! = .init()
+        
+        emitter
+            .map { (value) -> Int in
+                self.workLog.log(.map)
+                return value
+            }
+            .collect(with: collector)
+            .map { (value) -> Int in
+                self.workLog.log(.map)
+                return value
+            }
+            .logResults(with: workLog)
+        
+        emitter.terminate(testError)
+        XCTAssertEqual(workLog, [.terminated(testErrorDescription), .finished])
+    }
+    
+    func testShouldHandleClose_WhenDeallocating_WithCollectorAndTransformations() {
+        let collector: SubscriptionCollector! = .init()
+        
+        emitter
+            .map { (value) -> Int in
+                self.workLog.log(.map)
+                return value
+            }
+            .collect(with: collector)
+            .map { (value) -> Int in
+                self.workLog.log(.map)
+                return value
+            }
+            .logResults(with: workLog)
+        
+        emitter = nil
+        XCTAssertEqual(workLog, [.ended, .finished])
+    }
+    
+    func testShouldNotHandle_WhenClosing_WithCollectorAndTransformations() {
+        var collector: SubscriptionCollector! = .init()
+        
+        emitter
+            .map { (value) -> Int in
+                self.workLog.log(.map)
+                return value
+            }
+            .collect(with: collector)
+            .map { (value) -> Int in
+                self.workLog.log(.map)
+                return value
+            }
+            .logResults(with: workLog)
+        
+        collector = nil
+        emitter.end()
+        XCTAssertEqual(workLog, [])
+    }
+    
+    func testShouldNotHandle_WhenTerminating_WithCollectorAndTransformations() {
+        var collector: SubscriptionCollector! = .init()
+        
+        emitter
+            .map { (value) -> Int in
+                self.workLog.log(.map)
+                return value
+            }
+            .collect(with: collector)
+            .map { (value) -> Int in
+                self.workLog.log(.map)
+                return value
+            }
+            .logResults(with: workLog)
+        
+        collector = nil
+        emitter.terminate(testError)
+        XCTAssertEqual(workLog, [])
+    }
+    
+    func testShouldNotHandle_WhenDeallocating_WithCollectorAndTransformations() {
+        var collector: SubscriptionCollector! = .init()
+        
+        emitter
+            .map { (value) -> Int in
+                self.workLog.log(.map)
+                return value
+            }
+            .collect(with: collector)
+            .map { (value) -> Int in
+                self.workLog.log(.map)
+                return value
+            }
+            .logResults(with: workLog)
+        
+        collector = nil
+        emitter = nil
+        XCTAssertEqual(workLog, [])
+    }
 
     // MARK: -
 
@@ -668,6 +828,13 @@ class StreamTests: XCTestCase {
         XCTAssertEqual(workLog, [.ended, .finished])
     }
 
+    // MARK: -
+    
+    // MARK: memory
+    
+    
+    
+    
     // MARK: -
 
     // MARK: thread safety

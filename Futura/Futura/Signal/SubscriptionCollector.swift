@@ -13,7 +13,6 @@
  limitations under the License. */
 
 extension Signal {
-    
     /// Transforms Signal into new Signal instance using provided collector
     /// for keeping subscriptions alive. It will be used for all subscriptions
     /// made on the new Signal instance and propagated for all future Signal
@@ -23,10 +22,12 @@ extension Signal {
     ///
     /// - Parameter collector: SubscriptionCollector used to collect subscriptions for returned signal.
     /// - Returns: New Signal instance of same type, forwarding all tokens and using provided collector.
-    public func collect(with collector: SubscriptionCollector) -> Signal {
-        let next = SignalForwarder<Value, Value>.init(source: self, collector: collector)
-        forward(to: next)
-        return next
+    public func collect(with collector: SubscriptionCollector) -> Signal<Value> {
+        Mutex.lock(mtx)
+        defer { Mutex.unlock(mtx) }
+        let signal: SignalForwarder<Value, Value> = .init(source: self, collector: collector)
+        self.forward(to: signal)
+        return signal
     }
 }
 
@@ -42,21 +43,18 @@ public final class SubscriptionCollector {
     private let lock: RecursiveLock = .init()
     private var subscriptions: [Subscription] = .init()
 
-    internal var isActive: Bool = true
-
     /// Creates empty collector instance.
     public init() {}
 
     internal func collect(_ subscription: Subscription) {
         lock.synchronized {
-            guard isActive else { return }
             subscriptions.append(subscription)
         }
     }
 
     deinit {
         lock.synchronized {
-            isActive = false
+            subscriptions.forEach { $0.deactivate() }
             subscriptions = .init()
         }
     }
