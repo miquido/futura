@@ -66,12 +66,12 @@ let futureData =
         return try decode(from: $0)
     }
 futureData
-    .switch(to: DispatchWorker.background)
+    .switch(to: DispatchQueue.global(qos: .background))
     .value {
         store(text: $0)
     }
 futureData
-    .switch(to: DispatchWorker.main)
+    .switch(to: DispatchQueue.main)
     .value {
         present(text: $0)
     }
