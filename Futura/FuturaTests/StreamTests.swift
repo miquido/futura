@@ -676,7 +676,7 @@ class StreamTests: XCTestCase {
     func testShouldWorkProperly_WhenAccessingOnManyThreads() {
         asyncTest(iterationTimeout: 5,
                   timeoutBody: {
-            XCTFail("Not in time - possible deadlock or fail")
+                      XCTFail("Not in time - possible deadlock or fail")
         }) { complete in
             let dispatchQueue: DispatchQueue = DispatchQueue(label: "test", qos: .default, attributes: .concurrent)
             let lock_1: RecursiveLock = .init()

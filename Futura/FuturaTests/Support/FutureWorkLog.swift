@@ -1,24 +1,23 @@
 /* Copyright 2018 Miquido
- 
+
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
- 
+
  http://www.apache.org/licenses/LICENSE-2.0
- 
+
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License. */
 
-final class FutureWorkLog : Equatable {
-
+final class FutureWorkLog: Equatable {
     private var log: [Event]
-    
+
     enum Event {
-        case then(String)
-        case fail(String)
+        case value(String)
+        case error(String)
         case resulted
         case always
         case recover
@@ -31,74 +30,74 @@ final class FutureWorkLog : Equatable {
     init(_ elements: FutureWorkLog.Event...) {
         self.log = Array(elements)
     }
-    
+
     init(_ elements: [FutureWorkLog.Event]) {
         self.log = Array(elements)
     }
-    
+
     func log(_ event: Event) {
         log.append(event)
     }
-    
+
     var isEmpty: Bool {
         return log.isEmpty
     }
-    
+
     static func == (lhs: FutureWorkLog, rhs: FutureWorkLog) -> Bool {
         return lhs.log == rhs.log
     }
 }
 
-extension FutureWorkLog.Event : CustomStringConvertible {
+extension FutureWorkLog.Event: CustomStringConvertible {
     var description: String {
         return debugDescription
     }
 }
 
-extension FutureWorkLog.Event : CustomDebugStringConvertible {
+extension FutureWorkLog.Event: CustomDebugStringConvertible {
     var debugDescription: String {
         switch self {
-        case let .then(value):
-            return "then(\(value))"
-        case let .fail(error):
-            return "fail(\(error))"
-        case .resulted:
-            return "resulted"
-        case .always:
-            return "always"
-        case .recover:
-            return "recover"
-        case .catch:
-            return "catch"
-        case .map:
-            return "map"
-        case .flatMap:
-            return "flatMap"
-        case .switch:
-            return "switch"
+            case let .value(value):
+                return "value(\(value))"
+            case let .error(error):
+                return "error(\(error))"
+            case .resulted:
+                return "resulted"
+            case .always:
+                return "always"
+            case .recover:
+                return "recover"
+            case .catch:
+                return "catch"
+            case .map:
+                return "map"
+            case .flatMap:
+                return "flatMap"
+            case .switch:
+                return "switch"
         }
     }
 }
 
-extension FutureWorkLog.Event : Equatable {
+extension FutureWorkLog.Event: Equatable {
     static func == (lhs: FutureWorkLog.Event, rhs: FutureWorkLog.Event) -> Bool {
         return lhs.debugDescription == rhs.debugDescription
     }
 }
 
-extension FutureWorkLog : CustomStringConvertible {
+extension FutureWorkLog: CustomStringConvertible {
     var description: String {
         return debugDescription
     }
 }
 
-extension FutureWorkLog : CustomDebugStringConvertible {
+extension FutureWorkLog: CustomDebugStringConvertible {
     var debugDescription: String {
         return "WorkLog[\(log.map { $0.debugDescription }.joined(separator: "-"))]"
     }
 }
 
-extension FutureWorkLog : ExpressibleByArrayLiteral {
+extension FutureWorkLog: ExpressibleByArrayLiteral {
     convenience init(arrayLiteral elements: FutureWorkLog.Event...) {
         self.init(elements)
     }
