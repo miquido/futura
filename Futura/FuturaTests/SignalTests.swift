@@ -27,7 +27,7 @@ class SignalTests: XCTestCase {
 
     // MARK: -
 
-    // MARK: Access
+    // MARK: access
 
     func testShouldHandleValue_WhenBroadcastingValue() {
         emitter.signal
@@ -313,7 +313,7 @@ class SignalTests: XCTestCase {
 
     // MARK: -
 
-    // MARK: FlatMap
+    // MARK: flatMap
 
     func testShouldHandleValue_WhenBroadcastingValue_WithFlatMap_WithValue() {
         let otherEmitter = Emitter<Int>()
@@ -463,7 +463,7 @@ class SignalTests: XCTestCase {
 
     // MARK: -
 
-    // MARK: Collector
+    // MARK: collector
 
     func testShouldHandleValue_WhenBroadcastingValue_WithCollector() {
         var collector: SubscriptionCollector! = .init()
@@ -723,7 +723,7 @@ class SignalTests: XCTestCase {
 
     // MARK: -
 
-    // MARK: WorkerSwitch
+    // MARK: workerSwitch
 
     func testShouldHandleValue_WhenBroadcastingValue_WithWorkerSwitch() {
         let worker: TestWorker = .init()
@@ -790,9 +790,61 @@ class SignalTests: XCTestCase {
         XCTAssertEqual(workLog, [.ended, .finished])
     }
 
+    func testShouldHandleValuesAndErrors_WithTransformations() {
+        var collector: SubscriptionCollector! = .init()
+        let worker: TestWorker = .init()
+
+        emitter
+            .map { (value) -> Int in
+                self.workLog.log(.map)
+                return value + 1
+            }
+            .logResults(with: workLog)
+            .switch(to: worker)
+            .logResults(with: workLog)
+            .collect(with: collector)
+            .map { (value) -> Int in
+                self.workLog.log(.map)
+                return value + 1
+            }
+            .logResults(with: workLog)
+
+        emitter.emit(0)
+        worker.execute()
+        emitter.emit(testError)
+        worker.execute()
+        collector = nil
+        worker.execute()
+        emitter.emit(0)
+        worker.execute()
+        emitter.emit(testError)
+        worker.execute()
+        emitter.terminate(testError)
+        worker.execute()
+        XCTAssertEqual(workLog, [
+            .map,
+            .values(testDescription(of: 1)),
+            .values(testDescription(of: 1)),
+            .map,
+            .values(testDescription(of: 2)),
+            .errors(testErrorDescription),
+            .errors(testErrorDescription),
+            .errors(testErrorDescription),
+            .map,
+            .values(testDescription(of: 1)),
+            .values(testDescription(of: 1)),
+            .errors(testErrorDescription),
+            .errors(testErrorDescription),
+            .terminated(testErrorDescription),
+            .finished,
+            .terminated(testErrorDescription),
+            .finished,
+        ])
+    }
+
     // MARK: -
 
-    // MARK: Filter
+    // MARK: filter
 
     func testShouldHandleValue_WhenBroadcastingValue_WithFilterPassing() {
         emitter
@@ -875,6 +927,53 @@ class SignalTests: XCTestCase {
     // MARK: -
 
     // MARK: memory
+
+    func testShouldDeallocateWithoutHandlers() {
+        var emitter: Emitter<Int>? = Emitter<Int>()
+        weak var signal = emitter?.signal
+
+        XCTAssertNotNil(signal)
+
+        emitter = nil
+
+        XCTAssertNil(signal)
+    }
+
+    func testShouldDeallocateWithHandlers() {
+        var emitter: Emitter<Int>? = Emitter<Int>()
+        weak var signal = emitter?.signal
+        signal?.logResults(with: workLog)
+
+        XCTAssertNotNil(signal)
+
+        emitter = nil
+
+        XCTAssertNil(signal)
+        XCTAssertEqual(workLog, [.ended, .finished])
+    }
+
+    func testShouldDeallocateWithTransformations() {
+        var emitter: Emitter<Int>? = Emitter<Int>()
+        weak var signal = emitter?.signal
+        var mapped = emitter?.signal.map { $0 }
+        weak var mappedSignal = mapped
+        mappedSignal?.logResults(with: workLog)
+
+        XCTAssertNotNil(signal)
+        XCTAssertNotNil(mappedSignal)
+
+        emitter = nil
+
+        XCTAssertNil(signal)
+        XCTAssertNotNil(mappedSignal)
+
+        mapped = nil
+
+        XCTAssertNil(signal)
+        XCTAssertNil(mappedSignal)
+
+        XCTAssertEqual(workLog, [.ended, .finished])
+    }
 
     // MARK: -
 

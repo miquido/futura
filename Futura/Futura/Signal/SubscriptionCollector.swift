@@ -40,22 +40,27 @@ extension Signal {
 /// This will deallocate all transformed Signal instances using
 /// this collector that are not referenced and kept alive intentionally.
 public final class SubscriptionCollector {
-    private let lock: RecursiveLock = .init()
+    private let mtx: Mutex.Pointer = Mutex.make(recursive: true)
     private var subscriptions: [Subscription] = .init()
 
     /// Creates empty collector instance.
     public init() {}
 
     internal func collect(_ subscription: Subscription) {
-        lock.synchronized {
-            subscriptions.append(subscription)
-        }
+        Mutex.lock(mtx)
+        defer { Mutex.unlock(mtx) }
+        subscriptions.append(subscription)
+    }
+
+    internal func deactivate() {
+        Mutex.lock(mtx)
+        defer { Mutex.unlock(mtx) }
+        subscriptions.forEach { $0.deactivate() }
     }
 
     deinit {
-        lock.synchronized {
-            subscriptions.forEach { $0.deactivate() }
-            subscriptions = .init()
-        }
+        Mutex.lock(mtx)
+        subscriptions.forEach { $0.deactivate() }
+        subscriptions = .init()
     }
 }

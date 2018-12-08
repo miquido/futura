@@ -14,15 +14,15 @@
 
 internal final class Subscription {
     internal typealias ID = UInt64
-    
+
     private let unsubscribe: () -> Void
     internal let deactivate: () -> Void
-    
+
     internal init(deactivation: @escaping () -> Void, unsubscribtion: @escaping () -> Void) {
         self.deactivate = deactivation
         self.unsubscribe = unsubscribtion
     }
-    
+
     deinit {
         unsubscribe()
     }
@@ -31,15 +31,19 @@ internal final class Subscription {
 internal final class Subscriber<Value> {
     internal typealias Event = Signal<Value>.Event
     private let body: (Event) -> Void
-    internal var isActive: Bool = true
-    
+    private var isActive: Bool = true
+
     internal init(body: @escaping (Event) -> Void) {
         self.body = body
     }
-    
-    internal func forward(_ event: Event) {
+
+    internal func recieve(_ event: Event) {
         guard isActive else { return }
         body(event)
+    }
+
+    internal func deactivate() {
+        isActive = false
     }
 }
 

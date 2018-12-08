@@ -39,22 +39,20 @@ internal final class SignalScheduler<Value>: SignalForwarder<Value, Value> {
     internal override func broadcast(_ token: Token) {
         Mutex.lock(mtx)
         defer { Mutex.unlock(mtx) }
-            let subscribers = self.subscribers
-            associatedWorker.schedule {
-                subscribers.forEach { $0.1.forward(.token(token)) }
-            }
+        associatedWorker.schedule {
+            self.subscribers.forEach { $0.1.recieve(.token(token)) }
+        }
     }
 
     internal override func finish(_ reason: Error? = nil) {
         Mutex.lock(mtx)
         defer { Mutex.unlock(mtx) }
-            let subscribers = self.subscribers
-            associatedWorker.schedule {
-                subscribers.forEach { $0.1.forward(.finish(reason)) }
-            }
-            finish = .some(reason)
-            let sub = subscribers
+        associatedWorker.schedule {
+            self.subscribers.forEach { $0.1.recieve(.finish(reason)) }
+            self.finish = .some(reason)
+            let sub = self.subscribers
             // cache until end of scope to prevent deallocation of subscribers while making changes in subscribers dictionary - prevents crash
             self.subscribers = .init()
+        }
     }
 }

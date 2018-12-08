@@ -49,8 +49,8 @@ public class Signal<Value> {
         guard !isFinished else { return nil }
         let id = subscriptionID.next()
         let subscriber: Subscriber<Value> = .init(body: body)
-        let subscription: Subscription = .init(deactivation: {
-            subscriber.isActive = false
+        let subscription: Subscription = .init(deactivation: { [weak subscriber] in
+            subscriber?.deactivate()
         }, unsubscribtion: { [weak self] in
             guard let self = self else { return }
             Mutex.lock(self.mtx)
@@ -66,13 +66,13 @@ public class Signal<Value> {
     internal func broadcast(_ token: Token) {
         Mutex.lock(mtx)
         defer { Mutex.unlock(mtx) }
-        subscribers.forEach { $0.1.forward(.token(token)) }
+        subscribers.forEach { $0.1.recieve(.token(token)) }
     }
 
     internal func finish(_ reason: Error? = nil) {
         Mutex.lock(mtx)
         defer { Mutex.unlock(mtx) }
-        subscribers.forEach { $0.1.forward(.finish(reason)) }
+        subscribers.forEach { $0.1.recieve(.finish(reason)) }
         finish = .some(reason)
         let sub = subscribers
         // cache until end of scope to prevent deallocation of subscribers while making changes in subscribers dictionary - prevents crash

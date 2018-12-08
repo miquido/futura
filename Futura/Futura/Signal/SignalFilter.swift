@@ -28,8 +28,8 @@ public extension Signal {
 internal final class SignalFilter<Value>: SignalForwarder<Value, Value> {
     internal init(source: Signal<Value>, filter: @escaping (Value) -> Bool) {
         super.init(source: source, collector: source.collector)
-        collect(source.subscribe {
-            switch $0 {
+        collect(source.subscribe { event in
+            switch event {
                 case let .token(.value(value)):
                     guard filter(value) else { return }
                     self.broadcast(.value(value))

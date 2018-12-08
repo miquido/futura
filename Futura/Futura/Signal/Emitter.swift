@@ -16,7 +16,6 @@
 /// Using Emitter is the only way to pass any information through Signals.
 /// Values and errors are called tokens to call any emission.
 public final class Emitter<Value>: Signal<Value> {
-    
     /// Creates Emitter instance with given type.
     public init() {
         super.init(collector: nil)
