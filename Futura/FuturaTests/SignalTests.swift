@@ -117,6 +117,50 @@ class SignalTests: XCTestCase {
         XCTAssertEqual(workLog, [.terminated(testErrorDescription), .finished])
     }
 
+    func testShouldHandleClose_WhenAlreadyClosed() {
+        emitter.end()
+        emitter.signal
+            .values {
+                self.workLog.log(.values(testDescription(of: $0)))
+            }
+            .errors {
+                self.workLog.log(.errors(testDescription(of: $0)))
+            }
+            .ended {
+                self.workLog.log(.ended)
+            }
+            .terminated {
+                self.workLog.log(.terminated(testDescription(of: $0)))
+            }
+            .finished {
+                self.workLog.log(.finished)
+            }
+
+        XCTAssertEqual(workLog, [.ended, .finished])
+    }
+
+    func testShouldHandleTermination_WhenAlreadyTerminated() {
+        emitter.terminate(testError)
+        emitter.signal
+            .values {
+                self.workLog.log(.values(testDescription(of: $0)))
+            }
+            .errors {
+                self.workLog.log(.errors(testDescription(of: $0)))
+            }
+            .ended {
+                self.workLog.log(.ended)
+            }
+            .terminated {
+                self.workLog.log(.terminated(testDescription(of: $0)))
+            }
+            .finished {
+                self.workLog.log(.finished)
+            }
+
+        XCTAssertEqual(workLog, [.terminated(testErrorDescription), .finished])
+    }
+
     func testShouldHandleClose_WhenDeallocating() {
         emitter.signal
             .values {
@@ -516,10 +560,10 @@ class SignalTests: XCTestCase {
         emitter = nil
         XCTAssertEqual(workLog, [])
     }
-    
+
     func testShouldHandleValue_WhenBroadcastingValue_WithCollectorAndTransformations() {
         var collector: SubscriptionCollector! = .init()
-        
+
         emitter
             .map { (value) -> Int in
                 self.workLog.log(.map)
@@ -531,16 +575,16 @@ class SignalTests: XCTestCase {
                 return value
             }
             .logResults(with: workLog)
-        
+
         emitter.emit(0)
         collector = nil
         emitter.emit(0)
         XCTAssertEqual(workLog, [.map, .map, .values(testDescription(of: 0)), .map])
     }
-    
+
     func testShouldHandleError_WhenBroadcastingError_WithCollectorAndTransformations() {
         var collector: SubscriptionCollector! = .init()
-        
+
         emitter
             .map { (value) -> Int in
                 self.workLog.log(.map)
@@ -552,16 +596,16 @@ class SignalTests: XCTestCase {
                 return value
             }
             .logResults(with: workLog)
-        
+
         emitter.emit(testError)
         collector = nil
         emitter.emit(testError)
         XCTAssertEqual(workLog, [.errors(testErrorDescription)])
     }
-    
+
     func testShouldHandleClose_WhenClosing_WithCollectorAndTransformations() {
         var collector: SubscriptionCollector! = .init()
-        
+
         emitter
             .map { (value) -> Int in
                 self.workLog.log(.map)
@@ -573,15 +617,15 @@ class SignalTests: XCTestCase {
                 return value
             }
             .logResults(with: workLog)
-        
+
         emitter.end()
         collector = nil
         XCTAssertEqual(workLog, [.ended, .finished])
     }
-    
+
     func testShouldHandleTerminate_WhenTerminating_WithCollectorAndTransformations() {
         let collector: SubscriptionCollector! = .init()
-        
+
         emitter
             .map { (value) -> Int in
                 self.workLog.log(.map)
@@ -593,14 +637,14 @@ class SignalTests: XCTestCase {
                 return value
             }
             .logResults(with: workLog)
-        
+
         emitter.terminate(testError)
         XCTAssertEqual(workLog, [.terminated(testErrorDescription), .finished])
     }
-    
+
     func testShouldHandleClose_WhenDeallocating_WithCollectorAndTransformations() {
         let collector: SubscriptionCollector! = .init()
-        
+
         emitter
             .map { (value) -> Int in
                 self.workLog.log(.map)
@@ -612,14 +656,14 @@ class SignalTests: XCTestCase {
                 return value
             }
             .logResults(with: workLog)
-        
+
         emitter = nil
         XCTAssertEqual(workLog, [.ended, .finished])
     }
-    
+
     func testShouldNotHandle_WhenClosing_WithCollectorAndTransformations() {
         var collector: SubscriptionCollector! = .init()
-        
+
         emitter
             .map { (value) -> Int in
                 self.workLog.log(.map)
@@ -631,15 +675,15 @@ class SignalTests: XCTestCase {
                 return value
             }
             .logResults(with: workLog)
-        
+
         collector = nil
         emitter.end()
         XCTAssertEqual(workLog, [])
     }
-    
+
     func testShouldNotHandle_WhenTerminating_WithCollectorAndTransformations() {
         var collector: SubscriptionCollector! = .init()
-        
+
         emitter
             .map { (value) -> Int in
                 self.workLog.log(.map)
@@ -651,15 +695,15 @@ class SignalTests: XCTestCase {
                 return value
             }
             .logResults(with: workLog)
-        
+
         collector = nil
         emitter.terminate(testError)
         XCTAssertEqual(workLog, [])
     }
-    
+
     func testShouldNotHandle_WhenDeallocating_WithCollectorAndTransformations() {
         var collector: SubscriptionCollector! = .init()
-        
+
         emitter
             .map { (value) -> Int in
                 self.workLog.log(.map)
@@ -671,7 +715,7 @@ class SignalTests: XCTestCase {
                 return value
             }
             .logResults(with: workLog)
-        
+
         collector = nil
         emitter = nil
         XCTAssertEqual(workLog, [])
@@ -829,12 +873,9 @@ class SignalTests: XCTestCase {
     }
 
     // MARK: -
-    
+
     // MARK: memory
-    
-    
-    
-    
+
     // MARK: -
 
     // MARK: thread safety
