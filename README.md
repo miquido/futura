@@ -88,11 +88,13 @@ futureData
 ```
 This conversion not only simplifies the code keeping the same functionality and multithreading execution but it also splits things to be more manageable and testable. Each part - database, presentation and logs - is clearly separated from each other and may be applied in different more suitable places.
 
+For more usage examples please look at attached Playground.
+
 ## How to get it?
 
-Best way to use Futura library is to use git submodule
+You can use Futura as git submodule
 ``` bash
-git submodule add git@github.com:miquido/futura.git
+git submodule add https://github.com/miquido/futura.git
 ```
 and integrate it with your code base.
 
@@ -112,15 +114,15 @@ Futura consists of a set of tools that helps you manage asynchronous and concurr
 
 ### Lock
 
-There are two helpers here. Easy to use pthread_mutex wrapper and even easier to use RecursiveLock based on it. Both are used internally to provide fast and reliable synchronization.
+There are two helpers here. Easy to use pthread_mutex wrapper (Mutex) and even easier to use RecursiveLock based on it. Both are used internally to provide fast and reliable synchronization.
 
 ### Worker
 
-Worker is a fundamental tool of Futura. It is abstraction on execution of tasks that allows to use any kind of threading solution. If you need any custom scheduling or thread implementation you can conform to Worker protocol and use that one in your code base. There is no implicit or forced usage of any concrete Worker across all tools (with one exception).
+Worker is a fundamental tool of Futura. It is abstraction on execution of tasks that allows to use any kind of threading solution. If you need any custom scheduling or thread implementation you can conform to Worker protocol and use that one in your code base. There is no implicit or forced usage of any concrete Worker across all tools (with one exception). Proper usage of workers allows you to write completely synchronous unit tests. No more XCTestExpectation or timeouts, just look how Futura is tested internally.
 
 ### Future
 
-For tasks that are performed only once, there is a nice Future/Promise implementation. It enables you to make your code better organized and easier to read. Specially useful when dealing with network requests, database transactions and other one time tasks.
+For tasks that are performed only once, there is a nice promise implementation. It enables you to make your code better organized and easier to read. Specially useful when dealing with network requests, database transactions and other one time tasks.
 
 ### Signal
 
