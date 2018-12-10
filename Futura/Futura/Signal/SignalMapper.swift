@@ -30,8 +30,8 @@ public extension Signal {
 internal final class SignalMapper<SourceValue, Value>: SignalForwarder<SourceValue, Value> {
     internal init(source: Signal<SourceValue>, transform: @escaping (SourceValue) throws -> Value) {
         super.init(source: source, collector: source.collector)
-        collect(source.subscribe {
-            switch $0 {
+        collect(source.subscribe { event in
+            switch event {
                 case let .token(.value(value)):
                     do {
                         try self.broadcast(.value(transform(value)))

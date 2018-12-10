@@ -16,7 +16,7 @@
 		40258CB12175C6E5008EE920 /* SignalFlatMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40258CB02175C6E5008EE920 /* SignalFlatMapper.swift */; };
 		40258CB32175C7CE008EE920 /* SignalScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40258CB22175C7CE008EE920 /* SignalScheduler.swift */; };
 		40258CB52175C814008EE920 /* Emitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40258CB42175C814008EE920 /* Emitter.swift */; };
-		40258CB72175CE79008EE920 /* StreamTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40258CB62175CE79008EE920 /* StreamTests.swift */; };
+		40258CB72175CE79008EE920 /* SignalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40258CB62175CE79008EE920 /* SignalTests.swift */; };
 		404B9499215A351100640928 /* Futura.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 404B948F215A351100640928 /* Futura.framework */; };
 		404B949E215A351100640928 /* FuturaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404B949D215A351100640928 /* FuturaTests.swift */; };
 		404B94AA215A352D00640928 /* RecursiveLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404B94A9215A352D00640928 /* RecursiveLock.swift */; };
@@ -66,7 +66,7 @@
 		40258CB02175C6E5008EE920 /* SignalFlatMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalFlatMapper.swift; sourceTree = "<group>"; };
 		40258CB22175C7CE008EE920 /* SignalScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalScheduler.swift; sourceTree = "<group>"; };
 		40258CB42175C814008EE920 /* Emitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Emitter.swift; sourceTree = "<group>"; };
-		40258CB62175CE79008EE920 /* StreamTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamTests.swift; sourceTree = "<group>"; };
+		40258CB62175CE79008EE920 /* SignalTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalTests.swift; sourceTree = "<group>"; };
 		404B948F215A351100640928 /* Futura.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Futura.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		404B9493215A351100640928 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		404B9498215A351100640928 /* FuturaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FuturaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -120,7 +120,7 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		40258CA52175C3C4008EE920 /* Stream */ = {
+		40258CA52175C3C4008EE920 /* Signal */ = {
 			isa = PBXGroup;
 			children = (
 				40258CA62175C406008EE920 /* Subscription.swift */,
@@ -133,7 +133,7 @@
 				40750C4F217A3FFC00067852 /* SignalFilter.swift */,
 				40258CB22175C7CE008EE920 /* SignalScheduler.swift */,
 			);
-			path = Stream;
+			path = Signal;
 			sourceTree = "<group>";
 		};
 		404B9485215A351100640928 = {
@@ -159,7 +159,7 @@
 		404B9491215A351100640928 /* Futura */ = {
 			isa = PBXGroup;
 			children = (
-				40258CA52175C3C4008EE920 /* Stream */,
+				40258CA52175C3C4008EE920 /* Signal */,
 				407AA551216E48670030C433 /* Future */,
 				407AA555216E4CD60030C433 /* Synchronization */,
 				407AA550216E481B0030C433 /* Worker */,
@@ -176,7 +176,7 @@
 				407AA552216E4B840030C433 /* Support */,
 				404B94BB215A365100640928 /* PromiseAndFutureTests.swift */,
 				40AFB89B216B72BC00ABB5BB /* FutureZipTests.swift */,
-				40258CB62175CE79008EE920 /* StreamTests.swift */,
+				40258CB62175CE79008EE920 /* SignalTests.swift */,
 				404B94B9215A364100640928 /* RecursiveLockTests.swift */,
 				404B94BF215A5CC600640928 /* WorkerTests.swift */,
 			);
@@ -195,6 +195,7 @@
 		407AA550216E481B0030C433 /* Worker */ = {
 			isa = PBXGroup;
 			children = (
+				404B94B1215A358900640928 /* ExecutionContext.swift */,
 				404B94B3215A35AF00640928 /* Worker.swift */,
 				404B94B5215A35C700640928 /* DispatchQueueWorker.swift */,
 				4004D27521A837EB0036426D /* OperationQueueWorker.swift */,
@@ -207,7 +208,6 @@
 			children = (
 				404B94AF215A356B00640928 /* Future.swift */,
 				404B94B7215A35E700640928 /* Promise.swift */,
-				404B94B1215A358900640928 /* ExecutionContext.swift */,
 			);
 			path = Future;
 			sourceTree = "<group>";
@@ -397,7 +397,7 @@
 				404B94BA215A364100640928 /* RecursiveLockTests.swift in Sources */,
 				40AFB89C216B72BC00ABB5BB /* FutureZipTests.swift in Sources */,
 				4075C52421624F8100B40806 /* TestWorker.swift in Sources */,
-				40258CB72175CE79008EE920 /* StreamTests.swift in Sources */,
+				40258CB72175CE79008EE920 /* SignalTests.swift in Sources */,
 				404B949E215A351100640928 /* FuturaTests.swift in Sources */,
 				404B94BC215A365100640928 /* PromiseAndFutureTests.swift in Sources */,
 				404B94C0215A5CC600640928 /* WorkerTests.swift in Sources */,

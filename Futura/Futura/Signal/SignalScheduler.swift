@@ -37,29 +37,22 @@ internal final class SignalScheduler<Value>: SignalForwarder<Value, Value> {
     }
 
     internal override func broadcast(_ token: Token) {
-        lock.synchronized {
-            guard !isSuspended else { return }
-            let subscribers = self.subscribers
-            associatedWorker.schedule {
-                subscribers.forEach { $0.1(.token(token)) }
-            }
+        Mutex.lock(mtx)
+        defer { Mutex.unlock(mtx) }
+        associatedWorker.schedule {
+            self.subscribers.forEach { $0.1.recieve(.token(token)) }
         }
     }
 
     internal override func finish(_ reason: Error? = nil) {
-        lock.synchronized {
-            guard !isSuspended else { return }
-            #warning("TODO: this suspended may prevent braodcasting finish - to check")
-            let subscribers = self.subscribers
-            associatedWorker.schedule {
-                subscribers.forEach { $0.1(.finish(reason)) }
-            }
-            isFinished = true
-            var sub = subscribers
+        Mutex.lock(mtx)
+        defer { Mutex.unlock(mtx) }
+        associatedWorker.schedule {
+            self.subscribers.forEach { $0.1.recieve(.finish(reason)) }
+            self.finish = .some(reason)
+            let sub = self.subscribers
             // cache until end of scope to prevent deallocation of subscribers while making changes in subscribers dictionary - prevents crash
             self.subscribers = .init()
-            sub.removeAll() // only to silence warning about unused value `sub`
-            #warning("TODO: to check performance of removeAll")
         }
     }
 }

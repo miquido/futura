@@ -34,13 +34,14 @@ internal final class SignalFlatMapper<SourceValue, Value>: SignalForwarder<Sourc
 
     internal init(source: Signal<SourceValue>, transform: @escaping (SourceValue) throws -> Signal<Value>) {
         super.init(source: source, collector: source.collector)
-        collect(source.subscribe {
+        collect(source.subscribe { event in
             self.mappedCollector = .init()
-            switch $0 {
+            switch event {
                 case let .token(.value(value)):
                     do {
-                        let subscribtion = try transform(value).subscribe {
-                            switch $0 {
+                        let subscribtion = try transform(value).subscribe { [weak self] event in
+                            guard let self = self else { return }
+                            switch event {
                                 case let .token(.value(value)):
                                     self.broadcast(.value(value))
                                 case let .token(.error(error)):

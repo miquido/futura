@@ -19,17 +19,13 @@ internal class SignalForwarder<V1, V2>: Signal<V2> {
         self.source = source
         super.init(collector: collector)
     }
-
-    override var isSuspended: Bool {
-        return super.isSuspended || (source?.isSuspended ?? false)
-    }
 }
 
 extension Signal {
     internal func forward(to destination: SignalForwarder<Value, Value>) {
         precondition(destination.source === self)
-        destination.collect(subscribe({
-            switch $0 {
+        destination.collect(subscribe({ event in
+            switch event {
                 case let .token(token):
                     destination.broadcast(token)
                 case let .finish(reason):

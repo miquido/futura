@@ -21,61 +21,67 @@
 /// passed before observation will never occour.
 public class Signal<Value> {
     internal typealias Token = Result<Value>
-    internal typealias Subscriber = (Event) -> Void
 
     private var subscriptionID: Subscription.ID = 0
     private let privateCollector: SubscriptionCollector = .init()
 
-    internal let lock: RecursiveLock = .init()
-    internal var subscribers: [(id: Subscription.ID, subscriber: Subscriber)] = .init()
+    internal let mtx: Mutex.Pointer = Mutex.make(recursive: true)
+    internal var subscribers: [(id: Subscription.ID, subscriber: Subscriber<Value>)] = .init()
     internal weak var collector: SubscriptionCollector?
-    internal var isFinished: Bool = false
-    internal var isUnsubscribing: Bool = false
+    internal var finish: Error??
+    internal var isFinished: Bool {
+        Mutex.lock(mtx)
+        defer { Mutex.unlock(mtx) }
+        if case .some = finish {
+            return true
+        } else {
+            return false
+        }
+    }
 
     internal init(collector: SubscriptionCollector?) {
         self.collector = collector
     }
 
-    internal func subscribe(_ subscriber: @escaping Subscriber) -> Subscription? {
-        return lock.synchronized {
-            guard !isFinished else { return nil }
-            let id = subscriptionID.next()
-            subscribers.append((id: id, subscriber: subscriber))
-            return Subscription.init { [weak self] in
-                guard let self = self else { return }
-                self.lock.synchronized {
-                    self.isUnsubscribing = true
-                    if let idx = self.subscribers.firstIndex(where: { $0.id == id }) {
-                        self.subscribers.remove(at: idx)
-                    } else { /* do nothing */ }
-                    self.isUnsubscribing = false
-                }
-            }
-        }
+    internal func subscribe(_ body: @escaping (Event) -> Void) -> Subscription? {
+        Mutex.lock(mtx)
+        defer { Mutex.unlock(mtx) }
+        guard !isFinished else { return nil }
+        let id = subscriptionID.next()
+        let subscriber: Subscriber<Value> = .init(body: body)
+        let subscription: Subscription = .init(deactivation: { [weak subscriber] in
+            subscriber?.deactivate()
+        }, unsubscribtion: { [weak self] in
+            guard let self = self else { return }
+            Mutex.lock(self.mtx)
+            defer { Mutex.unlock(self.mtx) }
+            if let idx = self.subscribers.firstIndex(where: { $0.id == id }) {
+                self.subscribers.remove(at: idx)
+            } else { /* do nothing */ }
+        })
+        subscribers.append((id: id, subscriber: subscriber))
+        return subscription
     }
 
     internal func broadcast(_ token: Token) {
-        lock.synchronized {
-            guard !isSuspended else { return }
-            subscribers.forEach { $0.1(.token(token)) }
-        }
+        Mutex.lock(mtx)
+        defer { Mutex.unlock(mtx) }
+        subscribers.forEach { $0.1.recieve(.token(token)) }
     }
 
     internal func finish(_ reason: Error? = nil) {
-        lock.synchronized {
-            guard !isSuspended else { return }
-            #warning("TODO: this suspended may prevent braodcasting finish - to check")
-            subscribers.forEach { $0.1(.finish(reason)) }
-            isFinished = true
-            var sub = subscribers
-            // cache until end of scope to prevent deallocation of subscribers while making changes in subscribers dictionary - prevents crash
-            subscribers = .init()
-            sub.removeAll() // only to silence warning about unused value `sub`
-            #warning("TODO: to check performance of removeAll")
-        }
+        Mutex.lock(mtx)
+        defer { Mutex.unlock(mtx) }
+        subscribers.forEach { $0.1.recieve(.finish(reason)) }
+        finish = .some(reason)
+        let sub = subscribers
+        // cache until end of scope to prevent deallocation of subscribers while making changes in subscribers dictionary - prevents crash
+        subscribers = .init()
     }
 
     internal func collect(_ subscribtion: Subscription?) {
+        Mutex.lock(mtx)
+        defer { Mutex.unlock(mtx) }
         guard let subscribtion = subscribtion else { return }
         if let collector = collector {
             collector.collect(subscribtion)
@@ -84,14 +90,10 @@ public class Signal<Value> {
         }
     }
 
-    // prevents broadcasting if internal state not allows this
-    // i.e. in the middle of removing subscription
-    // prevents a lot of crashes...
-    internal var isSuspended: Bool {
-        return isUnsubscribing || !(collector?.isActive ?? true) || !privateCollector.isActive
+    deinit {
+        finish()
+        Mutex.destroy(mtx)
     }
-
-    deinit { finish() }
 }
 
 extension Signal {
@@ -102,7 +104,6 @@ extension Signal {
 }
 
 public extension Signal {
-    
     /// Handler used to observe values passed through this Signal instance.
     ///
     /// - Parameter observer: Handler called every time Signal gets value.
@@ -132,45 +133,77 @@ public extension Signal {
     #warning("TODO: add tokens handler - either value or error without reference")
 
     /// Handler used to observe finishing of this Signal by ending (without error).
+    /// It will be called immediately with given context if
+    /// signal already ended.
     ///
+    /// - Parameter executionContext: Context used to execute handler.
     /// - Parameter observer: Handler called when Signal ends.
     /// - Returns: Same Signal instance for eventual further chaining.
     @discardableResult
-    func ended(_ observer: @escaping () -> Void) -> Signal {
-        #warning("Since this method waits for completion and can be called only once shouldn't it be called if Signal already finished?")
-        collect(subscribe { event in
+    func ended(inContext executionContext: ExecutionContext = .undefined, _ observer: @escaping () -> Void) -> Signal {
+        if let subscription = (subscribe { event in
             guard case .finish(.none) = event else { return }
-            observer()
-        })
+            executionContext.execute {
+                observer()
+            }
+        }) {
+            collect(subscription)
+        } else {
+            guard case .some(.none) = finish else { return self }
+            executionContext.execute {
+                observer()
+            }
+        }
         return self
     }
 
     /// Handler used to observe finishing of this Signal by termination (with error).
+    /// It will be called immediately with given context if
+    /// signal already terminated.
     ///
+    /// - Parameter executionContext: Context used to execute handler.
     /// - Parameter observer: Handler called when Signal terminates.
     /// - Returns: Same Signal instance for eventual further chaining.
     @discardableResult
-    func terminated(_ observer: @escaping (Error) -> Void) -> Signal {
-        #warning("Since this method waits for completion and can be called only once shouldn't it be called if Signal already finished?")
-        collect(subscribe { event in
+    func terminated(inContext executionContext: ExecutionContext = .undefined, _ observer: @escaping (Error) -> Void) -> Signal {
+        if let subscription = (subscribe { event in
             guard case let .finish(.some(reason)) = event else { return }
-            observer(reason)
-        })
+            executionContext.execute {
+                observer(reason)
+            }
+        }) {
+            collect(subscription)
+        } else {
+            guard case let .some(.some(reason)) = finish else { return self }
+            executionContext.execute {
+                observer(reason)
+            }
+        }
         return self
     }
 
     /// Handler used to observe finishing of this Signal either by ending or termination
-    /// (with or without error).
+    /// (with or without error). It will be called immediately with given context if
+    /// signal already finished.
     ///
+    /// - Parameter executionContext: Context used to execute handler.
     /// - Parameter observer: Handler called when Signal finishes.
     /// - Returns: Same Signal instance for eventual further chaining.
     @discardableResult
-    func finished(_ observer: @escaping () -> Void) -> Signal {
-        #warning("Since this method waits for completion and can be called only once shouldn't it be called if Signal already finished?")
-        collect(subscribe { event in
+    func finished(inContext executionContext: ExecutionContext = .undefined, _ observer: @escaping () -> Void) -> Signal {
+        if let subscription = (subscribe { event in
             guard case .finish = event else { return }
-            observer()
-        })
+            executionContext.execute {
+                observer()
+            }
+        }) {
+            collect(subscription)
+        } else {
+            guard case .some = finish else { return self }
+            executionContext.execute {
+                observer()
+            }
+        }
         return self
     }
 }
