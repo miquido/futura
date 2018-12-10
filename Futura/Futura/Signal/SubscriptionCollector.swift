@@ -62,5 +62,6 @@ public final class SubscriptionCollector {
         Mutex.lock(mtx)
         subscriptions.forEach { $0.deactivate() }
         subscriptions = .init()
+        Mutex.destroy(mtx)
     }
 }
