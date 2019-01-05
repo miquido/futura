@@ -24,11 +24,73 @@ class RecursiveLockPerformanceTests: XCTestCase {
 
             for _ in 0 ..< count {
                 lock.lock()
-                total += 1
                 lock.unlock()
             }
+        }
+    }
+    
+    func testPerformance_RecursiveLock_Synchronized() {
+        let lock = RecursiveLock()
+        let count = 1_000_000
+        measure {
+            for _ in 0 ..< count{
+                lock.synchronized {}
+            }
+        }
+    }
 
-            XCTAssert(total == count)
+    func testPerformance_Schedule_OfFuturaWorkerOnOtherWorker() {
+        let count = 1_000_000
+        let worker = FuturaWorker()
+        measure {
+            for _ in 0 ..< count {
+                worker.schedule {}
+            }
+        }
+    }
+
+    func testPerformance_Schedule_OfFuturaWorkerOnSelf() {
+        let count = 1_000_000
+        let worker: FuturaWorker = .init()
+        let mtx = Mutex.make(recursive: false)
+        Mutex.lock(mtx)
+        measure {
+            worker.schedule {
+                for _ in 0 ..< count {
+                    worker.schedule {}
+                }
+                Mutex.unlock(mtx)
+            }
+            Mutex.lock(mtx)
+        }
+        Mutex.destroy(mtx)
+    }
+
+    func testPerformance_Schedule_OfDispatchWorkerOnOtherWorker() {
+        let count = 1_000_000
+        let worker: DispatchQueue = .global()
+        measure {
+            for _ in 0..<count {
+                worker.schedule {}
+            }
+        }
+    }
+
+    func testPerformance_Schedule_OfDispatchWorkerOnSelf() {
+        let count = 1_000_000
+        let worker: DispatchQueue = .global()
+        let mtx = Mutex.make(recursive: false)
+        Mutex.lock(mtx)
+        measure {
+            worker.schedule {
+                for _ in 0 ..< count {
+                    worker.schedule {}
+                }
+                Mutex.unlock(mtx)
+            }
+            Mutex.lock(mtx)
+
+            Mutex.destroy(mtx)
         }
     }
 
