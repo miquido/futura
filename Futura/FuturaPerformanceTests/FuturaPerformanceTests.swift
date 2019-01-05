@@ -1,11 +1,11 @@
 /* Copyright 2018 Miquido
- 
+
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
- 
+
  http://www.apache.org/licenses/LICENSE-2.0
- 
+
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,11 +16,12 @@ import Futura
 import XCTest
 
 class RecursiveLockPerformanceTests: XCTestCase {
-    
-    func testPerformance_RecursiveLock_LockAndUnlock() {
-        let lock = RecursiveLock()
-        let count = 1_000_000
+    func testPerformance_LockAndUnlock() {
+        let count = 10_000_000
         measure {
+            let lock = RecursiveLock()
+            var total = 0
+
             for _ in 0 ..< count {
                 lock.lock()
                 lock.unlock()
@@ -67,7 +68,7 @@ class RecursiveLockPerformanceTests: XCTestCase {
 
     func testPerformance_Schedule_OfDispatchWorkerOnOtherWorker() {
         let count = 1_000_000
-        let worker: DispatchWorker = .default
+        let worker: DispatchQueue = .global()
         measure {
             for _ in 0..<count {
                 worker.schedule {}
@@ -77,7 +78,7 @@ class RecursiveLockPerformanceTests: XCTestCase {
 
     func testPerformance_Schedule_OfDispatchWorkerOnSelf() {
         let count = 1_000_000
-        let worker: DispatchWorker = .default
+        let worker: DispatchQueue = .global()
         let mtx = Mutex.make(recursive: false)
         Mutex.lock(mtx)
         measure {
@@ -88,7 +89,22 @@ class RecursiveLockPerformanceTests: XCTestCase {
                 Mutex.unlock(mtx)
             }
             Mutex.lock(mtx)
+
+            Mutex.destroy(mtx)
         }
-        Mutex.destroy(mtx)
+    }
+
+    func testPerformance_Synchronized() {
+        let count = 10_000_000
+        measure {
+            let lock = RecursiveLock()
+            var total = 0
+
+            for _ in 0 ..< count {
+                lock.synchronized { total += 1 }
+            }
+
+            XCTAssert(total == count)
+        }
     }
 }

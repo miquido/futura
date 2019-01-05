@@ -12,7 +12,11 @@
  See the License for the specific language governing permissions and
  limitations under the License. */
 
-internal enum Result<T> {
-    case value(T)
-    case error(Error)
+import Dispatch
+
+extension DispatchQueue: Worker {
+    /// OperationQueue as Worker assigns work to queue using async method.
+    public func schedule(_ work: @escaping () -> Void) {
+        async(execute: work)
+    }
 }

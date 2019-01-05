@@ -12,26 +12,25 @@
  See the License for the specific language governing permissions and
  limitations under the License. */
 
-final class FutureWorkLog: Equatable {
+final class StreamWorkLog: Equatable {
     private var log: [Event]
 
     enum Event {
-        case value(String)
-        case error(String)
-        case resulted
-        case always
-        case recover
-        case `catch`
+        case values(String)
+        case errors(String)
+        case ended
+        case terminated(String)
+        case finished
         case map
         case flatMap
-        case `switch`
+        case filter(Bool)
     }
 
-    init(_ elements: FutureWorkLog.Event...) {
+    init(_ elements: StreamWorkLog.Event...) {
         self.log = Array(elements)
     }
 
-    init(_ elements: [FutureWorkLog.Event]) {
+    init(_ elements: [StreamWorkLog.Event]) {
         self.log = Array(elements)
     }
 
@@ -43,62 +42,60 @@ final class FutureWorkLog: Equatable {
         return log.isEmpty
     }
 
-    static func == (lhs: FutureWorkLog, rhs: FutureWorkLog) -> Bool {
+    static func == (lhs: StreamWorkLog, rhs: StreamWorkLog) -> Bool {
         return lhs.log == rhs.log
     }
 }
 
-extension FutureWorkLog.Event: CustomStringConvertible {
+extension StreamWorkLog.Event: CustomStringConvertible {
     var description: String {
         return debugDescription
     }
 }
 
-extension FutureWorkLog.Event: CustomDebugStringConvertible {
+extension StreamWorkLog.Event: CustomDebugStringConvertible {
     var debugDescription: String {
         switch self {
-            case let .value(value):
-                return "value(\(value))"
-            case let .error(error):
-                return "error(\(error))"
-            case .resulted:
-                return "resulted"
-            case .always:
-                return "always"
-            case .recover:
-                return "recover"
-            case .catch:
-                return "catch"
+            case let .values(value):
+                return "values(\(value))"
+            case let .errors(error):
+                return "errors(\(error))"
             case .map:
                 return "map"
             case .flatMap:
                 return "flatMap"
-            case .switch:
-                return "switch"
+            case .ended:
+                return "ended"
+            case .finished:
+                return "finished"
+            case let .terminated(error):
+                return "terminated(\(error))"
+            case let .filter(isIncluded):
+                return "filter(\(isIncluded))"
         }
     }
 }
 
-extension FutureWorkLog.Event: Equatable {
-    static func == (lhs: FutureWorkLog.Event, rhs: FutureWorkLog.Event) -> Bool {
+extension StreamWorkLog.Event: Equatable {
+    static func == (lhs: StreamWorkLog.Event, rhs: StreamWorkLog.Event) -> Bool {
         return lhs.debugDescription == rhs.debugDescription
     }
 }
 
-extension FutureWorkLog: CustomStringConvertible {
+extension StreamWorkLog: CustomStringConvertible {
     var description: String {
         return debugDescription
     }
 }
 
-extension FutureWorkLog: CustomDebugStringConvertible {
+extension StreamWorkLog: CustomDebugStringConvertible {
     var debugDescription: String {
-        return "WorkLog[\(log.map { $0.debugDescription }.joined(separator: "-"))]"
+        return "StreamWorkLog[\(log.map { $0.debugDescription }.joined(separator: "-"))]"
     }
 }
 
-extension FutureWorkLog: ExpressibleByArrayLiteral {
-    convenience init(arrayLiteral elements: FutureWorkLog.Event...) {
+extension StreamWorkLog: ExpressibleByArrayLiteral {
+    convenience init(arrayLiteral elements: StreamWorkLog.Event...) {
         self.init(elements)
     }
 }
