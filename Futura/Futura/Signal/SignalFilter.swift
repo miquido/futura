@@ -21,14 +21,18 @@ public extension Signal {
     /// - Parameter filter: Filtering function returning true for values that can be passed/
     /// - Returns: New Signal instance passing filtered values and all errors.
     func filter(_ filter: @escaping (Value) -> Bool) -> Signal<Value> {
-        return SignalFilter(source: self, filter: filter)
+        let next: SignalFilter = .init(source: self, filter: filter)
+        #if FUTURA_DEBUG
+            self.debugLog("+filter -> \(next.debugDescription)")
+        #endif
+        return next
     }
 }
 
 internal final class SignalFilter<Value>: SignalForwarder<Value, Value> {
     internal init(source: Signal<Value>, filter: @escaping (Value) -> Bool) {
         super.init(source: source, collector: source.collector)
-        collect(source.subscribe { event in
+        collect(source.subscribe { [weak source] event in
             switch event {
                 case let .token(.value(value)):
                     guard filter(value) else { return }
@@ -38,6 +42,9 @@ internal final class SignalFilter<Value>: SignalForwarder<Value, Value> {
                 case let .finish(reason):
                     self.finish(reason)
             }
+            #if FUTURA_DEBUG
+                source?.debugLog("filter() -> \(self.debugDescription)")
+            #endif
         })
     }
 }

@@ -25,6 +25,9 @@ public class Signal<Value> {
     private var subscriptionID: Subscription.ID = 0
     private let privateCollector: SubscriptionCollector = .init()
 
+    #if FUTURA_DEBUG
+        internal var debugMode: DebugMode
+    #endif
     internal let mtx: Mutex.Pointer = Mutex.make(recursive: true)
     internal var subscribers: [(id: Subscription.ID, subscriber: Subscriber<Value>)] = .init()
     internal weak var collector: SubscriptionCollector?
@@ -39,9 +42,16 @@ public class Signal<Value> {
         }
     }
 
-    internal init(collector: SubscriptionCollector?) {
-        self.collector = collector
-    }
+    #if FUTURA_DEBUG
+        internal init(collector: SubscriptionCollector?, debug: DebugMode = .disabled) {
+            self.debugMode = debug
+            self.collector = collector
+        }
+    #else
+        internal init(collector: SubscriptionCollector?) {
+            self.collector = collector
+        }
+    #endif
 
     internal func subscribe(_ body: @escaping (Event) -> Void) -> Subscription? {
         Mutex.lock(mtx)
@@ -103,107 +113,3 @@ extension Signal {
     }
 }
 
-public extension Signal {
-    /// Handler used to observe values passed through this Signal instance.
-    ///
-    /// - Parameter observer: Handler called every time Signal gets value.
-    /// - Returns: Same Signal instance for eventual further chaining.
-    @discardableResult
-    func values(_ observer: @escaping (Value) -> Void) -> Signal {
-        collect(subscribe { event in
-            guard case let .token(.value(value)) = event else { return }
-            observer(value)
-        })
-        return self
-    }
-
-    /// Handler used to observe errors passed through this Signal instance.
-    ///
-    /// - Parameter observer: Handler called every time Signal gets error.
-    /// - Returns: Same Signal instance for eventual further chaining.
-    @discardableResult
-    func errors(_ observer: @escaping (Error) -> Void) -> Signal {
-        collect(subscribe { event in
-            guard case let .token(.error(value)) = event else { return }
-            observer(value)
-        })
-        return self
-    }
-
-    #warning("TODO: add tokens handler - either value or error without reference")
-
-    /// Handler used to observe finishing of this Signal by ending (without error).
-    /// It will be called immediately with given context if
-    /// signal already ended.
-    ///
-    /// - Parameter executionContext: Context used to execute handler.
-    /// - Parameter observer: Handler called when Signal ends.
-    /// - Returns: Same Signal instance for eventual further chaining.
-    @discardableResult
-    func ended(inContext executionContext: ExecutionContext = .undefined, _ observer: @escaping () -> Void) -> Signal {
-        if let subscription = (subscribe { event in
-            guard case .finish(.none) = event else { return }
-            executionContext.execute {
-                observer()
-            }
-        }) {
-            collect(subscription)
-        } else {
-            guard case .some(.none) = finish else { return self }
-            executionContext.execute {
-                observer()
-            }
-        }
-        return self
-    }
-
-    /// Handler used to observe finishing of this Signal by termination (with error).
-    /// It will be called immediately with given context if
-    /// signal already terminated.
-    ///
-    /// - Parameter executionContext: Context used to execute handler.
-    /// - Parameter observer: Handler called when Signal terminates.
-    /// - Returns: Same Signal instance for eventual further chaining.
-    @discardableResult
-    func terminated(inContext executionContext: ExecutionContext = .undefined, _ observer: @escaping (Error) -> Void) -> Signal {
-        if let subscription = (subscribe { event in
-            guard case let .finish(.some(reason)) = event else { return }
-            executionContext.execute {
-                observer(reason)
-            }
-        }) {
-            collect(subscription)
-        } else {
-            guard case let .some(.some(reason)) = finish else { return self }
-            executionContext.execute {
-                observer(reason)
-            }
-        }
-        return self
-    }
-
-    /// Handler used to observe finishing of this Signal either by ending or termination
-    /// (with or without error). It will be called immediately with given context if
-    /// signal already finished.
-    ///
-    /// - Parameter executionContext: Context used to execute handler.
-    /// - Parameter observer: Handler called when Signal finishes.
-    /// - Returns: Same Signal instance for eventual further chaining.
-    @discardableResult
-    func finished(inContext executionContext: ExecutionContext = .undefined, _ observer: @escaping () -> Void) -> Signal {
-        if let subscription = (subscribe { event in
-            guard case .finish = event else { return }
-            executionContext.execute {
-                observer()
-            }
-        }) {
-            collect(subscription)
-        } else {
-            guard case .some = finish else { return self }
-            executionContext.execute {
-                observer()
-            }
-        }
-        return self
-    }
-}

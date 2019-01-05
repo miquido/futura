@@ -17,7 +17,11 @@ internal class SignalForwarder<V1, V2>: Signal<V2> {
 
     internal init(source: Signal<V1>, collector: SubscriptionCollector?) {
         self.source = source
+        #if FUTURA_DEBUG
+        super.init(collector: collector, debug: source.debugMode.propagated)
+        #else
         super.init(collector: collector)
+        #endif
     }
 }
 

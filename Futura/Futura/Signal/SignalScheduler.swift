@@ -23,7 +23,11 @@ public extension Signal {
     /// transformations and handlers of new Signal.
     /// - Returns: New Signal instance operating on provided Worker.
     func `switch`(to worker: Worker) -> Signal<Value> {
-        return SignalScheduler(source: self, worker: worker)
+        let next: SignalScheduler = .init(source: self, worker: worker)
+        #if FUTURA_DEBUG
+            self.debugLog("+switch -> \(next.debugDescription)")
+        #endif
+        return next
     }
 }
 
@@ -33,7 +37,19 @@ internal final class SignalScheduler<Value>: SignalForwarder<Value, Value> {
     internal init(source: Signal<Value>, worker: Worker) {
         self.associatedWorker = worker
         super.init(source: source, collector: source.collector)
-        source.forward(to: self)
+        #if FUTURA_DEBUG
+            self.collect(source.subscribe({ [weak source] event in
+                switch event {
+                    case let .token(token):
+                        self.broadcast(token)
+                    case let .finish(reason):
+                        self.finish(reason)
+                }
+                source?.debugLog("switch() -> \(self.debugDescription)")
+            }))
+        #else
+            source.forward(to: self)
+        #endif
     }
 
     internal override func broadcast(_ token: Token) {

@@ -35,6 +35,14 @@
 		40750C52217A423B00067852 /* StreamWorkLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40750C51217A423B00067852 /* StreamWorkLog.swift */; };
 		4075C52421624F8100B40806 /* TestWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4075C52321624F8100B40806 /* TestWorker.swift */; };
 		407AA544216E174F0030C433 /* Mutex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 407AA543216E174F0030C433 /* Mutex.swift */; };
+		409EB72C21E0CA50003814F8 /* DebugMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 409EB72B21E0CA50003814F8 /* DebugMode.swift */; };
+		409EB73021E0CACD003814F8 /* FuturaDebug.swift in Sources */ = {isa = PBXBuildFile; fileRef = 409EB72F21E0CACD003814F8 /* FuturaDebug.swift */; };
+		409EB73221E0D00B003814F8 /* Future+Handlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 409EB73121E0D00B003814F8 /* Future+Handlers.swift */; };
+		409EB73421E0D01A003814F8 /* Future+Transformations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 409EB73321E0D01A003814F8 /* Future+Transformations.swift */; };
+		409EB73621E0D026003814F8 /* Future+Zip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 409EB73521E0D026003814F8 /* Future+Zip.swift */; };
+		409EB73821E0D45E003814F8 /* Future+Debug.swift in Sources */ = {isa = PBXBuildFile; fileRef = 409EB73721E0D45E003814F8 /* Future+Debug.swift */; };
+		409EB73A21E0E721003814F8 /* Signal+Debug.swift in Sources */ = {isa = PBXBuildFile; fileRef = 409EB73921E0E721003814F8 /* Signal+Debug.swift */; };
+		409EB73C21E0E8F3003814F8 /* Signal+Handlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 409EB73B21E0E8F3003814F8 /* Signal+Handlers.swift */; };
 		40AFB89C216B72BC00ABB5BB /* FutureZipTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40AFB89B216B72BC00ABB5BB /* FutureZipTests.swift */; };
 		40DB891D21A98CCA001B8CE7 /* FutureWorkLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 408B60FB2163630300C1A948 /* FutureWorkLog.swift */; };
 /* End PBXBuildFile section */
@@ -90,6 +98,14 @@
 		4075C52321624F8100B40806 /* TestWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestWorker.swift; sourceTree = "<group>"; };
 		407AA543216E174F0030C433 /* Mutex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mutex.swift; sourceTree = "<group>"; };
 		408B60FB2163630300C1A948 /* FutureWorkLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureWorkLog.swift; sourceTree = "<group>"; };
+		409EB72B21E0CA50003814F8 /* DebugMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugMode.swift; sourceTree = "<group>"; };
+		409EB72F21E0CACD003814F8 /* FuturaDebug.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuturaDebug.swift; sourceTree = "<group>"; };
+		409EB73121E0D00B003814F8 /* Future+Handlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Future+Handlers.swift"; sourceTree = "<group>"; };
+		409EB73321E0D01A003814F8 /* Future+Transformations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Future+Transformations.swift"; sourceTree = "<group>"; };
+		409EB73521E0D026003814F8 /* Future+Zip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Future+Zip.swift"; sourceTree = "<group>"; };
+		409EB73721E0D45E003814F8 /* Future+Debug.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Future+Debug.swift"; sourceTree = "<group>"; };
+		409EB73921E0E721003814F8 /* Signal+Debug.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Signal+Debug.swift"; sourceTree = "<group>"; };
+		409EB73B21E0E8F3003814F8 /* Signal+Handlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Signal+Handlers.swift"; sourceTree = "<group>"; };
 		40AFB89B216B72BC00ABB5BB /* FutureZipTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureZipTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -127,6 +143,8 @@
 				40258CAA2175C44C008EE920 /* SubscriptionCollector.swift */,
 				40258CB42175C814008EE920 /* Emitter.swift */,
 				40258CA82175C40F008EE920 /* Signal.swift */,
+				409EB73B21E0E8F3003814F8 /* Signal+Handlers.swift */,
+				409EB73921E0E721003814F8 /* Signal+Debug.swift */,
 				40258CAC2175C60C008EE920 /* SignalForwarder.swift */,
 				40258CAE2175C64F008EE920 /* SignalMapper.swift */,
 				40258CB02175C6E5008EE920 /* SignalFlatMapper.swift */,
@@ -159,6 +177,7 @@
 		404B9491215A351100640928 /* Futura */ = {
 			isa = PBXGroup;
 			children = (
+				409EB72A21E0CA43003814F8 /* Debug */,
 				40258CA52175C3C4008EE920 /* Signal */,
 				407AA551216E48670030C433 /* Future */,
 				407AA555216E4CD60030C433 /* Synchronization */,
@@ -206,8 +225,12 @@
 		407AA551216E48670030C433 /* Future */ = {
 			isa = PBXGroup;
 			children = (
-				404B94AF215A356B00640928 /* Future.swift */,
 				404B94B7215A35E700640928 /* Promise.swift */,
+				404B94AF215A356B00640928 /* Future.swift */,
+				409EB73121E0D00B003814F8 /* Future+Handlers.swift */,
+				409EB73321E0D01A003814F8 /* Future+Transformations.swift */,
+				409EB73521E0D026003814F8 /* Future+Zip.swift */,
+				409EB73721E0D45E003814F8 /* Future+Debug.swift */,
 			);
 			path = Future;
 			sourceTree = "<group>";
@@ -230,6 +253,15 @@
 				404B94A9215A352D00640928 /* RecursiveLock.swift */,
 			);
 			path = Synchronization;
+			sourceTree = "<group>";
+		};
+		409EB72A21E0CA43003814F8 /* Debug */ = {
+			isa = PBXGroup;
+			children = (
+				409EB72B21E0CA50003814F8 /* DebugMode.swift */,
+				409EB72F21E0CACD003814F8 /* FuturaDebug.swift */,
+			);
+			path = Debug;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -372,20 +404,28 @@
 				40750C50217A3FFC00067852 /* SignalFilter.swift in Sources */,
 				40258CAB2175C44C008EE920 /* SubscriptionCollector.swift in Sources */,
 				40258CB52175C814008EE920 /* Emitter.swift in Sources */,
+				409EB72C21E0CA50003814F8 /* DebugMode.swift in Sources */,
 				404B94AC215A354000640928 /* Result.swift in Sources */,
 				404B94B4215A35AF00640928 /* Worker.swift in Sources */,
+				409EB73A21E0E721003814F8 /* Signal+Debug.swift in Sources */,
 				40258CA72175C406008EE920 /* Subscription.swift in Sources */,
 				404B94B2215A358900640928 /* ExecutionContext.swift in Sources */,
 				40258CB32175C7CE008EE920 /* SignalScheduler.swift in Sources */,
 				404B94B0215A356B00640928 /* Future.swift in Sources */,
 				40258CB12175C6E5008EE920 /* SignalFlatMapper.swift in Sources */,
 				40258CAF2175C64F008EE920 /* SignalMapper.swift in Sources */,
+				409EB73221E0D00B003814F8 /* Future+Handlers.swift in Sources */,
 				404B94B6215A35C700640928 /* DispatchQueueWorker.swift in Sources */,
 				40258CA92175C40F008EE920 /* Signal.swift in Sources */,
 				4004D27621A837EB0036426D /* OperationQueueWorker.swift in Sources */,
 				40258CAD2175C60C008EE920 /* SignalForwarder.swift in Sources */,
 				404B94AA215A352D00640928 /* RecursiveLock.swift in Sources */,
 				404B94B8215A35E700640928 /* Promise.swift in Sources */,
+				409EB73621E0D026003814F8 /* Future+Zip.swift in Sources */,
+				409EB73C21E0E8F3003814F8 /* Signal+Handlers.swift in Sources */,
+				409EB73021E0CACD003814F8 /* FuturaDebug.swift in Sources */,
+				409EB73821E0D45E003814F8 /* Future+Debug.swift in Sources */,
+				409EB73421E0D01A003814F8 /* Future+Transformations.swift in Sources */,
 				407AA544216E174F0030C433 /* Mutex.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

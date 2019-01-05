@@ -1,6 +1,8 @@
 import Foundation
 import Futura
 
+FuturaDebug.logger = { print($0) }
+
 enum Errors: Error {
     case invalidState
     case noData
@@ -32,6 +34,7 @@ extension String {
 
 let githubRequest = URLRequest(url: URL(string: "https://www.github.com")!)
 make(request: githubRequest)
+    .debug(.propagated)
     .map { (_, data) -> Data in
         guard let data = data else {
             throw Errors.noData
@@ -64,6 +67,7 @@ struct SomeDecodable: Decodable {
 let jsonRequest = URLRequest(url: URL(string: "https://www.somejson.com/json")!)
 
 make(request: jsonRequest)
+    .debug(.single)
     .map { (_, data) -> Data in
         guard let data = data else {
             throw Errors.noData
@@ -200,6 +204,7 @@ button.setTitle("BUTTON", for: .normal)
 view.addSubview(button)
 
 textField.signal.text
+    .debug(.propagated)
     .map(validateNotEmpty)
     .map(convertToURL)
     .flatMap { url in
