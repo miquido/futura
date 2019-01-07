@@ -184,6 +184,16 @@ class FutureZipTests: XCTestCase {
         XCTAssertEqual(worker.execute(), 1)
         XCTAssertEqual(workLog, [.always])
     }
+    
+    func testShouldHandleValue_UsingEmptyArray() {
+        zip([] as [Future<Int>])
+            .logResults(with: workLog)
+        XCTAssert(worker.isEmpty)
+        
+        XCTAssertEqual(worker.execute(), 0)
+        
+        XCTAssertEqual(workLog, [.value(testDescription(of: [] as [Int])), .resulted, .always])
+    }
 
     func testShouldHandleValue_WhenCompletingWithValueOnBoth_UsingArray() {
         zip([promise_1.future, promise_2.future])
