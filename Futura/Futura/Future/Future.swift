@@ -377,8 +377,9 @@ public func zip<T, U>(_ f1: Future<T>, _ f2: Future<U>) -> Future<(T, U)> {
 /// Result Future will fail or become canceled if any of provided Futures fails or becomes canceled without waiting for other results.
 ///
 /// - Parameter futures: Array of Futures to zip.
-/// - Returns: New Future instance with that is combination of all Futures.
+/// - Returns: New Future instance with that is combination of all Futures. If input array is empty it returns succeeded future with empty array as result.
 public func zip<T>(_ futures: [Future<T>]) -> Future<[T]> {
+    guard !futures.isEmpty else { return .init(succeededWith: [], executionContext: .undefined) }
     let zippedFuture = Future<[T]>(executionContext: .undefined)
     let lock: RecursiveLock = .init()
     let count: Int = futures.count
