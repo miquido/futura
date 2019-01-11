@@ -50,6 +50,7 @@ internal final class SignalScheduler<Value>: SignalForwarder<Value, Value> {
     internal override func finish(_ reason: Error? = nil) {
         Mutex.lock(mtx)
         defer { Mutex.unlock(mtx) }
+        guard !self.isFinished else { return }
         let subscribersCache = subscribers
         let collectorCache = internalCollector
         // cache to ensure execution if signal was
