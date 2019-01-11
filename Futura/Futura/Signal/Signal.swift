@@ -141,7 +141,18 @@ public extension Signal {
         return self
     }
     
-    #warning("TODO: add tokens handler - either value or error without reference")
+    /// Handler used to observe all tokens passed through this Signal instance.
+    ///
+    /// - Parameter observer: Handler called every time Signal gets any token.
+    /// - Returns: Same Signal instance for eventual further chaining.
+    @discardableResult
+    func tokens(_ observer: @escaping () -> Void) -> Signal {
+        collect(subscribe { event in
+            guard case .token = event else { return }
+            observer()
+        })
+        return self
+    }
     
     /// Handler used to observe finishing of this Signal by ending (without error).
     /// It will be called immediately with given context if

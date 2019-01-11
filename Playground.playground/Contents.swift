@@ -277,18 +277,13 @@ textField.signal.text
     .flatMap { url in
         return button.signal.tap.map { url }
     }
-    .map(callURL)
+    .flatMapFuture(callURL)
+    .map(decodeAsString)
     .values {
-        $0.map(decodeAsString)
-            .value {
-                print("Network result:\n \($0)")
-            }
-            .error {
-                print("Network error: \($0)")
-            }
+        print("Network result:\n \($0)")
     }
     .errors {
-        print("Error: \($0)")
+        print("Network error: \($0)")
     }
 
 PlaygroundPage.current.liveView = view

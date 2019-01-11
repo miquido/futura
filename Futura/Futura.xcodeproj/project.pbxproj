@@ -37,6 +37,8 @@
 		407AA544216E174F0030C433 /* Mutex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 407AA543216E174F0030C433 /* Mutex.swift */; };
 		40AFB89C216B72BC00ABB5BB /* FutureZipTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40AFB89B216B72BC00ABB5BB /* FutureZipTests.swift */; };
 		40DB891D21A98CCA001B8CE7 /* FutureWorkLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 408B60FB2163630300C1A948 /* FutureWorkLog.swift */; };
+		40F3C29421E8DEBF006AB7CB /* SignalMerger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40F3C29321E8DEBF006AB7CB /* SignalMerger.swift */; };
+		40F3C29621E8EAE6006AB7CB /* SignalFutureFlatMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40F3C29521E8EAE6006AB7CB /* SignalFutureFlatMapper.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -91,6 +93,8 @@
 		407AA543216E174F0030C433 /* Mutex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mutex.swift; sourceTree = "<group>"; };
 		408B60FB2163630300C1A948 /* FutureWorkLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureWorkLog.swift; sourceTree = "<group>"; };
 		40AFB89B216B72BC00ABB5BB /* FutureZipTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureZipTests.swift; sourceTree = "<group>"; };
+		40F3C29321E8DEBF006AB7CB /* SignalMerger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalMerger.swift; sourceTree = "<group>"; };
+		40F3C29521E8EAE6006AB7CB /* SignalFutureFlatMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalFutureFlatMapper.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -130,8 +134,10 @@
 				40258CAC2175C60C008EE920 /* SignalForwarder.swift */,
 				40258CAE2175C64F008EE920 /* SignalMapper.swift */,
 				40258CB02175C6E5008EE920 /* SignalFlatMapper.swift */,
+				40F3C29521E8EAE6006AB7CB /* SignalFutureFlatMapper.swift */,
 				40750C4F217A3FFC00067852 /* SignalFilter.swift */,
 				40258CB22175C7CE008EE920 /* SignalScheduler.swift */,
+				40F3C29321E8DEBF006AB7CB /* SignalMerger.swift */,
 			);
 			path = Signal;
 			sourceTree = "<group>";
@@ -373,6 +379,7 @@
 				40258CAB2175C44C008EE920 /* SubscriptionCollector.swift in Sources */,
 				40258CB52175C814008EE920 /* Emitter.swift in Sources */,
 				404B94AC215A354000640928 /* Result.swift in Sources */,
+				40F3C29421E8DEBF006AB7CB /* SignalMerger.swift in Sources */,
 				404B94B4215A35AF00640928 /* Worker.swift in Sources */,
 				40258CA72175C406008EE920 /* Subscription.swift in Sources */,
 				404B94B2215A358900640928 /* ExecutionContext.swift in Sources */,
@@ -380,6 +387,7 @@
 				404B94B0215A356B00640928 /* Future.swift in Sources */,
 				40258CB12175C6E5008EE920 /* SignalFlatMapper.swift in Sources */,
 				40258CAF2175C64F008EE920 /* SignalMapper.swift in Sources */,
+				40F3C29621E8EAE6006AB7CB /* SignalFutureFlatMapper.swift in Sources */,
 				404B94B6215A35C700640928 /* DispatchQueueWorker.swift in Sources */,
 				40258CA92175C40F008EE920 /* Signal.swift in Sources */,
 				4004D27621A837EB0036426D /* OperationQueueWorker.swift in Sources */,
