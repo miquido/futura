@@ -37,6 +37,7 @@
 		407AA544216E174F0030C433 /* Mutex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 407AA543216E174F0030C433 /* Mutex.swift */; };
 		40AFB89C216B72BC00ABB5BB /* FutureZipTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40AFB89B216B72BC00ABB5BB /* FutureZipTests.swift */; };
 		40DB891D21A98CCA001B8CE7 /* FutureWorkLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 408B60FB2163630300C1A948 /* FutureWorkLog.swift */; };
+		40F3C29021E889A6006AB7CB /* SignalMixer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40F3C28F21E889A6006AB7CB /* SignalMixer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -91,6 +92,7 @@
 		407AA543216E174F0030C433 /* Mutex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mutex.swift; sourceTree = "<group>"; };
 		408B60FB2163630300C1A948 /* FutureWorkLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureWorkLog.swift; sourceTree = "<group>"; };
 		40AFB89B216B72BC00ABB5BB /* FutureZipTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureZipTests.swift; sourceTree = "<group>"; };
+		40F3C28F21E889A6006AB7CB /* SignalMixer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalMixer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -132,6 +134,7 @@
 				40258CB02175C6E5008EE920 /* SignalFlatMapper.swift */,
 				40750C4F217A3FFC00067852 /* SignalFilter.swift */,
 				40258CB22175C7CE008EE920 /* SignalScheduler.swift */,
+				40F3C28F21E889A6006AB7CB /* SignalMixer.swift */,
 			);
 			path = Signal;
 			sourceTree = "<group>";
@@ -380,6 +383,7 @@
 				404B94B0215A356B00640928 /* Future.swift in Sources */,
 				40258CB12175C6E5008EE920 /* SignalFlatMapper.swift in Sources */,
 				40258CAF2175C64F008EE920 /* SignalMapper.swift in Sources */,
+				40F3C29021E889A6006AB7CB /* SignalMixer.swift in Sources */,
 				404B94B6215A35C700640928 /* DispatchQueueWorker.swift in Sources */,
 				40258CA92175C40F008EE920 /* Signal.swift in Sources */,
 				4004D27621A837EB0036426D /* OperationQueueWorker.swift in Sources */,
