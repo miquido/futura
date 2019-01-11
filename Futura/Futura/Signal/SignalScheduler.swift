@@ -29,30 +29,52 @@ public extension Signal {
 
 internal final class SignalScheduler<Value>: SignalForwarder<Value, Value> {
     private let associatedWorker: Worker
-
+    
     internal init(source: Signal<Value>, worker: Worker) {
         self.associatedWorker = worker
         super.init(source: source, collector: source.collector)
         source.forward(to: self)
     }
-
+    
     internal override func broadcast(_ token: Token) {
-        Mutex.lock(mtx)
-        defer { Mutex.unlock(mtx) }
-        associatedWorker.schedule {
-            self.subscribers.forEach { $0.1.recieve(.token(token)) }
+        associatedWorker.schedule { [weak self] in
+            guard let self = self else { return }
+            Mutex.lock(self.mtx)
+            defer { Mutex.unlock(self.mtx) }
+            for (_, subscriber) in self.subscribers {
+                subscriber.recieve(.token(token))
+            }
         }
     }
-
+    
     internal override func finish(_ reason: Error? = nil) {
         Mutex.lock(mtx)
         defer { Mutex.unlock(mtx) }
-        associatedWorker.schedule {
-            self.subscribers.forEach { $0.1.recieve(.finish(reason)) }
-            self.finish = .some(reason)
-            let sub = self.subscribers
-            // cache until end of scope to prevent deallocation of subscribers while making changes in subscribers dictionary - prevents crash
-            self.subscribers = .init()
+        guard !self.isFinished else { return }
+        let subscribersCache = subscribers
+        let collectorCache = internalCollector
+        // cache to ensure execution if signal was
+        // deallocated in the mean time
+        associatedWorker.schedule { [weak self] in
+            if let self = self {
+                Mutex.lock(self.mtx)
+                defer { Mutex.unlock(self.mtx) }
+                guard !self.isFinished else { return }
+                self.finish = .some(reason)
+                for (_, subscriber) in self.subscribers {
+                    subscriber.recieve(.finish(reason))
+                }
+                let sub = self.subscribers
+                // cache until end of scope to prevent deallocation of subscribers while making changes in subscribers dictionary - prevents crash
+                self.subscribers = .init()
+            } else {
+                for (_, subscriber) in subscribersCache {
+                    subscriber.recieve(.finish(reason))
+                }
+                collectorCache.deactivate()
+            }
+            
         }
     }
+    
 }

@@ -21,28 +21,26 @@
 /// passed before observation will never occour.
 public class Signal<Value> {
     internal typealias Token = Result<Value>
-
+    
     private var subscriptionID: Subscription.ID = 0
-    private let privateCollector: SubscriptionCollector = .init()
-
+    internal let internalCollector: SubscriptionCollector = .init()
+    
     internal let mtx: Mutex.Pointer = Mutex.make(recursive: true)
     internal var subscribers: [(id: Subscription.ID, subscriber: Subscriber<Value>)] = .init()
     internal weak var collector: SubscriptionCollector?
     internal var finish: Error??
     internal var isFinished: Bool {
-        Mutex.lock(mtx)
-        defer { Mutex.unlock(mtx) }
         if case .some = finish {
             return true
         } else {
             return false
         }
     }
-
+    
     internal init(collector: SubscriptionCollector?) {
         self.collector = collector
     }
-
+    
     internal func subscribe(_ body: @escaping (Event) -> Void) -> Subscription? {
         Mutex.lock(mtx)
         defer { Mutex.unlock(mtx) }
@@ -51,34 +49,39 @@ public class Signal<Value> {
         let subscriber: Subscriber<Value> = .init(body: body)
         let subscription: Subscription = .init(deactivation: { [weak subscriber] in
             subscriber?.deactivate()
-        }, unsubscribtion: { [weak self] in
-            guard let self = self else { return }
-            Mutex.lock(self.mtx)
-            defer { Mutex.unlock(self.mtx) }
-            if let idx = self.subscribers.firstIndex(where: { $0.id == id }) {
-                self.subscribers.remove(at: idx)
-            } else { /* do nothing */ }
+            }, unsubscribtion: { [weak self] in
+                guard let self = self else { return }
+                Mutex.lock(self.mtx)
+                defer { Mutex.unlock(self.mtx) }
+                if let idx = self.subscribers.firstIndex(where: { $0.id == id }) {
+                    self.subscribers.remove(at: idx)
+                } else { /* do nothing */ }
         })
         subscribers.append((id: id, subscriber: subscriber))
         return subscription
     }
-
+    
     internal func broadcast(_ token: Token) {
         Mutex.lock(mtx)
         defer { Mutex.unlock(mtx) }
-        subscribers.forEach { $0.1.recieve(.token(token)) }
+        for (_, subscriber) in self.subscribers {
+            subscriber.recieve(.token(token))
+        }
     }
-
+    
     internal func finish(_ reason: Error? = nil) {
         Mutex.lock(mtx)
         defer { Mutex.unlock(mtx) }
-        subscribers.forEach { $0.1.recieve(.finish(reason)) }
+        guard !isFinished else { return }
         finish = .some(reason)
+        for (_, subscriber) in subscribers {
+            subscriber.recieve(.finish(reason))
+        }
         let sub = subscribers
         // cache until end of scope to prevent deallocation of subscribers while making changes in subscribers dictionary - prevents crash
         subscribers = .init()
     }
-
+    
     internal func collect(_ subscribtion: Subscription?) {
         Mutex.lock(mtx)
         defer { Mutex.unlock(mtx) }
@@ -86,10 +89,10 @@ public class Signal<Value> {
         if let collector = collector {
             collector.collect(subscribtion)
         } else {
-            privateCollector.collect(subscribtion)
+            internalCollector.collect(subscribtion)
         }
     }
-
+    
     deinit {
         finish()
         Mutex.destroy(mtx)
@@ -100,6 +103,14 @@ extension Signal {
     internal enum Event {
         case token(Token)
         case finish(Error?)
+    }
+}
+
+extension Signal {
+    
+    /// Returns new Signal instance than never emits
+    public static var never: Signal<Value> {
+        return Emitter<Value>().signal
     }
 }
 
@@ -116,7 +127,7 @@ public extension Signal {
         })
         return self
     }
-
+    
     /// Handler used to observe errors passed through this Signal instance.
     ///
     /// - Parameter observer: Handler called every time Signal gets error.
@@ -129,9 +140,9 @@ public extension Signal {
         })
         return self
     }
-
+    
     #warning("TODO: add tokens handler - either value or error without reference")
-
+    
     /// Handler used to observe finishing of this Signal by ending (without error).
     /// It will be called immediately with given context if
     /// signal already ended.
@@ -156,7 +167,7 @@ public extension Signal {
         }
         return self
     }
-
+    
     /// Handler used to observe finishing of this Signal by termination (with error).
     /// It will be called immediately with given context if
     /// signal already terminated.
@@ -181,7 +192,7 @@ public extension Signal {
         }
         return self
     }
-
+    
     /// Handler used to observe finishing of this Signal either by ending or termination
     /// (with or without error). It will be called immediately with given context if
     /// signal already finished.

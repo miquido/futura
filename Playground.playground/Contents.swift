@@ -80,33 +80,104 @@ make(request: jsonRequest)
 
 import UIKit
 
-var buttonTapKey: Int = 0
-private class ClosureHolder<T> {
-    let closure: (T?) -> Void
-
-    init(_ closure: @escaping (T?) -> Void) {
-        self.closure = closure
-    }
-
-    @objc
-    func invoke(with any: Any) {
-        closure(any as? T)
-    }
-}
-
-struct SignalSource<Subject> {
-    let subject: Subject
-    init(subject: Subject) {
+public struct SignalSource<Subject> {
+    internal let subject: Subject
+    internal init(subject: Subject) {
         self.subject = subject
     }
 }
 
-extension UIButton {
+internal class ClosureHolder<T> {
+    private let closure: (T?) -> Void
+    
+    internal init(_ closure: @escaping (T?) -> Void) {
+        self.closure = closure
+    }
+    
+    @objc
+    internal func invoke(with any: Any) {
+        closure(any as? T)
+    }
+}
+
+internal class CleanupHolder {
+    private let closure: () -> Void
+    
+    internal init(_ closure: @escaping () -> Void) {
+        self.closure = closure
+    }
+    
+    deinit {
+        closure()
+    }
+}
+
+internal func swizzleInstance(method originalSelector: Selector, with swizzledSelector: Selector, for classType: AnyClass) {
+    guard let originalMethod = class_getInstanceMethod(classType, originalSelector),
+        let swizzledMethod = class_getInstanceMethod(classType, swizzledSelector) else {
+            return
+    }
+    
+    let added = class_addMethod(classType,
+                                originalSelector,
+                                method_getImplementation(swizzledMethod),
+                                method_getTypeEncoding(swizzledMethod))
+    if added {
+        class_replaceMethod(classType,
+                            swizzledSelector,
+                            method_getImplementation(originalMethod),
+                            method_getTypeEncoding(originalMethod))
+    } else {
+        method_exchangeImplementations(originalMethod, swizzledMethod)
+    }
+}
+public extension UIViewController {
+    var signal: SignalSource<UIViewController> { return .init(subject: self) }
+}
+
+fileprivate extension UIViewController {
+    static var swizzle: Void = {
+        swizzleInstance(method: #selector(UIViewController.viewWillAppear(_:)), with: #selector(UIViewController.swizzle_viewWillAppear(_:)), for: UIViewController.self)
+        swizzleInstance(method: #selector(UIViewController.viewWillDisappear(_:)), with: #selector(UIViewController.swizzle_viewWillDisappear(_:)), for: UIViewController.self)
+    }()
+    
+    @objc func swizzle_viewWillAppear(_ animated: Bool) {
+        self.swizzle_viewWillAppear(animated)
+        self.signal.visibilityEmitter.emit(true)
+    }
+    
+    @objc func swizzle_viewWillDisappear(_ animated: Bool) {
+        self.swizzle_viewWillDisappear(animated)
+        self.signal.visibilityEmitter.emit(false)
+    }
+}
+
+fileprivate var viewControllerVisibilityKey: Int = 0
+extension SignalSource where Subject: UIViewController {
+    fileprivate var visibilityEmitter: Emitter<Bool> {
+        if let signal = objc_getAssociatedObject(subject, &viewControllerVisibilityKey) as? Emitter<Bool> {
+            return signal
+        } else {
+            _ = UIViewController.swizzle
+            let emitter: Emitter<Bool> = .init()
+            objc_setAssociatedObject(subject, &viewControllerVisibilityKey, emitter.signal, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            return emitter
+        }
+    }
+    
+    public var visibility: Signal<Bool> {
+        return visibilityEmitter.signal
+    }
+}
+
+
+public extension UIButton {
     var signal: SignalSource<UIButton> { return .init(subject: self) }
 }
 
+fileprivate var buttonTapKey: Int = 0
 extension SignalSource where Subject: UIButton {
-    var tap: Signal<Void> {
+    public var tap: Signal<Void> {
         if let signal = objc_getAssociatedObject(subject, &buttonTapKey) as? Emitter<Void> {
             return signal
         } else {
@@ -122,18 +193,19 @@ extension SignalSource where Subject: UIButton {
     }
 }
 
-extension UITextField {
+public extension UITextField {
     var signal: SignalSource<UITextField> { return .init(subject: self) }
 }
 
+fileprivate var textFieldChangeKey: Int = 0
 extension SignalSource where Subject: UITextField {
-    var text: Signal<String> {
-        if let signal = objc_getAssociatedObject(subject, &buttonTapKey) as? Emitter<String> {
+    public var text: Signal<String> {
+        if let signal = objc_getAssociatedObject(subject, &textFieldChangeKey) as? Emitter<String> {
             return signal
         } else {
             let emitter: Emitter<String> = .init()
-            objc_setAssociatedObject(subject, &buttonTapKey, emitter.signal, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-
+            objc_setAssociatedObject(subject, &textFieldChangeKey, emitter.signal, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            
             let closureHolder = ClosureHolder<UITextField> {
                 emitter.emit($0?.text ?? "")
             }

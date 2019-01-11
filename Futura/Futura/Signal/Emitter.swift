@@ -69,3 +69,11 @@ public final class Emitter<Value>: Signal<Value> {
         return self
     }
 }
+
+extension Emitter where Value == Void {
+    
+    /// Shortcut for emiting Void values
+    public func emit() {
+        self.emit(())
+    }
+}
