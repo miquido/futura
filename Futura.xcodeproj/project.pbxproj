@@ -1,0 +1,739 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXAggregateTarget section */
+		"Futura::FuturaPackageTests::ProductTarget" /* FuturaPackageTests */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = OBJ_85 /* Build configuration list for PBXAggregateTarget "FuturaPackageTests" */;
+			buildPhases = (
+			);
+			dependencies = (
+				OBJ_88 /* PBXTargetDependency */,
+				OBJ_90 /* PBXTargetDependency */,
+			);
+			name = FuturaPackageTests;
+			productName = FuturaPackageTests;
+		};
+/* End PBXAggregateTarget section */
+
+/* Begin PBXBuildFile section */
+		OBJ_104 /* FutureZipTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_37 /* FutureZipTests.swift */; };
+		OBJ_105 /* PromiseAndFutureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_38 /* PromiseAndFutureTests.swift */; };
+		OBJ_106 /* RecursiveLockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_39 /* RecursiveLockTests.swift */; };
+		OBJ_107 /* SignalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_40 /* SignalTests.swift */; };
+		OBJ_108 /* FuturaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_42 /* FuturaTests.swift */; };
+		OBJ_109 /* FutureWorkLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_43 /* FutureWorkLog.swift */; };
+		OBJ_110 /* StreamWorkLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_44 /* StreamWorkLog.swift */; };
+		OBJ_111 /* TestWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_45 /* TestWorker.swift */; };
+		OBJ_112 /* WorkerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_46 /* WorkerTests.swift */; };
+		OBJ_115 /* Futura.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Futura::Futura::Product" /* Futura.framework */; };
+		OBJ_57 /* Future.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_10 /* Future.swift */; };
+		OBJ_58 /* Promise.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_11 /* Promise.swift */; };
+		OBJ_59 /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_12 /* Result.swift */; };
+		OBJ_60 /* Emitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_14 /* Emitter.swift */; };
+		OBJ_61 /* Signal.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_15 /* Signal.swift */; };
+		OBJ_62 /* SignalFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_16 /* SignalFilter.swift */; };
+		OBJ_63 /* SignalFlatMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_17 /* SignalFlatMapper.swift */; };
+		OBJ_64 /* SignalForwarder.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_18 /* SignalForwarder.swift */; };
+		OBJ_65 /* SignalFutureFlatMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_19 /* SignalFutureFlatMapper.swift */; };
+		OBJ_66 /* SignalMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_20 /* SignalMapper.swift */; };
+		OBJ_67 /* SignalMerger.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_21 /* SignalMerger.swift */; };
+		OBJ_68 /* SignalScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_22 /* SignalScheduler.swift */; };
+		OBJ_69 /* Subscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_23 /* Subscription.swift */; };
+		OBJ_70 /* SubscriptionCollector.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_24 /* SubscriptionCollector.swift */; };
+		OBJ_71 /* Mutex.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_26 /* Mutex.swift */; };
+		OBJ_72 /* RecursiveLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_27 /* RecursiveLock.swift */; };
+		OBJ_73 /* DispatchQueueWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_29 /* DispatchQueueWorker.swift */; };
+		OBJ_74 /* ExecutionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_30 /* ExecutionContext.swift */; };
+		OBJ_75 /* OperationQueueWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_31 /* OperationQueueWorker.swift */; };
+		OBJ_76 /* Worker.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_32 /* Worker.swift */; };
+		OBJ_83 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_6 /* Package.swift */; };
+		OBJ_96 /* FuturaPerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_35 /* FuturaPerformanceTests.swift */; };
+		OBJ_98 /* Futura.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Futura::Futura::Product" /* Futura.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		40F304AB21E9F996000C730E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = OBJ_1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = "Futura::Futura";
+			remoteInfo = Futura;
+		};
+		40F304AC21E9F996000C730E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = OBJ_1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = "Futura::Futura";
+			remoteInfo = Futura;
+		};
+		40F304AD21E9F996000C730E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = OBJ_1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = "Futura::FuturaPerformanceTests";
+			remoteInfo = FuturaPerformanceTests;
+		};
+		40F304AE21E9F996000C730E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = OBJ_1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = "Futura::FuturaTests";
+			remoteInfo = FuturaTests;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		"Futura::Futura::Product" /* Futura.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Futura.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		"Futura::FuturaPerformanceTests::Product" /* FuturaPerformanceTests.xctest */ = {isa = PBXFileReference; lastKnownFileType = file; path = FuturaPerformanceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		"Futura::FuturaTests::Product" /* FuturaTests.xctest */ = {isa = PBXFileReference; lastKnownFileType = file; path = FuturaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		OBJ_10 /* Future.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Future.swift; sourceTree = "<group>"; };
+		OBJ_11 /* Promise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Promise.swift; sourceTree = "<group>"; };
+		OBJ_12 /* Result.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
+		OBJ_14 /* Emitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Emitter.swift; sourceTree = "<group>"; };
+		OBJ_15 /* Signal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Signal.swift; sourceTree = "<group>"; };
+		OBJ_16 /* SignalFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalFilter.swift; sourceTree = "<group>"; };
+		OBJ_17 /* SignalFlatMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalFlatMapper.swift; sourceTree = "<group>"; };
+		OBJ_18 /* SignalForwarder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalForwarder.swift; sourceTree = "<group>"; };
+		OBJ_19 /* SignalFutureFlatMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalFutureFlatMapper.swift; sourceTree = "<group>"; };
+		OBJ_20 /* SignalMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalMapper.swift; sourceTree = "<group>"; };
+		OBJ_21 /* SignalMerger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalMerger.swift; sourceTree = "<group>"; };
+		OBJ_22 /* SignalScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalScheduler.swift; sourceTree = "<group>"; };
+		OBJ_23 /* Subscription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Subscription.swift; sourceTree = "<group>"; };
+		OBJ_24 /* SubscriptionCollector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionCollector.swift; sourceTree = "<group>"; };
+		OBJ_26 /* Mutex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mutex.swift; sourceTree = "<group>"; };
+		OBJ_27 /* RecursiveLock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecursiveLock.swift; sourceTree = "<group>"; };
+		OBJ_29 /* DispatchQueueWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DispatchQueueWorker.swift; sourceTree = "<group>"; };
+		OBJ_30 /* ExecutionContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExecutionContext.swift; sourceTree = "<group>"; };
+		OBJ_31 /* OperationQueueWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationQueueWorker.swift; sourceTree = "<group>"; };
+		OBJ_32 /* Worker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Worker.swift; sourceTree = "<group>"; };
+		OBJ_35 /* FuturaPerformanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuturaPerformanceTests.swift; sourceTree = "<group>"; };
+		OBJ_37 /* FutureZipTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureZipTests.swift; sourceTree = "<group>"; };
+		OBJ_38 /* PromiseAndFutureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromiseAndFutureTests.swift; sourceTree = "<group>"; };
+		OBJ_39 /* RecursiveLockTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecursiveLockTests.swift; sourceTree = "<group>"; };
+		OBJ_40 /* SignalTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalTests.swift; sourceTree = "<group>"; };
+		OBJ_42 /* FuturaTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuturaTests.swift; sourceTree = "<group>"; };
+		OBJ_43 /* FutureWorkLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureWorkLog.swift; sourceTree = "<group>"; };
+		OBJ_44 /* StreamWorkLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamWorkLog.swift; sourceTree = "<group>"; };
+		OBJ_45 /* TestWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestWorker.swift; sourceTree = "<group>"; };
+		OBJ_46 /* WorkerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkerTests.swift; sourceTree = "<group>"; };
+		OBJ_6 /* Package.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		OBJ_114 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 0;
+			files = (
+				OBJ_115 /* Futura.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		OBJ_77 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		OBJ_97 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 0;
+			files = (
+				OBJ_98 /* Futura.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		OBJ_13 /* Signal */ = {
+			isa = PBXGroup;
+			children = (
+				OBJ_14 /* Emitter.swift */,
+				OBJ_15 /* Signal.swift */,
+				OBJ_16 /* SignalFilter.swift */,
+				OBJ_17 /* SignalFlatMapper.swift */,
+				OBJ_18 /* SignalForwarder.swift */,
+				OBJ_19 /* SignalFutureFlatMapper.swift */,
+				OBJ_20 /* SignalMapper.swift */,
+				OBJ_21 /* SignalMerger.swift */,
+				OBJ_22 /* SignalScheduler.swift */,
+				OBJ_23 /* Subscription.swift */,
+				OBJ_24 /* SubscriptionCollector.swift */,
+			);
+			path = Signal;
+			sourceTree = "<group>";
+		};
+		OBJ_25 /* Synchronization */ = {
+			isa = PBXGroup;
+			children = (
+				OBJ_26 /* Mutex.swift */,
+				OBJ_27 /* RecursiveLock.swift */,
+			);
+			path = Synchronization;
+			sourceTree = "<group>";
+		};
+		OBJ_28 /* Worker */ = {
+			isa = PBXGroup;
+			children = (
+				OBJ_29 /* DispatchQueueWorker.swift */,
+				OBJ_30 /* ExecutionContext.swift */,
+				OBJ_31 /* OperationQueueWorker.swift */,
+				OBJ_32 /* Worker.swift */,
+			);
+			path = Worker;
+			sourceTree = "<group>";
+		};
+		OBJ_33 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				OBJ_34 /* FuturaPerformanceTests */,
+				OBJ_36 /* FuturaTests */,
+			);
+			name = Tests;
+			sourceTree = SOURCE_ROOT;
+		};
+		OBJ_34 /* FuturaPerformanceTests */ = {
+			isa = PBXGroup;
+			children = (
+				OBJ_35 /* FuturaPerformanceTests.swift */,
+			);
+			name = FuturaPerformanceTests;
+			path = Tests/FuturaPerformanceTests;
+			sourceTree = SOURCE_ROOT;
+		};
+		OBJ_36 /* FuturaTests */ = {
+			isa = PBXGroup;
+			children = (
+				OBJ_41 /* Support */,
+				OBJ_37 /* FutureZipTests.swift */,
+				OBJ_38 /* PromiseAndFutureTests.swift */,
+				OBJ_39 /* RecursiveLockTests.swift */,
+				OBJ_40 /* SignalTests.swift */,
+				OBJ_46 /* WorkerTests.swift */,
+			);
+			name = FuturaTests;
+			path = Tests/FuturaTests;
+			sourceTree = SOURCE_ROOT;
+		};
+		OBJ_41 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				OBJ_42 /* FuturaTests.swift */,
+				OBJ_43 /* FutureWorkLog.swift */,
+				OBJ_44 /* StreamWorkLog.swift */,
+				OBJ_45 /* TestWorker.swift */,
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
+		OBJ_48 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				"Futura::FuturaTests::Product" /* FuturaTests.xctest */,
+				"Futura::FuturaPerformanceTests::Product" /* FuturaPerformanceTests.xctest */,
+				"Futura::Futura::Product" /* Futura.framework */,
+			);
+			name = Products;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		OBJ_5 /*  */ = {
+			isa = PBXGroup;
+			children = (
+				OBJ_6 /* Package.swift */,
+				OBJ_7 /* Sources */,
+				OBJ_33 /* Tests */,
+				OBJ_48 /* Products */,
+			);
+			name = "";
+			sourceTree = "<group>";
+		};
+		OBJ_7 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				OBJ_8 /* Futura */,
+			);
+			name = Sources;
+			sourceTree = SOURCE_ROOT;
+		};
+		OBJ_8 /* Futura */ = {
+			isa = PBXGroup;
+			children = (
+				OBJ_12 /* Result.swift */,
+				OBJ_9 /* Future */,
+				OBJ_13 /* Signal */,
+				OBJ_25 /* Synchronization */,
+				OBJ_28 /* Worker */,
+			);
+			name = Futura;
+			path = Sources/Futura;
+			sourceTree = SOURCE_ROOT;
+		};
+		OBJ_9 /* Future */ = {
+			isa = PBXGroup;
+			children = (
+				OBJ_10 /* Future.swift */,
+				OBJ_11 /* Promise.swift */,
+			);
+			path = Future;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		"Futura::Futura" /* Futura */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = OBJ_53 /* Build configuration list for PBXNativeTarget "Futura" */;
+			buildPhases = (
+				OBJ_56 /* Sources */,
+				OBJ_77 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Futura;
+			productName = Futura;
+			productReference = "Futura::Futura::Product" /* Futura.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		"Futura::FuturaPerformanceTests" /* FuturaPerformanceTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = OBJ_92 /* Build configuration list for PBXNativeTarget "FuturaPerformanceTests" */;
+			buildPhases = (
+				OBJ_95 /* Sources */,
+				OBJ_97 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				OBJ_99 /* PBXTargetDependency */,
+			);
+			name = FuturaPerformanceTests;
+			productName = FuturaPerformanceTests;
+			productReference = "Futura::FuturaPerformanceTests::Product" /* FuturaPerformanceTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		"Futura::FuturaTests" /* FuturaTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = OBJ_100 /* Build configuration list for PBXNativeTarget "FuturaTests" */;
+			buildPhases = (
+				OBJ_103 /* Sources */,
+				OBJ_114 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				OBJ_116 /* PBXTargetDependency */,
+			);
+			name = FuturaTests;
+			productName = FuturaTests;
+			productReference = "Futura::FuturaTests::Product" /* FuturaTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		"Futura::SwiftPMPackageDescription" /* FuturaPackageDescription */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = OBJ_79 /* Build configuration list for PBXNativeTarget "FuturaPackageDescription" */;
+			buildPhases = (
+				OBJ_82 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FuturaPackageDescription;
+			productName = FuturaPackageDescription;
+			productType = "com.apple.product-type.framework";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		OBJ_1 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 9999;
+			};
+			buildConfigurationList = OBJ_2 /* Build configuration list for PBXProject "Futura" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = OBJ_5 /*  */;
+			productRefGroup = OBJ_48 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				"Futura::Futura" /* Futura */,
+				"Futura::SwiftPMPackageDescription" /* FuturaPackageDescription */,
+				"Futura::FuturaPackageTests::ProductTarget" /* FuturaPackageTests */,
+				"Futura::FuturaPerformanceTests" /* FuturaPerformanceTests */,
+				"Futura::FuturaTests" /* FuturaTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		OBJ_103 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 0;
+			files = (
+				OBJ_104 /* FutureZipTests.swift in Sources */,
+				OBJ_105 /* PromiseAndFutureTests.swift in Sources */,
+				OBJ_106 /* RecursiveLockTests.swift in Sources */,
+				OBJ_107 /* SignalTests.swift in Sources */,
+				OBJ_108 /* FuturaTests.swift in Sources */,
+				OBJ_109 /* FutureWorkLog.swift in Sources */,
+				OBJ_110 /* StreamWorkLog.swift in Sources */,
+				OBJ_111 /* TestWorker.swift in Sources */,
+				OBJ_112 /* WorkerTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		OBJ_56 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 0;
+			files = (
+				OBJ_57 /* Future.swift in Sources */,
+				OBJ_58 /* Promise.swift in Sources */,
+				OBJ_59 /* Result.swift in Sources */,
+				OBJ_60 /* Emitter.swift in Sources */,
+				OBJ_61 /* Signal.swift in Sources */,
+				OBJ_62 /* SignalFilter.swift in Sources */,
+				OBJ_63 /* SignalFlatMapper.swift in Sources */,
+				OBJ_64 /* SignalForwarder.swift in Sources */,
+				OBJ_65 /* SignalFutureFlatMapper.swift in Sources */,
+				OBJ_66 /* SignalMapper.swift in Sources */,
+				OBJ_67 /* SignalMerger.swift in Sources */,
+				OBJ_68 /* SignalScheduler.swift in Sources */,
+				OBJ_69 /* Subscription.swift in Sources */,
+				OBJ_70 /* SubscriptionCollector.swift in Sources */,
+				OBJ_71 /* Mutex.swift in Sources */,
+				OBJ_72 /* RecursiveLock.swift in Sources */,
+				OBJ_73 /* DispatchQueueWorker.swift in Sources */,
+				OBJ_74 /* ExecutionContext.swift in Sources */,
+				OBJ_75 /* OperationQueueWorker.swift in Sources */,
+				OBJ_76 /* Worker.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		OBJ_82 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 0;
+			files = (
+				OBJ_83 /* Package.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		OBJ_95 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 0;
+			files = (
+				OBJ_96 /* FuturaPerformanceTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		OBJ_116 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = "Futura::Futura" /* Futura */;
+			targetProxy = 40F304AB21E9F996000C730E /* PBXContainerItemProxy */;
+		};
+		OBJ_88 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = "Futura::FuturaPerformanceTests" /* FuturaPerformanceTests */;
+			targetProxy = 40F304AD21E9F996000C730E /* PBXContainerItemProxy */;
+		};
+		OBJ_90 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = "Futura::FuturaTests" /* FuturaTests */;
+			targetProxy = 40F304AE21E9F996000C730E /* PBXContainerItemProxy */;
+		};
+		OBJ_99 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = "Futura::Futura" /* Futura */;
+			targetProxy = 40F304AC21E9F996000C730E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		OBJ_101 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
+				HEADER_SEARCH_PATHS = "$(inherited)";
+				INFOPLIST_FILE = Futura.xcodeproj/FuturaTests_Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @loader_path/../Frameworks @loader_path/Frameworks";
+				OTHER_CFLAGS = "$(inherited)";
+				OTHER_LDFLAGS = "$(inherited)";
+				OTHER_SWIFT_FLAGS = "$(inherited)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
+				SWIFT_VERSION = 4.2;
+				TARGET_NAME = FuturaTests;
+			};
+			name = Debug;
+		};
+		OBJ_102 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
+				HEADER_SEARCH_PATHS = "$(inherited)";
+				INFOPLIST_FILE = Futura.xcodeproj/FuturaTests_Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @loader_path/../Frameworks @loader_path/Frameworks";
+				OTHER_CFLAGS = "$(inherited)";
+				OTHER_LDFLAGS = "$(inherited)";
+				OTHER_SWIFT_FLAGS = "$(inherited)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
+				SWIFT_VERSION = 4.2;
+				TARGET_NAME = FuturaTests;
+			};
+			name = Release;
+		};
+		OBJ_3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_NS_ASSERTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_SWIFT_FLAGS = "-DXcode";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "macosx iphoneos iphonesimulator appletvos appletvsimulator watchos watchsimulator";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "SWIFT_PACKAGE DEBUG FUTURA_DEBUG";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				USE_HEADERMAP = NO;
+			};
+			name = Debug;
+		};
+		OBJ_4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_OPTIMIZATION_LEVEL = s;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				OTHER_SWIFT_FLAGS = "-DXcode";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "macosx iphoneos iphonesimulator appletvos appletvsimulator watchos watchsimulator";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = SWIFT_PACKAGE;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				USE_HEADERMAP = NO;
+			};
+			name = Release;
+		};
+		OBJ_54 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ENABLE_TESTABILITY = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
+				HEADER_SEARCH_PATHS = "$(inherited)";
+				INFOPLIST_FILE = Futura.xcodeproj/Futura_Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) $(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
+				OTHER_CFLAGS = "$(inherited)";
+				OTHER_LDFLAGS = "$(inherited)";
+				OTHER_SWIFT_FLAGS = "$(inherited)";
+				PRODUCT_BUNDLE_IDENTIFIER = Futura;
+				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
+				SWIFT_VERSION = 4.2;
+				TARGET_NAME = Futura;
+			};
+			name = Debug;
+		};
+		OBJ_55 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ENABLE_TESTABILITY = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
+				HEADER_SEARCH_PATHS = "$(inherited)";
+				INFOPLIST_FILE = Futura.xcodeproj/Futura_Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) $(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
+				OTHER_CFLAGS = "$(inherited)";
+				OTHER_LDFLAGS = "$(inherited)";
+				OTHER_SWIFT_FLAGS = "$(inherited)";
+				PRODUCT_BUNDLE_IDENTIFIER = Futura;
+				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
+				SWIFT_VERSION = 4.2;
+				TARGET_NAME = Futura;
+			};
+			name = Release;
+		};
+		OBJ_80 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				LD = /usr/bin/true;
+				OTHER_SWIFT_FLAGS = "-swift-version 4.2 -I $(TOOLCHAIN_DIR)/usr/lib/swift/pm/4_2 -target x86_64-apple-macosx10.10 -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk";
+				SWIFT_VERSION = 4.2;
+			};
+			name = Debug;
+		};
+		OBJ_81 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				LD = /usr/bin/true;
+				OTHER_SWIFT_FLAGS = "-swift-version 4.2 -I $(TOOLCHAIN_DIR)/usr/lib/swift/pm/4_2 -target x86_64-apple-macosx10.10 -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk";
+				SWIFT_VERSION = 4.2;
+			};
+			name = Release;
+		};
+		OBJ_86 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		OBJ_87 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Release;
+		};
+		OBJ_93 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
+				HEADER_SEARCH_PATHS = "$(inherited)";
+				INFOPLIST_FILE = Futura.xcodeproj/FuturaPerformanceTests_Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @loader_path/../Frameworks @loader_path/Frameworks";
+				OTHER_CFLAGS = "$(inherited)";
+				OTHER_LDFLAGS = "$(inherited)";
+				OTHER_SWIFT_FLAGS = "$(inherited)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
+				SWIFT_VERSION = 4.2;
+				TARGET_NAME = FuturaPerformanceTests;
+			};
+			name = Debug;
+		};
+		OBJ_94 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
+				HEADER_SEARCH_PATHS = "$(inherited)";
+				INFOPLIST_FILE = Futura.xcodeproj/FuturaPerformanceTests_Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @loader_path/../Frameworks @loader_path/Frameworks";
+				OTHER_CFLAGS = "$(inherited)";
+				OTHER_LDFLAGS = "$(inherited)";
+				OTHER_SWIFT_FLAGS = "$(inherited)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
+				SWIFT_VERSION = 4.2;
+				TARGET_NAME = FuturaPerformanceTests;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		OBJ_100 /* Build configuration list for PBXNativeTarget "FuturaTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				OBJ_101 /* Debug */,
+				OBJ_102 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		OBJ_2 /* Build configuration list for PBXProject "Futura" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				OBJ_3 /* Debug */,
+				OBJ_4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		OBJ_53 /* Build configuration list for PBXNativeTarget "Futura" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				OBJ_54 /* Debug */,
+				OBJ_55 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		OBJ_79 /* Build configuration list for PBXNativeTarget "FuturaPackageDescription" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				OBJ_80 /* Debug */,
+				OBJ_81 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		OBJ_85 /* Build configuration list for PBXAggregateTarget "FuturaPackageTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				OBJ_86 /* Debug */,
+				OBJ_87 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		OBJ_92 /* Build configuration list for PBXNativeTarget "FuturaPerformanceTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				OBJ_93 /* Debug */,
+				OBJ_94 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = OBJ_1 /* Project object */;
+}
