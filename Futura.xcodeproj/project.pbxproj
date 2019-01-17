@@ -22,6 +22,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		408CF8C821F0AFF700F0F390 /* SignalErrorCatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 408CF8C721F0AFF700F0F390 /* SignalErrorCatcher.swift */; };
 		OBJ_104 /* FutureZipTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_37 /* FutureZipTests.swift */; };
 		OBJ_105 /* PromiseAndFutureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_38 /* PromiseAndFutureTests.swift */; };
 		OBJ_106 /* RecursiveLockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_39 /* RecursiveLockTests.swift */; };
@@ -89,6 +90,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		408CF8C721F0AFF700F0F390 /* SignalErrorCatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalErrorCatcher.swift; sourceTree = "<group>"; };
 		"Futura::Futura::Product" /* Futura.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Futura.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Futura::FuturaPerformanceTests::Product" /* FuturaPerformanceTests.xctest */ = {isa = PBXFileReference; lastKnownFileType = file; path = FuturaPerformanceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Futura::FuturaTests::Product" /* FuturaTests.xctest */ = {isa = PBXFileReference; lastKnownFileType = file; path = FuturaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -158,6 +160,7 @@
 				OBJ_14 /* Emitter.swift */,
 				OBJ_15 /* Signal.swift */,
 				OBJ_16 /* SignalFilter.swift */,
+				408CF8C721F0AFF700F0F390 /* SignalErrorCatcher.swift */,
 				OBJ_17 /* SignalFlatMapper.swift */,
 				OBJ_18 /* SignalForwarder.swift */,
 				OBJ_19 /* SignalFutureFlatMapper.swift */,
@@ -243,7 +246,7 @@
 			name = Products;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		OBJ_5 /*  */ = {
+		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
@@ -251,7 +254,6 @@
 				OBJ_33 /* Tests */,
 				OBJ_48 /* Products */,
 			);
-			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_7 /* Sources */ = {
@@ -366,7 +368,7 @@
 			knownRegions = (
 				en,
 			);
-			mainGroup = OBJ_5 /*  */;
+			mainGroup = OBJ_5;
 			productRefGroup = OBJ_48 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -411,6 +413,7 @@
 				OBJ_64 /* SignalForwarder.swift in Sources */,
 				OBJ_65 /* SignalFutureFlatMapper.swift in Sources */,
 				OBJ_66 /* SignalMapper.swift in Sources */,
+				408CF8C821F0AFF700F0F390 /* SignalErrorCatcher.swift in Sources */,
 				OBJ_67 /* SignalMerger.swift in Sources */,
 				OBJ_68 /* SignalScheduler.swift in Sources */,
 				OBJ_69 /* Subscription.swift in Sources */,

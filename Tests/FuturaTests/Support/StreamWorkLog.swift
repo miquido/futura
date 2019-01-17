@@ -26,6 +26,7 @@ final class StreamWorkLog: Equatable {
         case flatMap
         case flatMapFuture
         case filter(Bool)
+        case `catch`(String)
     }
 
     init(_ elements: StreamWorkLog.Event...) {
@@ -78,6 +79,8 @@ extension StreamWorkLog.Event: CustomDebugStringConvertible {
                 return "terminated(\(error))"
             case let .filter(isIncluded):
                 return "filter(\(isIncluded))"
+            case let .catch(error):
+                return "catch(\(error))"
         }
     }
 }

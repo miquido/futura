@@ -900,6 +900,20 @@ class SignalTests: XCTestCase {
         worker.execute()
         XCTAssertEqual(workLog, [.errors(testErrorDescription)])
     }
+    
+    func testShouldHandleEnd_WhenClosing_WithWorkerSwitchWithoutDeallocate() {
+        let worker: TestWorker = .init()
+        let switched =
+        emitter
+            .switch(to: worker)
+        switched
+            .logResults(with: workLog)
+        
+        emitter.end()
+        XCTAssertEqual(workLog, [])
+        worker.execute()
+        XCTAssertEqual(workLog, [.ended, .finished])
+    }
 
     func testShouldHandleEnd_WhenClosing_WithWorkerSwitch() {
         let worker: TestWorker = .init()
@@ -1114,6 +1128,107 @@ class SignalTests: XCTestCase {
         ])
     }
 
+    // MARK: -
+    
+    // MARK: catch
+    
+    func testShouldHandleValue_WhenBroadcastingValue_WithCatch() {
+        emitter
+            .catch {
+                self.workLog.log(.catch(testDescription(of: $0)))
+                switch $0 {
+                case is TestError: break
+                case _:
+                    throw $0
+                }
+            }
+            .logResults(with: workLog)
+        
+        emitter.emit(0)
+        XCTAssertEqual(workLog, [.values(testDescription(of: 0))])
+    }
+    
+    func testShouldNotHandle_WhenBroadcastingError_WithCatchSuccess() {
+        emitter
+            .catch {
+                self.workLog.log(.catch(testDescription(of: $0)))
+                switch $0 {
+                case is TestError: break
+                case _:
+                    throw $0
+                }
+            }
+            .logResults(with: workLog)
+        
+        emitter.emit(testError)
+        XCTAssertEqual(workLog, [.catch(testErrorDescription)])
+    }
+    
+    func testShouldHandleError_WhenBroadcastingError_WithCatchFailure() {
+        let nsError: NSError = .init(domain: "TEST", code: 0, userInfo: nil)
+        emitter
+            .catch {
+                self.workLog.log(.catch(testDescription(of: $0)))
+                switch $0 {
+                case is TestError: break
+                case _:
+                    throw $0
+                }
+            }
+            .logResults(with: workLog)
+        
+        emitter.emit(nsError)
+        XCTAssertEqual(workLog, [.catch(testDescription(of: nsError)), .errors(testDescription(of: nsError))])
+    }
+    
+    func testShouldHandleEnd_WhenClosing_WithCatch() {
+        emitter
+            .catch {
+                self.workLog.log(.catch(testDescription(of: $0)))
+                switch $0 {
+                case is TestError: break
+                case _:
+                    throw $0
+                }
+            }
+            .logResults(with: workLog)
+        
+        emitter.end()
+        XCTAssertEqual(workLog, [.ended, .finished])
+    }
+    
+    func testShouldHandleTerminate_WhenTerminating_WithCatch() {
+        emitter
+            .catch {
+                self.workLog.log(.catch(testDescription(of: $0)))
+                switch $0 {
+                case is TestError: break
+                case _:
+                    throw $0
+                }
+            }
+            .logResults(with: workLog)
+        
+        emitter.terminate(testError)
+        XCTAssertEqual(workLog, [.terminated(testErrorDescription), .finished])
+    }
+    
+    func testShouldHandleEnd_WhenDeallocating_WithCatch() {
+        emitter
+            .catch {
+                self.workLog.log(.catch(testDescription(of: $0)))
+                switch $0 {
+                case is TestError: break
+                case _:
+                    throw $0
+                }
+            }
+            .logResults(with: workLog)
+        
+        emitter = nil
+        XCTAssertEqual(workLog, [.ended, .finished])
+    }
+    
     // MARK: -
 
     // MARK: merge
