@@ -40,7 +40,7 @@ public final class Emitter<Value>: Signal<Value> {
     /// Finishes this Emitter and all associated Signals.
     /// This method should be called to end Emitter and all associated Signals
     /// without errors when it will not emit any values or errors anymore.
-    /// It will be called automatically when Emitter becomes dealocated.
+    /// It will be called automatically when Emitter becomes deallocated.
     /// This method have no effect on Emitter that have already finished.
     ///
     /// - Note: Finished Signals begins to deallocate if able and releases all

@@ -30,6 +30,8 @@ public class Signal<Value> {
     internal weak var collector: SubscriptionCollector?
     internal var finish: Error??
     internal var isFinished: Bool {
+        Mutex.lock(mtx)
+        defer { Mutex.unlock(mtx) }
         if case .some = finish {
             return true
         } else {

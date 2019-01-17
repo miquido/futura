@@ -487,125 +487,124 @@ class SignalTests: XCTestCase {
         otherEmitter.emit(1)
         XCTAssertEqual(workLog, [.ended, .finished])
     }
-    
+
     // MARK: -
-    
+
     // MARK: flatMapFuture
-    
+
     func testShouldHandleValue_WhenBroadcastingValue_WithFlatMapFuture_WithValue() {
         let promise: Promise<Int> = .init()
-        
+
         emitter
             .flatMapFuture({ (val: Int) -> Future<Int> in
                 self.workLog.log(.flatMapFuture)
                 return promise.future.map { $0 + val }
             })
             .logResults(with: workLog)
-        
+
         emitter.emit(1)
         promise.fulfill(with: 1)
         XCTAssertEqual(workLog, [.flatMapFuture, .values(testDescription(of: 2))])
     }
-    
+
     func testShouldHandleError_WhenBroadcastingValue_WithFlatMapFuture_WithError() {
         let promise: Promise<Int> = .init()
-        
+
         emitter
             .flatMapFuture({ (val: Int) -> Future<Int> in
                 self.workLog.log(.flatMapFuture)
                 return promise.future.map { $0 + val }
             })
             .logResults(with: workLog)
-        
+
         emitter.emit(1)
         promise.break(with: testError)
         XCTAssertEqual(workLog, [.flatMapFuture, .errors(testErrorDescription)])
     }
-    
+
     func testShouldHandleEnded_WhenBroadcastingValue_WithFlatMapFuture_WithCancel() {
         let promise: Promise<Int> = .init()
-        
+
         emitter
             .flatMapFuture({ (val: Int) -> Future<Int> in
                 self.workLog.log(.flatMapFuture)
                 return promise.future.map { $0 + val }
             })
             .logResults(with: workLog)
-        
+
         emitter.emit(0)
         promise.cancel()
         emitter.emit(0)
         XCTAssertEqual(workLog, [.flatMapFuture, .flatMapFuture])
     }
-    
+
     func testShouldHandleError_WhenBroadcastingError_WithFlatMapFuture() {
         let promise: Promise<Int> = .init()
-        
+
         emitter
             .flatMapFuture({ (val: Int) -> Future<Int> in
                 self.workLog.log(.flatMapFuture)
                 return promise.future.map { $0 + val }
             })
             .logResults(with: workLog)
-        
-        
+
         emitter.emit(testError)
         promise.fulfill(with: 1)
         XCTAssertEqual(workLog, [.errors(testErrorDescription)])
     }
-    
+
     func testShouldHandleError_WhenBroadcastingValue_WithThrowingFlatMapFuture() {
         emitter
-            .flatMapFuture({ (val: Int) -> Future<Int> in
+            .flatMapFuture({ (_: Int) -> Future<Int> in
                 self.workLog.log(.flatMapFuture)
                 throw testError
             })
             .logResults(with: workLog)
-        
+
         emitter.emit(0)
         XCTAssertEqual(workLog, [.flatMapFuture, .errors(testErrorDescription)])
     }
-    
+
     func testShouldHandleEnd_WhenClosing_WithFlatMapFuture() {
         let promise: Promise<Int> = .init()
-        
+
         emitter
             .flatMapFuture({ (val: Int) -> Future<Int> in
                 self.workLog.log(.flatMapFuture)
                 return promise.future.map { $0 + val }
             })
             .logResults(with: workLog)
-        
+
         emitter.end()
         promise.fulfill(with: 0)
         XCTAssertEqual(workLog, [.ended, .finished])
     }
-    
+
     func testShouldHandleTerminate_WhenTerminating_WithFlatMapFuture() {
         let promise: Promise<Int> = .init()
-        
+
         emitter
             .flatMapFuture({ (val: Int) -> Future<Int> in
                 self.workLog.log(.flatMapFuture)
                 return promise.future.map { $0 + val }
             })
             .logResults(with: workLog)
-        
+
         emitter.terminate(testError)
         promise.fulfill(with: 0)
         XCTAssertEqual(workLog, [.terminated(testErrorDescription), .finished])
     }
-    
+
     func testShouldHandleEnd_WhenDeallocating_WithFlatMapFuture() {
         let promise: Promise<Int> = .init()
-        
+
         emitter
             .flatMapFuture({ (val: Int) -> Future<Int> in
                 self.workLog.log(.flatMapFuture)
                 return promise.future.map { $0 + val }
             })
             .logResults(with: workLog)
-        
+
         emitter = nil
         promise.fulfill(with: 0)
         XCTAssertEqual(workLog, [.ended, .finished])
@@ -900,15 +899,15 @@ class SignalTests: XCTestCase {
         worker.execute()
         XCTAssertEqual(workLog, [.errors(testErrorDescription)])
     }
-    
+
     func testShouldHandleEnd_WhenClosing_WithWorkerSwitchWithoutDeallocate() {
         let worker: TestWorker = .init()
         let switched =
-        emitter
+            emitter
             .switch(to: worker)
         switched
             .logResults(with: workLog)
-        
+
         emitter.end()
         XCTAssertEqual(workLog, [])
         worker.execute()
@@ -1129,106 +1128,106 @@ class SignalTests: XCTestCase {
     }
 
     // MARK: -
-    
+
     // MARK: catch
-    
+
     func testShouldHandleValue_WhenBroadcastingValue_WithCatch() {
         emitter
             .catch {
                 self.workLog.log(.catch(testDescription(of: $0)))
                 switch $0 {
-                case is TestError: break
-                case _:
-                    throw $0
+                    case is TestError: break
+                    case _:
+                        throw $0
                 }
             }
             .logResults(with: workLog)
-        
+
         emitter.emit(0)
         XCTAssertEqual(workLog, [.values(testDescription(of: 0))])
     }
-    
+
     func testShouldNotHandle_WhenBroadcastingError_WithCatchSuccess() {
         emitter
             .catch {
                 self.workLog.log(.catch(testDescription(of: $0)))
                 switch $0 {
-                case is TestError: break
-                case _:
-                    throw $0
+                    case is TestError: break
+                    case _:
+                        throw $0
                 }
             }
             .logResults(with: workLog)
-        
+
         emitter.emit(testError)
         XCTAssertEqual(workLog, [.catch(testErrorDescription)])
     }
-    
+
     func testShouldHandleError_WhenBroadcastingError_WithCatchFailure() {
         let nsError: NSError = .init(domain: "TEST", code: 0, userInfo: nil)
         emitter
             .catch {
                 self.workLog.log(.catch(testDescription(of: $0)))
                 switch $0 {
-                case is TestError: break
-                case _:
-                    throw $0
+                    case is TestError: break
+                    case _:
+                        throw $0
                 }
             }
             .logResults(with: workLog)
-        
+
         emitter.emit(nsError)
         XCTAssertEqual(workLog, [.catch(testDescription(of: nsError)), .errors(testDescription(of: nsError))])
     }
-    
+
     func testShouldHandleEnd_WhenClosing_WithCatch() {
         emitter
             .catch {
                 self.workLog.log(.catch(testDescription(of: $0)))
                 switch $0 {
-                case is TestError: break
-                case _:
-                    throw $0
+                    case is TestError: break
+                    case _:
+                        throw $0
                 }
             }
             .logResults(with: workLog)
-        
+
         emitter.end()
         XCTAssertEqual(workLog, [.ended, .finished])
     }
-    
+
     func testShouldHandleTerminate_WhenTerminating_WithCatch() {
         emitter
             .catch {
                 self.workLog.log(.catch(testDescription(of: $0)))
                 switch $0 {
-                case is TestError: break
-                case _:
-                    throw $0
+                    case is TestError: break
+                    case _:
+                        throw $0
                 }
             }
             .logResults(with: workLog)
-        
+
         emitter.terminate(testError)
         XCTAssertEqual(workLog, [.terminated(testErrorDescription), .finished])
     }
-    
+
     func testShouldHandleEnd_WhenDeallocating_WithCatch() {
         emitter
             .catch {
                 self.workLog.log(.catch(testDescription(of: $0)))
                 switch $0 {
-                case is TestError: break
-                case _:
-                    throw $0
+                    case is TestError: break
+                    case _:
+                        throw $0
                 }
             }
             .logResults(with: workLog)
-        
+
         emitter = nil
         XCTAssertEqual(workLog, [.ended, .finished])
     }
-    
+
     // MARK: -
 
     // MARK: merge
@@ -1463,5 +1462,52 @@ class SignalTests: XCTestCase {
             XCTAssertEqual(counter_1 + counter_2 + counter_3, 300, "Calls count not matching expected")
             complete()
         }
+    }
+
+    // MARK: -
+
+    // MARK: timed emitter
+
+    func testShouldHandleProperly_WhenUsingTimedEmitter() {
+        var collector: SubscriptionCollector! = .init()
+        let emitter: TimedEmitter = .init(interval: 1)
+        emitter
+            .collect(with: collector)
+            .logResults(with: workLog)
+
+        sleep(3)
+        collector = nil
+        XCTAssertEqual(workLog, [
+            .values(testDescription(of: ())),
+            .values(testDescription(of: ())),
+            .values(testDescription(of: ())),
+        ])
+    }
+
+    func testShouldHandleEnd_WhenEnding_WithTimedEmitter() {
+        let emitter: TimedEmitter = .init(interval: 1)
+        emitter
+            .logResults(with: workLog)
+
+        emitter.end()
+        XCTAssertEqual(workLog, [.ended, .finished])
+    }
+
+    func testShouldHandleTerminate_WhenTerminating_WithTimedEmitter() {
+        let emitter: TimedEmitter = .init(interval: 1)
+        emitter
+            .logResults(with: workLog)
+
+        emitter.terminate(testError)
+        XCTAssertEqual(workLog, [.terminated(testErrorDescription), .finished])
+    }
+
+    func testShouldHandleEnd_WhenDeallocating_WithTimedEmitter() {
+        var emitter: TimedEmitter? = .init(interval: 1)
+        emitter?
+            .logResults(with: workLog)
+
+        emitter = nil
+        XCTAssertEqual(workLog, [.ended, .finished])
     }
 }

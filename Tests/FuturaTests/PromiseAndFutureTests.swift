@@ -1318,7 +1318,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
 
         promise = nil
 
-        XCTAssertNil(future, "Future not deallocated while responsible Promise dealocated")
+        XCTAssertNil(future, "Future not deallocated while responsible Promise deallocated")
     }
 
     func testShouldDeallocateWithHandlersWithoutReference() {
@@ -1331,7 +1331,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
 
         promise = nil
 
-        XCTAssertNil(future, "Future not deallocated while responsible Promise dealocated")
+        XCTAssertNil(future, "Future not deallocated while responsible Promise deallocated")
     }
 
     func testShouldDeallocateWithHandlersWithReference() {
@@ -1347,8 +1347,8 @@ class PromiseAndFutureTestsTests: XCTestCase {
         promise = nil
         child = nil
 
-        XCTAssertNil(future, "Future not deallocated while responsible Promise dealocated")
-        XCTAssertNil(weakChild, "Future not deallocated while parent Future dealocated")
+        XCTAssertNil(future, "Future not deallocated while responsible Promise deallocated")
+        XCTAssertNil(weakChild, "Future not deallocated while parent Future deallocated")
         XCTAssertNotNil(strongChild)
     }
 
