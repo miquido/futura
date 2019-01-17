@@ -34,7 +34,7 @@ public final class TimedEmitter: Signal<Void> {
         let dispatchInterval = DispatchTimeInterval.milliseconds(Int(interval * 1000.0))
         timer.schedule(deadline: DispatchTime.now() + dispatchInterval,
                        repeating: dispatchInterval,
-                       leeway: dispatchInterval)
+                       leeway: DispatchTimeInterval.milliseconds(0))
         timer.setEventHandler(handler: { [weak self] in
             guard let self = self else { return }
             guard !self.isFinished else { return }

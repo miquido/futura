@@ -1470,15 +1470,14 @@ class SignalTests: XCTestCase {
 
     func testShouldHandleProperly_WhenUsingTimedEmitter() {
         var collector: SubscriptionCollector! = .init()
-        let emitter: TimedEmitter = .init(interval: 1)
+        let emitter: TimedEmitter = .init(interval: 0.45)
         emitter
             .collect(with: collector)
             .logResults(with: workLog)
 
-        sleep(3)
+        sleep(1)
         collector = nil
         XCTAssertEqual(workLog, [
-            .values(testDescription(of: ())),
             .values(testDescription(of: ())),
             .values(testDescription(of: ())),
         ])
