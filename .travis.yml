@@ -2,4 +2,8 @@ language: swift
 osx_image: xcode10
 
 script:
-- swift test -c release -v --sanitize=thread
+- swift package generate-xcodeproj
+- xcodebuild test -scheme Futura-Package -configuration Release -enableCodeCoverage YES -enableThreadSanitizer YES
+
+after_success:
+- curl -s https://codecov.io/bash | bash

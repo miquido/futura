@@ -1,7 +1,9 @@
 # [![Futura](logo.jpeg)]()
 
 [![Build Status](https://api.travis-ci.org/miquido/futura.svg?branch=master)](https://travis-ci.org/miquido/futura)
+[![codecov](https://codecov.io/gh/miquido/futura/branch/master/graph/badge.svg)](https://codecov.io/gh/miquido/futura)
 [![Platforms](https://img.shields.io/badge/platform-iOS%20|%20macOS-gray.svg?style=flat)]()
+[![Swift Package Manager compatible](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg)](https://github.com/apple/swift-package-manager)
 [![SwiftVersion](https://img.shields.io/badge/Swift-4.2-brightgreen.svg)]()
 
 Futura is a library that provides simple yet powerful tools for working with asynchronous and concurrent code in Swift.
@@ -17,6 +19,7 @@ Futura is not any kind of framework. It does not provide single universal soluti
 ## Is that for me?
 
 If you are wondering if you should use Futura in your code base or what it is actually about please take a minute and look at sample code below. One of basic tools provided with this library is implementation of promises. With promises you can convert single asynchronous task to be more predictable and better handled. In example you can change URLSession requests like this:
+
 ``` swift
 make(request: URLRequest.init(url: "www.github.com"), using: URLSession.shared) { (data, response, error) in
     if let error = error {
@@ -51,7 +54,9 @@ make(request: URLRequest.init(url: "www.github.com"), using: URLSession.shared) 
     }
 }
 ```
+
 to be more like this:
+
 ``` swift
 let futureData = 
     make(request: URLRequest.init(url: "www.github.com"), using: URLSession.shared)
@@ -86,6 +91,7 @@ futureData
         log(count: $0)
     }
 ```
+
 This conversion not only simplifies the code keeping the same functionality and multithreading execution but it also splits things to be more manageable and testable. Each part - database, presentation and logs - is clearly separated from each other and may be applied in different more suitable places.
 
 For more usage examples please look at attached Playground.
@@ -93,21 +99,25 @@ For more usage examples please look at attached Playground.
 ## How to get it?
 
 You can use Futura as git submodule
+
 ``` bash
 git submodule add https://github.com/miquido/futura.git
 ```
+
 and integrate it with your code base.
 
 You can also use Carthage with a little less flexibility.
+
 ```
-github "miquido/futura" ~> 2.0
+github "miquido/futura" ~> 2.1
 ```
 
 You can even use CocoaPods, but since this library hasn't been added yet to the official CocoaPods spec repository you must point to it explicitly.
+
 ```
-pod 'Futura', :git => 'https://github.com/miquido/futura.git', :tag => '2.0.0'
+pod 'Futura', :git => 'https://github.com/miquido/futura.git', :tag => '2.1.0'
 ```
- 
+
 ## What it is exactly?
 
 Futura consists of a set of tools that helps you manage asynchronous and concurrent code.
@@ -128,14 +138,13 @@ For tasks that are performed only once, there is a nice promise implementation. 
 
 If you have continous stream of data or unpredictable events you should use Signal. It allows you to react on events or transform data that comes asynchronously. It works really nice for handling user interactions or network data streams.
 
-
 ## How to get involved?
 
 Since Futura is open source project you can feel invited to make it even better. If you have found any kind of bug please make an issue. If any part of documentation is missing or not comperhensive propose some change or describe it using issue. If you feel that there is smoething can be done better just fork this repository and propose some changes!
 
 ## License
 
-Copyright 2018 Miquido
+Copyright 2018-2019 Miquido
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
