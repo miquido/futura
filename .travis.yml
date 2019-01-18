@@ -3,7 +3,7 @@ osx_image: xcode10
 
 script:
 - swift package generate-xcodeproj
-- xcodebuild test -scheme Futura -configuration Release -enableCodeCoverage YES -enableThreadSanitizer YES
+- xcodebuild test -scheme Futura-Package -configuration Release -enableCodeCoverage YES -enableThreadSanitizer YES
 
 after_success:
 - curl -s https://codecov.io/bash | bash
