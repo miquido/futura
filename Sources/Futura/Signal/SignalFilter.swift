@@ -18,10 +18,43 @@ public extension Signal {
     /// Returns new instance of Signal that will pass only matching values.
     /// Filter does not affect error flow.
     ///
-    /// - Parameter filter: Filtering function returning true for values that can be passed/
+    /// - Parameter filter: Filtering function returning true for values that can be passed
     /// - Returns: New Signal instance passing filtered values and all errors.
     func filter(_ filter: @escaping (Value) -> Bool) -> Signal<Value> {
         return SignalFilter(source: self, filter: filter)
+    }
+
+    /// Transforms Signal into new Signal instance using duplicate filter
+    /// based on provided equal function.
+    /// Filters values passed by Signal.
+    /// Returns new instance of Signal that will pass only non duplicate following values.
+    /// Filter does not affect error flow.
+    ///
+    /// - Returns: New Signal instance passing filtered values and all errors.
+    func filterDuplicates(_ equals: @escaping (Value, Value) -> Bool) -> Signal<Value> {
+        var lastVal: Value?
+        return SignalFilter(source: self, filter: { newVal in
+            defer { lastVal = newVal }
+            guard let lastVal = lastVal else { return true }
+            return !equals(lastVal, newVal)
+        })
+    }
+}
+
+public extension Signal where Value: Equatable {
+    /// Transforms Signal into new Signal instance using duplicate filter.
+    /// Filters values passed by Signal.
+    /// Returns new instance of Signal that will pass only non duplicate following values.
+    /// Filter does not affect error flow.
+    ///
+    /// - Returns: New Signal instance passing filtered values and all errors.
+    func filterDuplicates() -> Signal<Value> {
+        var lastVal: Value?
+        return SignalFilter(source: self, filter: { newVal in
+            defer { lastVal = newVal }
+            guard let lastVal = lastVal else { return true }
+            return lastVal != newVal
+        })
     }
 }
 

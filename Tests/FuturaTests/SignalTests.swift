@@ -37,6 +37,9 @@ class SignalTests: XCTestCase {
             .errors {
                 self.workLog.log(.errors(testDescription(of: $0)))
             }
+            .tokens {
+                self.workLog.log(.tokens)
+            }
             .ended {
                 self.workLog.log(.ended)
             }
@@ -48,7 +51,7 @@ class SignalTests: XCTestCase {
             }
 
         emitter.emit(0)
-        XCTAssertEqual(workLog, [.values(testDescription(of: 0))])
+        XCTAssertEqual(workLog, [.values(testDescription(of: 0)), .tokens])
     }
 
     func testShouldHandleError_WhenBroadcastingError() {
@@ -58,6 +61,9 @@ class SignalTests: XCTestCase {
             }
             .errors {
                 self.workLog.log(.errors(testDescription(of: $0)))
+            }
+            .tokens {
+                self.workLog.log(.tokens)
             }
             .ended {
                 self.workLog.log(.ended)
@@ -70,16 +76,19 @@ class SignalTests: XCTestCase {
             }
 
         emitter.emit(testError)
-        XCTAssertEqual(workLog, [.errors(testErrorDescription)])
+        XCTAssertEqual(workLog, [.errors(testErrorDescription), .tokens])
     }
 
-    func testShouldHandleClose_WhenClosing() {
+    func testShouldHandleEnd_WhenClosing() {
         emitter.signal
             .values {
                 self.workLog.log(.values(testDescription(of: $0)))
             }
             .errors {
                 self.workLog.log(.errors(testDescription(of: $0)))
+            }
+            .tokens {
+                self.workLog.log(.tokens)
             }
             .ended {
                 self.workLog.log(.ended)
@@ -103,6 +112,9 @@ class SignalTests: XCTestCase {
             .errors {
                 self.workLog.log(.errors(testDescription(of: $0)))
             }
+            .tokens {
+                self.workLog.log(.tokens)
+            }
             .ended {
                 self.workLog.log(.ended)
             }
@@ -117,7 +129,7 @@ class SignalTests: XCTestCase {
         XCTAssertEqual(workLog, [.terminated(testErrorDescription), .finished])
     }
 
-    func testShouldHandleClose_WhenAlreadyClosed() {
+    func testShouldHandleEnd_WhenAlreadyEnded() {
         emitter.end()
         emitter.signal
             .values {
@@ -125,6 +137,9 @@ class SignalTests: XCTestCase {
             }
             .errors {
                 self.workLog.log(.errors(testDescription(of: $0)))
+            }
+            .tokens {
+                self.workLog.log(.tokens)
             }
             .ended {
                 self.workLog.log(.ended)
@@ -148,6 +163,9 @@ class SignalTests: XCTestCase {
             .errors {
                 self.workLog.log(.errors(testDescription(of: $0)))
             }
+            .tokens {
+                self.workLog.log(.tokens)
+            }
             .ended {
                 self.workLog.log(.ended)
             }
@@ -161,13 +179,16 @@ class SignalTests: XCTestCase {
         XCTAssertEqual(workLog, [.terminated(testErrorDescription), .finished])
     }
 
-    func testShouldHandleClose_WhenDeallocating() {
+    func testShouldHandleEnd_WhenDeallocating() {
         emitter.signal
             .values {
                 self.workLog.log(.values(testDescription(of: $0)))
             }
             .errors {
                 self.workLog.log(.errors(testDescription(of: $0)))
+            }
+            .tokens {
+                self.workLog.log(.tokens)
             }
             .ended {
                 self.workLog.log(.ended)
@@ -190,6 +211,9 @@ class SignalTests: XCTestCase {
             }
             .errors {
                 self.workLog.log(.errors(testDescription(of: $0)))
+            }
+            .tokens {
+                self.workLog.log(.tokens)
             }
             .ended {
                 self.workLog.log(.ended)
@@ -217,6 +241,9 @@ class SignalTests: XCTestCase {
             .errors {
                 self.workLog.log(.errors(testDescription(of: $0)))
             }
+            .tokens {
+                self.workLog.log(.tokens)
+            }
             .ended {
                 self.workLog.log(.ended)
             }
@@ -237,7 +264,7 @@ class SignalTests: XCTestCase {
 
     // MARK: -
 
-    // MARK: Map
+    // MARK: map
 
     func testShouldHandleValue_WhenBroadcastingValue_WithMap() {
         emitter
@@ -275,7 +302,7 @@ class SignalTests: XCTestCase {
         XCTAssertEqual(workLog, [.map, .errors(testErrorDescription)])
     }
 
-    func testShouldHandleClose_WhenClosing_WithMap() {
+    func testShouldHandleEnd_WhenClosing_WithMap() {
         emitter
             .map { (val: Int) -> Int in
                 self.workLog.log(.map)
@@ -299,7 +326,7 @@ class SignalTests: XCTestCase {
         XCTAssertEqual(workLog, [.terminated(testErrorDescription), .finished])
     }
 
-    func testShouldHandleClose_WhenDeallocating_WithMap() {
+    func testShouldHandleEnd_WhenDeallocating_WithMap() {
         emitter
             .map { (val: Int) -> Int in
                 self.workLog.log(.map)
@@ -347,7 +374,7 @@ class SignalTests: XCTestCase {
         XCTAssertEqual(workLog, [.flatMap, .errors(testErrorDescription)])
     }
 
-    func testShouldHandleended_WhenBroadcastingValue_WithFlatMap_WithClose() {
+    func testShouldHandlEended_WhenBroadcastingValue_WithFlatMap_WithEnd() {
         let otherEmitter = Emitter<Int>()
 
         emitter
@@ -413,7 +440,7 @@ class SignalTests: XCTestCase {
         XCTAssertEqual(workLog, [.flatMap, .errors(testErrorDescription)])
     }
 
-    func testShouldHandleClose_WhenClosing_WithFlatMap() {
+    func testShouldHandleEnd_WhenClosing_WithFlatMap() {
         let otherEmitter = Emitter<Int>()
 
         emitter
@@ -445,7 +472,7 @@ class SignalTests: XCTestCase {
         XCTAssertEqual(workLog, [.terminated(testErrorDescription), .finished])
     }
 
-    func testShouldHandleClose_WhenDeallocating_WithFlatMap() {
+    func testShouldHandleEnd_WhenDeallocating_WithFlatMap() {
         let otherEmitter = Emitter<Int>()
 
         emitter
@@ -458,6 +485,128 @@ class SignalTests: XCTestCase {
         otherEmitter.emit(2)
         emitter = nil
         otherEmitter.emit(1)
+        XCTAssertEqual(workLog, [.ended, .finished])
+    }
+
+    // MARK: -
+
+    // MARK: flatMapFuture
+
+    func testShouldHandleValue_WhenBroadcastingValue_WithFlatMapFuture_WithValue() {
+        let promise: Promise<Int> = .init()
+
+        emitter
+            .flatMapFuture({ (val: Int) -> Future<Int> in
+                self.workLog.log(.flatMapFuture)
+                return promise.future.map { $0 + val }
+            })
+            .logResults(with: workLog)
+
+        emitter.emit(1)
+        promise.fulfill(with: 1)
+        XCTAssertEqual(workLog, [.flatMapFuture, .values(testDescription(of: 2))])
+    }
+
+    func testShouldHandleError_WhenBroadcastingValue_WithFlatMapFuture_WithError() {
+        let promise: Promise<Int> = .init()
+
+        emitter
+            .flatMapFuture({ (val: Int) -> Future<Int> in
+                self.workLog.log(.flatMapFuture)
+                return promise.future.map { $0 + val }
+            })
+            .logResults(with: workLog)
+
+        emitter.emit(1)
+        promise.break(with: testError)
+        XCTAssertEqual(workLog, [.flatMapFuture, .errors(testErrorDescription)])
+    }
+
+    func testShouldHandleEnded_WhenBroadcastingValue_WithFlatMapFuture_WithCancel() {
+        let promise: Promise<Int> = .init()
+
+        emitter
+            .flatMapFuture({ (val: Int) -> Future<Int> in
+                self.workLog.log(.flatMapFuture)
+                return promise.future.map { $0 + val }
+            })
+            .logResults(with: workLog)
+
+        emitter.emit(0)
+        promise.cancel()
+        emitter.emit(0)
+        XCTAssertEqual(workLog, [.flatMapFuture, .flatMapFuture])
+    }
+
+    func testShouldHandleError_WhenBroadcastingError_WithFlatMapFuture() {
+        let promise: Promise<Int> = .init()
+
+        emitter
+            .flatMapFuture({ (val: Int) -> Future<Int> in
+                self.workLog.log(.flatMapFuture)
+                return promise.future.map { $0 + val }
+            })
+            .logResults(with: workLog)
+
+        emitter.emit(testError)
+        promise.fulfill(with: 1)
+        XCTAssertEqual(workLog, [.errors(testErrorDescription)])
+    }
+
+    func testShouldHandleError_WhenBroadcastingValue_WithThrowingFlatMapFuture() {
+        emitter
+            .flatMapFuture({ (_: Int) -> Future<Int> in
+                self.workLog.log(.flatMapFuture)
+                throw testError
+            })
+            .logResults(with: workLog)
+
+        emitter.emit(0)
+        XCTAssertEqual(workLog, [.flatMapFuture, .errors(testErrorDescription)])
+    }
+
+    func testShouldHandleEnd_WhenClosing_WithFlatMapFuture() {
+        let promise: Promise<Int> = .init()
+
+        emitter
+            .flatMapFuture({ (val: Int) -> Future<Int> in
+                self.workLog.log(.flatMapFuture)
+                return promise.future.map { $0 + val }
+            })
+            .logResults(with: workLog)
+
+        emitter.end()
+        promise.fulfill(with: 0)
+        XCTAssertEqual(workLog, [.ended, .finished])
+    }
+
+    func testShouldHandleTerminate_WhenTerminating_WithFlatMapFuture() {
+        let promise: Promise<Int> = .init()
+
+        emitter
+            .flatMapFuture({ (val: Int) -> Future<Int> in
+                self.workLog.log(.flatMapFuture)
+                return promise.future.map { $0 + val }
+            })
+            .logResults(with: workLog)
+
+        emitter.terminate(testError)
+        promise.fulfill(with: 0)
+        XCTAssertEqual(workLog, [.terminated(testErrorDescription), .finished])
+    }
+
+    func testShouldHandleEnd_WhenDeallocating_WithFlatMapFuture() {
+        let promise: Promise<Int> = .init()
+
+        emitter
+            .flatMapFuture({ (val: Int) -> Future<Int> in
+                self.workLog.log(.flatMapFuture)
+                return promise.future.map { $0 + val }
+            })
+            .logResults(with: workLog)
+
+        emitter = nil
+        promise.fulfill(with: 0)
         XCTAssertEqual(workLog, [.ended, .finished])
     }
 
@@ -491,7 +640,7 @@ class SignalTests: XCTestCase {
         XCTAssertEqual(workLog, [.errors(testErrorDescription)])
     }
 
-    func testShouldHandleClose_WhenClosing_WithCollector() {
+    func testShouldHandleEnd_WhenClosing_WithCollector() {
         var collector: SubscriptionCollector! = .init()
 
         emitter
@@ -514,7 +663,7 @@ class SignalTests: XCTestCase {
         XCTAssertEqual(workLog, [.terminated(testErrorDescription), .finished])
     }
 
-    func testShouldHandleClose_WhenDeallocating_WithCollector() {
+    func testShouldHandleEnd_WhenDeallocating_WithCollector() {
         let collector: SubscriptionCollector! = .init()
 
         emitter
@@ -603,7 +752,7 @@ class SignalTests: XCTestCase {
         XCTAssertEqual(workLog, [.errors(testErrorDescription)])
     }
 
-    func testShouldHandleClose_WhenClosing_WithCollectorAndTransformations() {
+    func testShouldHandleEnd_WhenClosing_WithCollectorAndTransformations() {
         var collector: SubscriptionCollector! = .init()
 
         emitter
@@ -642,7 +791,7 @@ class SignalTests: XCTestCase {
         XCTAssertEqual(workLog, [.terminated(testErrorDescription), .finished])
     }
 
-    func testShouldHandleClose_WhenDeallocating_WithCollectorAndTransformations() {
+    func testShouldHandleEnd_WhenDeallocating_WithCollectorAndTransformations() {
         let collector: SubscriptionCollector! = .init()
 
         emitter
@@ -751,7 +900,21 @@ class SignalTests: XCTestCase {
         XCTAssertEqual(workLog, [.errors(testErrorDescription)])
     }
 
-    func testShouldHandleClose_WhenClosing_WithWorkerSwitch() {
+    func testShouldHandleEnd_WhenClosing_WithWorkerSwitchWithoutDeallocate() {
+        let worker: TestWorker = .init()
+        let switched =
+            emitter
+            .switch(to: worker)
+        switched
+            .logResults(with: workLog)
+
+        emitter.end()
+        XCTAssertEqual(workLog, [])
+        worker.execute()
+        XCTAssertEqual(workLog, [.ended, .finished])
+    }
+
+    func testShouldHandleEnd_WhenClosing_WithWorkerSwitch() {
         let worker: TestWorker = .init()
 
         emitter
@@ -777,7 +940,7 @@ class SignalTests: XCTestCase {
         XCTAssertEqual(workLog, [.terminated(testErrorDescription), .finished])
     }
 
-    func testShouldHandleClose_WhenDeallocating_WithWorkerSwitch() {
+    func testShouldHandleEnd_WhenDeallocating_WithWorkerSwitch() {
         let worker: TestWorker = .init()
 
         emitter
@@ -885,7 +1048,7 @@ class SignalTests: XCTestCase {
         XCTAssertEqual(workLog, [.errors(testErrorDescription)])
     }
 
-    func testShouldHandleClose_WhenClosing_WithFilter() {
+    func testShouldHandleEnd_WhenClosing_WithFilter() {
         emitter
             .filter {
                 let result = $0 != 0
@@ -911,7 +1074,7 @@ class SignalTests: XCTestCase {
         XCTAssertEqual(workLog, [.terminated(testErrorDescription), .finished])
     }
 
-    func testShouldHandleClose_WhenDeallocating_WithFilter() {
+    func testShouldHandleEnd_WhenDeallocating_WithFilter() {
         emitter
             .filter {
                 let result = $0 != 0
@@ -922,6 +1085,281 @@ class SignalTests: XCTestCase {
 
         emitter = nil
         XCTAssertEqual(workLog, [.ended, .finished])
+    }
+
+    func testShouldHandleValues_WhenBroadcastingValues_WithDuplicateFilter() {
+        emitter
+            .filterDuplicates()
+            .logResults(with: workLog)
+
+        emitter.emit(0)
+        emitter.emit(0)
+        emitter.emit(1)
+        emitter.emit(0)
+        emitter.emit(0)
+        emitter.emit(1)
+        XCTAssertEqual(workLog, [
+            .values(testDescription(of: 0)),
+            .values(testDescription(of: 1)),
+            .values(testDescription(of: 0)),
+            .values(testDescription(of: 1)),
+        ])
+    }
+
+    func testShouldHandleValues_WhenBroadcastingValues_WithCustomDuplicateFilter() {
+        emitter
+            .filterDuplicates {
+                $0 == $1
+            }
+            .logResults(with: workLog)
+
+        emitter.emit(0)
+        emitter.emit(0)
+        emitter.emit(1)
+        emitter.emit(0)
+        emitter.emit(0)
+        emitter.emit(1)
+        XCTAssertEqual(workLog, [
+            .values(testDescription(of: 0)),
+            .values(testDescription(of: 1)),
+            .values(testDescription(of: 0)),
+            .values(testDescription(of: 1)),
+        ])
+    }
+
+    // MARK: -
+
+    // MARK: catch
+
+    func testShouldHandleValue_WhenBroadcastingValue_WithCatch() {
+        emitter
+            .catch {
+                self.workLog.log(.catch(testDescription(of: $0)))
+                switch $0 {
+                    case is TestError: break
+                    case _:
+                        throw $0
+                }
+            }
+            .logResults(with: workLog)
+
+        emitter.emit(0)
+        XCTAssertEqual(workLog, [.values(testDescription(of: 0))])
+    }
+
+    func testShouldNotHandle_WhenBroadcastingError_WithCatchSuccess() {
+        emitter
+            .catch {
+                self.workLog.log(.catch(testDescription(of: $0)))
+                switch $0 {
+                    case is TestError: break
+                    case _:
+                        throw $0
+                }
+            }
+            .logResults(with: workLog)
+
+        emitter.emit(testError)
+        XCTAssertEqual(workLog, [.catch(testErrorDescription)])
+    }
+
+    func testShouldHandleError_WhenBroadcastingError_WithCatchFailure() {
+        let nsError: NSError = .init(domain: "TEST", code: 0, userInfo: nil)
+        emitter
+            .catch {
+                self.workLog.log(.catch(testDescription(of: $0)))
+                switch $0 {
+                    case is TestError: break
+                    case _:
+                        throw $0
+                }
+            }
+            .logResults(with: workLog)
+
+        emitter.emit(nsError)
+        XCTAssertEqual(workLog, [.catch(testDescription(of: nsError)), .errors(testDescription(of: nsError))])
+    }
+
+    func testShouldHandleEnd_WhenClosing_WithCatch() {
+        emitter
+            .catch {
+                self.workLog.log(.catch(testDescription(of: $0)))
+                switch $0 {
+                    case is TestError: break
+                    case _:
+                        throw $0
+                }
+            }
+            .logResults(with: workLog)
+
+        emitter.end()
+        XCTAssertEqual(workLog, [.ended, .finished])
+    }
+
+    func testShouldHandleTerminate_WhenTerminating_WithCatch() {
+        emitter
+            .catch {
+                self.workLog.log(.catch(testDescription(of: $0)))
+                switch $0 {
+                    case is TestError: break
+                    case _:
+                        throw $0
+                }
+            }
+            .logResults(with: workLog)
+
+        emitter.terminate(testError)
+        XCTAssertEqual(workLog, [.terminated(testErrorDescription), .finished])
+    }
+
+    func testShouldHandleEnd_WhenDeallocating_WithCatch() {
+        emitter
+            .catch {
+                self.workLog.log(.catch(testDescription(of: $0)))
+                switch $0 {
+                    case is TestError: break
+                    case _:
+                        throw $0
+                }
+            }
+            .logResults(with: workLog)
+
+        emitter = nil
+        XCTAssertEqual(workLog, [.ended, .finished])
+    }
+
+    // MARK: -
+
+    // MARK: merge
+
+    func testShouldHandleValue_WhenBroadcastingValue_WithMerge() {
+        let first: Emitter<String> = .init()
+        let second: Emitter<String> = .init()
+        let third: Emitter<String> = .init()
+        merge(first, second, third)
+            .logResults(with: workLog)
+
+        first.emit("first")
+        second.emit("second")
+        third.emit("third")
+        second.emit("second")
+        first.emit("first")
+        XCTAssertEqual(workLog, [
+            .values(testDescription(of: "first")),
+            .values(testDescription(of: "second")),
+            .values(testDescription(of: "third")),
+            .values(testDescription(of: "second")),
+            .values(testDescription(of: "first")),
+        ])
+    }
+
+    func testShouldHandleError_WhenBroadcastingError_WithMerge() {
+        let first: Emitter<String> = .init()
+        let second: Emitter<String> = .init()
+        let third: Emitter<String> = .init()
+        merge(first, second, third)
+            .logResults(with: workLog)
+
+        first.emit(testError)
+        second.emit(testError)
+        third.emit(testError)
+        second.emit(testError)
+        first.emit(testError)
+        XCTAssertEqual(workLog, [
+            .errors(testErrorDescription),
+            .errors(testErrorDescription),
+            .errors(testErrorDescription),
+            .errors(testErrorDescription),
+            .errors(testErrorDescription),
+        ])
+    }
+
+    func testShouldHandleEnd_WhenClosing_WithMerge() {
+        let first: Emitter<Void> = .init()
+        let second: Emitter<Void> = .init()
+        let third: Emitter<Void> = .init()
+        merge(first, second, third)
+            .logResults(with: workLog)
+
+        first.emit()
+        second.emit()
+        third.emit()
+        second.end()
+        third.emit()
+        second.emit()
+        first.emit()
+        XCTAssertEqual(workLog, [
+            .values(testDescription(of: Void())),
+            .values(testDescription(of: Void())),
+            .values(testDescription(of: Void())),
+            .ended,
+            .finished,
+        ])
+    }
+
+    func testShouldHandleTerminate_WhenTerminating_WithMerge() {
+        let first: Emitter<Void> = .init()
+        let second: Emitter<Void> = .init()
+        let third: Emitter<Void> = .init()
+        merge(first, second, third)
+            .logResults(with: workLog)
+
+        first.emit()
+        second.emit()
+        third.emit()
+        second.terminate(testError)
+        third.emit()
+        second.emit()
+        first.emit()
+        XCTAssertEqual(workLog, [
+            .values(testDescription(of: Void())),
+            .values(testDescription(of: Void())),
+            .values(testDescription(of: Void())),
+            .terminated(testErrorDescription),
+            .finished,
+        ])
+    }
+
+    func testShouldHandleEnd_WhenDeallocating_WithMerge() {
+        let first: Emitter<Void> = .init()
+        var second: Emitter<Void>! = .init()
+        let third: Emitter<Void> = .init()
+        merge(first, second, third)
+            .logResults(with: workLog)
+
+        first.emit()
+        second.emit()
+        third.emit()
+        second = nil
+        third.emit()
+        first.emit()
+        XCTAssertEqual(workLog, [
+            .values(testDescription(of: Void())),
+            .values(testDescription(of: Void())),
+            .values(testDescription(of: Void())),
+            .ended,
+            .finished,
+        ])
+    }
+
+    func testShouldDeallocateWithMerge() {
+        var first: Emitter<Void>! = .init()
+        var second: Emitter<Void>! = .init()
+        var third: Emitter<Void>! = .init()
+        weak var merged = merge(first, second, third)
+
+        XCTAssertNotNil(merged)
+
+        first = nil
+        XCTAssertNil(first)
+
+        second = nil
+        XCTAssertNil(second)
+
+        third = nil
+        XCTAssertNil(third)
+
+        XCTAssertNil(merged)
     }
 
     // MARK: -
@@ -1024,5 +1462,51 @@ class SignalTests: XCTestCase {
             XCTAssertEqual(counter_1 + counter_2 + counter_3, 300, "Calls count not matching expected")
             complete()
         }
+    }
+
+    // MARK: -
+
+    // MARK: timed emitter
+
+    func testShouldHandleProperly_WhenUsingTimedEmitter() {
+        var collector: SubscriptionCollector! = .init()
+        let emitter: TimedEmitter = .init(interval: 0.45)
+        emitter
+            .collect(with: collector)
+            .logResults(with: workLog)
+
+        sleep(1)
+        collector = nil
+        XCTAssertEqual(workLog, [
+            .values(testDescription(of: ())),
+            .values(testDescription(of: ())),
+        ])
+    }
+
+    func testShouldHandleEnd_WhenEnding_WithTimedEmitter() {
+        let emitter: TimedEmitter = .init(interval: 1)
+        emitter
+            .logResults(with: workLog)
+
+        emitter.end()
+        XCTAssertEqual(workLog, [.ended, .finished])
+    }
+
+    func testShouldHandleTerminate_WhenTerminating_WithTimedEmitter() {
+        let emitter: TimedEmitter = .init(interval: 1)
+        emitter
+            .logResults(with: workLog)
+
+        emitter.terminate(testError)
+        XCTAssertEqual(workLog, [.terminated(testErrorDescription), .finished])
+    }
+
+    func testShouldHandleEnd_WhenDeallocating_WithTimedEmitter() {
+        var emitter: TimedEmitter? = .init(interval: 1)
+        emitter?
+            .logResults(with: workLog)
+
+        emitter = nil
+        XCTAssertEqual(workLog, [.ended, .finished])
     }
 }
