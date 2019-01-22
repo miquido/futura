@@ -29,7 +29,7 @@ public class Signal<Value> {
     internal var subscribers: [(id: Subscription.ID, subscriber: Subscriber<Value>)] = .init()
     internal weak var collector: SubscriptionCollector?
     internal var finish: Error??
-    internal var isFinished: Bool {
+    public var isFinished: Bool {
         Mutex.lock(mtx)
         defer { Mutex.unlock(mtx) }
         if case .some = finish {
@@ -112,7 +112,9 @@ extension Signal {
     
     /// Returns new Signal instance than never emits
     public static var never: Signal<Value> {
-        return Emitter<Value>().signal
+        let emitter: Emitter<Value> = .init()
+        emitter.end()
+        return emitter
     }
 }
 
