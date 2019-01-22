@@ -1,55 +1,6 @@
 import Foundation
 import Futura
 
-let e1: Emitter<Bool> = .init()
-let e2: Emitter<Void> = .init()
-let e3: Emitter<Void> = .init()
-//e1.flatMap { bool -> Signal<String> in
-//    guard bool else { return .never }
-//    return e2.map { _ in "YES 2" }
-//}
-//.values {
-//    print("\($0)")
-//}
-//.finished {
-//    print("FINISH ALL")
-//}
-    e2.values { _ in
-        print("NEXT")
-    }
-e1.flatMapLatest { bool -> Signal<String> in
-    guard bool else { return .never }
-    return e2.map { _ in "YES LATEST 2" }
-}
-.values {
-    print("\($0)")
-}
-.finished {
-    print("FINISH LATEST")
-}
-
-e1.emit(true)
-e2.emit()
-e3.emit()
-e1.emit(false)
-e2.emit()
-e3.emit()
-e1.emit(true)
-e2.emit()
-e3.emit()
-e1.emit(true)
-e2.emit()
-e3.emit()
-e1.emit(false)
-e2.emit()
-e3.emit()
-e1.emit(false)
-e2.emit()
-e3.emit()
-e1.emit(true)
-e2.emit()
-e3.emit()
-
 enum Errors: Error {
     case invalidState
     case noData
