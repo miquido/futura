@@ -358,6 +358,30 @@ class SignalTests: XCTestCase {
         XCTAssertEqual(workLog, [.flatMap, .values(testDescription(of: 1))])
     }
 
+    func testShouldHandleMultipleValues_WhenBroadcastingValue_WithFlatMap_WithMultipleValues() {
+        let otherEmitter = Emitter<Int>()
+
+        emitter
+            .flatMap({ (val: Int) -> Futura.Signal<Int> in
+                self.workLog.log(.flatMap)
+                return otherEmitter.map { val * $0 }
+            })
+            .logResults(with: workLog)
+
+        otherEmitter.emit(0)
+        emitter.emit(1)
+        otherEmitter.emit(2)
+        emitter.emit(2)
+        otherEmitter.emit(3)
+        XCTAssertEqual(workLog, [
+            .flatMap,
+            .values(testDescription(of: 2)),
+            .flatMap,
+            .values(testDescription(of: 3)),
+            .values(testDescription(of: 6)),
+        ])
+    }
+
     func testShouldHandleError_WhenBroadcastingValue_WithFlatMap_WithError() {
         let otherEmitter = Emitter<Int>()
 
@@ -486,6 +510,221 @@ class SignalTests: XCTestCase {
         emitter = nil
         otherEmitter.emit(1)
         XCTAssertEqual(workLog, [.ended, .finished])
+    }
+    
+    func testShouldHandleEnd_WhenDeallocatingInner_WithFlatMap() {
+        var otherEmitter: Emitter<Int>! = .init()
+        
+        emitter
+            .flatMap({ (val: Int) -> Futura.Signal<Int> in
+                self.workLog.log(.flatMap)
+                guard val > 0 else { return .never }
+                return otherEmitter
+            })
+            .logResults(with: workLog)
+        
+        
+        emitter.emit(1)
+        emitter.emit(0)
+        otherEmitter = nil
+        XCTAssertEqual(workLog, [.flatMap, .flatMap, .ended, .finished])
+    }
+    
+    // MARK: -
+    
+    // MARK: flatMapLatest
+    
+    func testShouldHandleValue_WhenBroadcastingValue_WithFlatMapLatest_WithValue() {
+        let otherEmitter = Emitter<Int>()
+        
+        emitter
+            .flatMapLatest({ (_: Int) -> Futura.Signal<Int> in
+                self.workLog.log(.flatMap)
+                return otherEmitter
+            })
+            .logResults(with: workLog)
+        
+        otherEmitter.emit(2)
+        emitter.emit(0)
+        otherEmitter.emit(1)
+        XCTAssertEqual(workLog, [.flatMap, .values(testDescription(of: 1))])
+    }
+    
+    func testShouldHandleValue_WhenBroadcastingValue_WithFlatMapLatest_WithMultipleValues() {
+        let otherEmitter = Emitter<Int>()
+        
+        emitter
+            .flatMapLatest({ (val: Int) -> Futura.Signal<Int> in
+                self.workLog.log(.flatMap)
+                return otherEmitter.map { val * $0 }
+            })
+            .logResults(with: workLog)
+        
+        otherEmitter.emit(0)
+        emitter.emit(1)
+        otherEmitter.emit(2)
+        emitter.emit(2)
+        otherEmitter.emit(3)
+        XCTAssertEqual(workLog, [
+            .flatMap,
+            .values(testDescription(of: 2)),
+            .flatMap,
+            .values(testDescription(of: 6)),
+            ])
+    }
+    
+    func testShouldHandleError_WhenBroadcastingValue_WithFlatMapLatest_WithError() {
+        let otherEmitter = Emitter<Int>()
+        
+        emitter
+            .flatMapLatest({ (_: Int) -> Futura.Signal<Int> in
+                self.workLog.log(.flatMap)
+                return otherEmitter
+            })
+            .logResults(with: workLog)
+        
+        otherEmitter.emit(testError)
+        emitter.emit(0)
+        otherEmitter.emit(testError)
+        XCTAssertEqual(workLog, [.flatMap, .errors(testErrorDescription)])
+    }
+    
+    func testShouldHandlEended_WhenBroadcastingValue_WithFlatMapLatest_WithEnd() {
+        let otherEmitter = Emitter<Int>()
+        
+        emitter
+            .flatMapLatest({ (_: Int) -> Futura.Signal<Int> in
+                self.workLog.log(.flatMap)
+                return otherEmitter
+            })
+            .logResults(with: workLog)
+        
+        emitter.emit(0)
+        otherEmitter.end()
+        emitter.emit(0)
+        otherEmitter.emit(0)
+        XCTAssertEqual(workLog, [.flatMap, .ended, .finished, .flatMap])
+    }
+    
+    func testShouldHandleTerminated_WhenBroadcastingValue_WithFlatMapLatest_WithTerminate() {
+        let otherEmitter = Emitter<Int>()
+        
+        emitter
+            .flatMapLatest({ (_: Int) -> Futura.Signal<Int> in
+                self.workLog.log(.flatMap)
+                return otherEmitter
+            })
+            .logResults(with: workLog)
+        
+        emitter.emit(0)
+        otherEmitter.terminate(testError)
+        emitter.emit(0)
+        otherEmitter.emit(0)
+        XCTAssertEqual(workLog, [.flatMap, .terminated(testErrorDescription), .finished, .flatMap])
+    }
+    
+    func testShouldHandleError_WhenBroadcastingError_WithFlatMapLatest() {
+        let otherEmitter = Emitter<Int>()
+        
+        emitter
+            .flatMapLatest({ (_: Int) -> Futura.Signal<Int> in
+                self.workLog.log(.flatMap)
+                return otherEmitter
+            })
+            .logResults(with: workLog)
+        
+        otherEmitter.emit(2)
+        emitter.emit(testError)
+        otherEmitter.emit(1)
+        XCTAssertEqual(workLog, [.errors(testErrorDescription)])
+    }
+    
+    func testShouldHandleError_WhenBroadcastingValue_WithThrowingFlatMapLatest() {
+        let otherEmitter = Emitter<Int>()
+        
+        emitter
+            .flatMapLatest({ (_: Int) -> Futura.Signal<Int> in
+                self.workLog.log(.flatMap)
+                throw testError
+            })
+            .logResults(with: workLog)
+        
+        otherEmitter.emit(2)
+        emitter.emit(0)
+        otherEmitter.emit(1)
+        XCTAssertEqual(workLog, [.flatMap, .errors(testErrorDescription)])
+    }
+    
+    func testShouldHandleEnd_WhenClosing_WithFlatMapLatest() {
+        let otherEmitter = Emitter<Int>()
+        
+        emitter
+            .flatMapLatest({ (_: Int) -> Futura.Signal<Int> in
+                self.workLog.log(.flatMap)
+                return otherEmitter
+            })
+            .logResults(with: workLog)
+        
+        otherEmitter.emit(2)
+        emitter.end()
+        otherEmitter.emit(1)
+        XCTAssertEqual(workLog, [.ended, .finished])
+    }
+    
+    func testShouldHandleTerminate_WhenTerminating_WithFlatMapLatest() {
+        let otherEmitter = Emitter<Int>()
+        
+        emitter
+            .flatMapLatest({ (_: Int) -> Futura.Signal<Int> in
+                self.workLog.log(.flatMap)
+                return otherEmitter
+            })
+            .logResults(with: workLog)
+        
+        otherEmitter.emit(2)
+        emitter.terminate(testError)
+        otherEmitter.emit(1)
+        XCTAssertEqual(workLog, [.terminated(testErrorDescription), .finished])
+    }
+    
+    func testShouldHandleEnd_WhenDeallocating_WithFlatMapLatest() {
+        let otherEmitter = Emitter<Int>()
+        
+        emitter
+            .flatMapLatest({ (_: Int) -> Futura.Signal<Int> in
+                self.workLog.log(.flatMap)
+                return otherEmitter
+            })
+            .logResults(with: workLog)
+        
+        otherEmitter.emit(2)
+        emitter = nil
+        otherEmitter.emit(1)
+        XCTAssertEqual(workLog, [.ended, .finished])
+    }
+    
+    func testShouldHandleEnd_WhenDeallocatingLatestInner_WithFlatMapLatest() {
+        var otherEmitter_1: Emitter<Int>! = .init()
+        var otherEmitter_2: Emitter<Int>! = .init()
+        
+        emitter
+            .flatMapLatest({ (val: Int) -> Futura.Signal<Int> in
+                self.workLog.log(.flatMap)
+                if val > 0 {
+                    return otherEmitter_1
+                } else {
+                    return otherEmitter_2
+                }
+            })
+            .logResults(with: workLog)
+        
+        
+        emitter.emit(1)
+        emitter.emit(0)
+        otherEmitter_1 = nil
+        XCTAssertEqual(workLog, [.flatMap, .flatMap])
+        otherEmitter_2 = nil
+        XCTAssertEqual(workLog, [.flatMap, .flatMap, .ended, .finished])
     }
 
     // MARK: -
@@ -1360,6 +1599,23 @@ class SignalTests: XCTestCase {
         XCTAssertNil(third)
 
         XCTAssertNil(merged)
+    }
+
+    // MARK: -
+
+    // MARK: never
+
+    func testShouldNeverHandle_WhenUsingNever() {
+        var neverSignal: Signal<Void>! = .never
+        
+        neverSignal
+            .logResults(with: workLog)
+        
+        // since ended/terminated/finished handlers are called always it is ok that those occoured here
+        XCTAssertTrue(neverSignal.isFinished)
+        XCTAssertEqual(workLog, [.ended, .finished])
+        neverSignal = nil
+        XCTAssertEqual(workLog, [.ended, .finished])
     }
 
     // MARK: -

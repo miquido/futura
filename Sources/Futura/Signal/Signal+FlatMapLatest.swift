@@ -18,23 +18,26 @@ public extension Signal {
     /// its value using other Signal.
     /// Returns new instance of Signal that will pass tokens
     /// transformed with given function combined with returned Signal.
+    /// It will keep only latest signal as active and pass its tokens.
+    /// If latest signal finishes resulting signal also finishes.
     /// It might throw to indicate error - throwed error will
     /// be automatically switched to Signal error.
     ///
     /// - Parameter transform: Value transformation function.
     /// Returned Signal will be flattened. Might throw to pass errors.
     /// - Returns: New Signal instance passing transformed tokens.
-    func flatMap<T>(_ transform: @escaping (Value) throws -> Signal<T>) -> Signal<T> {
-        return SignalFlatMapper(source: self, transform: transform)
+    func flatMapLatest<T>(_ transform: @escaping (Value) throws -> Signal<T>) -> Signal<T> {
+        return SignalFlatMapperLatest(source: self, transform: transform)
     }
 }
 
-internal final class SignalFlatMapper<SourceValue, Value>: SignalForwarder<SourceValue, Value> {
+internal final class SignalFlatMapperLatest<SourceValue, Value>: SignalForwarder<SourceValue, Value> {
     private var mappedCollector: SubscriptionCollector = .init()
 
     internal init(source: Signal<SourceValue>, transform: @escaping (SourceValue) throws -> Signal<Value>) {
         super.init(source: source, collector: source.collector)
         collect(source.subscribe { event in
+            self.mappedCollector.deactivate()
             self.mappedCollector = .init()
             switch event {
                 case let .token(.value(value)):

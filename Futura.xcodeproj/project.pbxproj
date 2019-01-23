@@ -23,7 +23,8 @@
 
 /* Begin PBXBuildFile section */
 		40828A7221F102B8000DDE1A /* TimedEmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40828A7121F102B8000DDE1A /* TimedEmitter.swift */; };
-		408CF8C821F0AFF700F0F390 /* SignalErrorCatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 408CF8C721F0AFF700F0F390 /* SignalErrorCatcher.swift */; };
+		408CF8C821F0AFF700F0F390 /* Signal+Catch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 408CF8C721F0AFF700F0F390 /* Signal+Catch.swift */; };
+		40DFB0A521F754F8006F1EFD /* Signal+FlatMapLatest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40DFB0A421F754F8006F1EFD /* Signal+FlatMapLatest.swift */; };
 		OBJ_104 /* FutureZipTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_37 /* FutureZipTests.swift */; };
 		OBJ_105 /* PromiseAndFutureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_38 /* PromiseAndFutureTests.swift */; };
 		OBJ_106 /* RecursiveLockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_39 /* RecursiveLockTests.swift */; };
@@ -39,13 +40,13 @@
 		OBJ_59 /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_12 /* Result.swift */; };
 		OBJ_60 /* Emitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_14 /* Emitter.swift */; };
 		OBJ_61 /* Signal.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_15 /* Signal.swift */; };
-		OBJ_62 /* SignalFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_16 /* SignalFilter.swift */; };
-		OBJ_63 /* SignalFlatMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_17 /* SignalFlatMapper.swift */; };
-		OBJ_64 /* SignalForwarder.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_18 /* SignalForwarder.swift */; };
-		OBJ_65 /* SignalFutureFlatMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_19 /* SignalFutureFlatMapper.swift */; };
-		OBJ_66 /* SignalMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_20 /* SignalMapper.swift */; };
-		OBJ_67 /* SignalMerger.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_21 /* SignalMerger.swift */; };
-		OBJ_68 /* SignalScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_22 /* SignalScheduler.swift */; };
+		OBJ_62 /* Signal+Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_16 /* Signal+Filter.swift */; };
+		OBJ_63 /* Signal+FlatMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_17 /* Signal+FlatMap.swift */; };
+		OBJ_64 /* Signal+Forward.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_18 /* Signal+Forward.swift */; };
+		OBJ_65 /* Signal+FutureFlatMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_19 /* Signal+FutureFlatMap.swift */; };
+		OBJ_66 /* Signal+Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_20 /* Signal+Map.swift */; };
+		OBJ_67 /* Signal+Merge.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_21 /* Signal+Merge.swift */; };
+		OBJ_68 /* Signal+Switch.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_22 /* Signal+Switch.swift */; };
 		OBJ_69 /* Subscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_23 /* Subscription.swift */; };
 		OBJ_70 /* SubscriptionCollector.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_24 /* SubscriptionCollector.swift */; };
 		OBJ_71 /* Mutex.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_26 /* Mutex.swift */; };
@@ -92,7 +93,8 @@
 
 /* Begin PBXFileReference section */
 		40828A7121F102B8000DDE1A /* TimedEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimedEmitter.swift; sourceTree = "<group>"; };
-		408CF8C721F0AFF700F0F390 /* SignalErrorCatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalErrorCatcher.swift; sourceTree = "<group>"; };
+		408CF8C721F0AFF700F0F390 /* Signal+Catch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Signal+Catch.swift"; sourceTree = "<group>"; };
+		40DFB0A421F754F8006F1EFD /* Signal+FlatMapLatest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Signal+FlatMapLatest.swift"; sourceTree = "<group>"; };
 		"Futura::Futura::Product" /* Futura.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Futura.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Futura::FuturaPerformanceTests::Product" /* FuturaPerformanceTests.xctest */ = {isa = PBXFileReference; lastKnownFileType = file; path = FuturaPerformanceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Futura::FuturaTests::Product" /* FuturaTests.xctest */ = {isa = PBXFileReference; lastKnownFileType = file; path = FuturaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -101,13 +103,13 @@
 		OBJ_12 /* Result.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
 		OBJ_14 /* Emitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Emitter.swift; sourceTree = "<group>"; };
 		OBJ_15 /* Signal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Signal.swift; sourceTree = "<group>"; };
-		OBJ_16 /* SignalFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalFilter.swift; sourceTree = "<group>"; };
-		OBJ_17 /* SignalFlatMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalFlatMapper.swift; sourceTree = "<group>"; };
-		OBJ_18 /* SignalForwarder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalForwarder.swift; sourceTree = "<group>"; };
-		OBJ_19 /* SignalFutureFlatMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalFutureFlatMapper.swift; sourceTree = "<group>"; };
-		OBJ_20 /* SignalMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalMapper.swift; sourceTree = "<group>"; };
-		OBJ_21 /* SignalMerger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalMerger.swift; sourceTree = "<group>"; };
-		OBJ_22 /* SignalScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalScheduler.swift; sourceTree = "<group>"; };
+		OBJ_16 /* Signal+Filter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Signal+Filter.swift"; sourceTree = "<group>"; };
+		OBJ_17 /* Signal+FlatMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Signal+FlatMap.swift"; sourceTree = "<group>"; };
+		OBJ_18 /* Signal+Forward.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Signal+Forward.swift"; sourceTree = "<group>"; };
+		OBJ_19 /* Signal+FutureFlatMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Signal+FutureFlatMap.swift"; sourceTree = "<group>"; };
+		OBJ_20 /* Signal+Map.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Signal+Map.swift"; sourceTree = "<group>"; };
+		OBJ_21 /* Signal+Merge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Signal+Merge.swift"; sourceTree = "<group>"; };
+		OBJ_22 /* Signal+Switch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Signal+Switch.swift"; sourceTree = "<group>"; };
 		OBJ_23 /* Subscription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Subscription.swift; sourceTree = "<group>"; };
 		OBJ_24 /* SubscriptionCollector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionCollector.swift; sourceTree = "<group>"; };
 		OBJ_26 /* Mutex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mutex.swift; sourceTree = "<group>"; };
@@ -162,14 +164,15 @@
 				OBJ_14 /* Emitter.swift */,
 				40828A7121F102B8000DDE1A /* TimedEmitter.swift */,
 				OBJ_15 /* Signal.swift */,
-				OBJ_16 /* SignalFilter.swift */,
-				408CF8C721F0AFF700F0F390 /* SignalErrorCatcher.swift */,
-				OBJ_17 /* SignalFlatMapper.swift */,
-				OBJ_18 /* SignalForwarder.swift */,
-				OBJ_19 /* SignalFutureFlatMapper.swift */,
-				OBJ_20 /* SignalMapper.swift */,
-				OBJ_21 /* SignalMerger.swift */,
-				OBJ_22 /* SignalScheduler.swift */,
+				OBJ_16 /* Signal+Filter.swift */,
+				408CF8C721F0AFF700F0F390 /* Signal+Catch.swift */,
+				OBJ_17 /* Signal+FlatMap.swift */,
+				40DFB0A421F754F8006F1EFD /* Signal+FlatMapLatest.swift */,
+				OBJ_18 /* Signal+Forward.swift */,
+				OBJ_19 /* Signal+FutureFlatMap.swift */,
+				OBJ_20 /* Signal+Map.swift */,
+				OBJ_21 /* Signal+Merge.swift */,
+				OBJ_22 /* Signal+Switch.swift */,
 				OBJ_23 /* Subscription.swift */,
 				OBJ_24 /* SubscriptionCollector.swift */,
 			);
@@ -411,14 +414,15 @@
 				OBJ_59 /* Result.swift in Sources */,
 				OBJ_60 /* Emitter.swift in Sources */,
 				OBJ_61 /* Signal.swift in Sources */,
-				OBJ_62 /* SignalFilter.swift in Sources */,
-				OBJ_63 /* SignalFlatMapper.swift in Sources */,
-				OBJ_64 /* SignalForwarder.swift in Sources */,
-				OBJ_65 /* SignalFutureFlatMapper.swift in Sources */,
-				OBJ_66 /* SignalMapper.swift in Sources */,
-				408CF8C821F0AFF700F0F390 /* SignalErrorCatcher.swift in Sources */,
-				OBJ_67 /* SignalMerger.swift in Sources */,
-				OBJ_68 /* SignalScheduler.swift in Sources */,
+				40DFB0A521F754F8006F1EFD /* Signal+FlatMapLatest.swift in Sources */,
+				OBJ_62 /* Signal+Filter.swift in Sources */,
+				OBJ_63 /* Signal+FlatMap.swift in Sources */,
+				OBJ_64 /* Signal+Forward.swift in Sources */,
+				OBJ_65 /* Signal+FutureFlatMap.swift in Sources */,
+				OBJ_66 /* Signal+Map.swift in Sources */,
+				408CF8C821F0AFF700F0F390 /* Signal+Catch.swift in Sources */,
+				OBJ_67 /* Signal+Merge.swift in Sources */,
+				OBJ_68 /* Signal+Switch.swift in Sources */,
 				OBJ_69 /* Subscription.swift in Sources */,
 				OBJ_70 /* SubscriptionCollector.swift in Sources */,
 				OBJ_71 /* Mutex.swift in Sources */,
