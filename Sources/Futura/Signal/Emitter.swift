@@ -26,7 +26,7 @@ public final class Emitter<Value>: Signal<Value> {
     ///
     /// - Parameter value: The value that will be broadcasted from this emitter.
     public func emit(_ value: Value) {
-        broadcast(.value(value))
+        broadcast(.success(value))
     }
 
     /// Broadcasts given error to all subscriptions.
@@ -34,7 +34,7 @@ public final class Emitter<Value>: Signal<Value> {
     ///
     /// - Parameter error: The error that will be broadcasted from this emitter.
     public func emit(_ error: Error) {
-        broadcast(.error(error))
+        broadcast(.failure(error))
     }
 
     /// Finishes this Emitter and all associated Signals.

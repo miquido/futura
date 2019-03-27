@@ -38,7 +38,7 @@ public final class TimedEmitter: Signal<Void> {
         timer.setEventHandler(handler: { [weak self] in
             guard let self = self else { return }
             guard !self.isFinished else { return }
-            self.broadcast(.value(Void()))
+            self.broadcast(.success(Void()))
         })
         timer.resume()
     }

@@ -37,15 +37,15 @@ internal final class SignalFlatMapper<SourceValue, Value>: SignalForwarder<Sourc
         super.init(source: source, collector: source.collector)
         collect(source.subscribe { event in
             switch event {
-                case let .token(.value(value)):
+                case let .token(.success(value)):
                     do {
                         let subscribtion = try transform(value).subscribe { [weak self] event in
                             guard let self = self else { return }
                             switch event {
-                                case let .token(.value(value)):
-                                    self.broadcast(.value(value))
-                                case let .token(.error(error)):
-                                    self.broadcast(.error(error))
+                                case let .token(.success(value)):
+                                    self.broadcast(.success(value))
+                                case let .token(.failure(error)):
+                                    self.broadcast(.failure(error))
                                 case let .finish(reason):
                                     self.finish(reason)
                             }
@@ -53,10 +53,10 @@ internal final class SignalFlatMapper<SourceValue, Value>: SignalForwarder<Sourc
                         guard let sub = subscribtion else { return }
                         self.collect(sub)
                     } catch {
-                        self.broadcast(.error(error))
+                        self.broadcast(.failure(error))
                     }
-                case let .token(.error(error)):
-                    self.broadcast(.error(error))
+                case let .token(.failure(error)):
+                    self.broadcast(.failure(error))
                 case let .finish(reason):
                     self.finish(reason)
             }

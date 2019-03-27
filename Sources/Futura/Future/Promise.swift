@@ -36,7 +36,7 @@ public final class Promise<Value> {
     /// transformations and handlers made on associated Future. Default is .undefined.
     public convenience init(succeededWith value: Value, executionContext: ExecutionContext = .undefined) {
         self.init(executionContext: executionContext)
-        future.become(.resulted(with: .value(value)))
+        future.become(.resulted(with: .success(value)))
     }
 
     /// Creates already finished Promise with given error and context.
@@ -46,21 +46,21 @@ public final class Promise<Value> {
     /// transformations and handlers made on associated Future. Default is .undefined.
     public convenience init(failedWith error: Error, executionContext: ExecutionContext = .undefined) {
         self.init(executionContext: executionContext)
-        future.become(.resulted(with: .error(error)))
+        future.become(.resulted(with: .failure(error)))
     }
 
     /// Finish Promise with given value. It will be ignored when already finished.
     ///
     /// - Parameter value: Value finishing this Promise.
     public func fulfill(with value: Value) {
-        future.become(.resulted(with: .value(value)))
+        future.become(.resulted(with: .success(value)))
     }
 
     /// Finish Promise with given error. It will be ignored when already finished.
     ///
     /// - Parameter error: Error completing this Promise.
     public func `break`(with error: Error) {
-        future.become(.resulted(with: .error(error)))
+        future.become(.resulted(with: .failure(error)))
     }
 
     /// Finish Promise without value or error. It will be ignored when already finished.
