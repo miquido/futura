@@ -20,7 +20,7 @@
 /// It does not use any cache or initial value mechanism so all tokens
 /// passed before observation will never occour.
 public class Signal<Value> {
-    internal typealias Token = Result<Value>
+    internal typealias Token = Result<Value, Error>
     
     private var subscriptionID: Subscription.ID = 0
     internal let internalCollector: SubscriptionCollector = .init()
@@ -126,7 +126,7 @@ public extension Signal {
     @discardableResult
     func values(_ observer: @escaping (Value) -> Void) -> Signal {
         collect(subscribe { event in
-            guard case let .token(.value(value)) = event else { return }
+            guard case let .token(.success(value)) = event else { return }
             observer(value)
         })
         return self
@@ -139,7 +139,7 @@ public extension Signal {
     @discardableResult
     func errors(_ observer: @escaping (Error) -> Void) -> Signal {
         collect(subscribe { event in
-            guard case let .token(.error(value)) = event else { return }
+            guard case let .token(.failure(value)) = event else { return }
             observer(value)
         })
         return self

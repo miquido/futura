@@ -3,6 +3,7 @@
 fastlane/report.xml
 
 ## Build generated
+.build/
 build/
 DerivedData
 

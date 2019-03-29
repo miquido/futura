@@ -32,13 +32,13 @@ internal final class SignalErrorCatcher<Value>: SignalForwarder<Value, Value> {
         super.init(source: source, collector: source.collector)
         collect(source.subscribe { event in
             switch event {
-                case let .token(.value(value)):
-                    self.broadcast(.value(value))
-                case let .token(.error(error)):
+                case let .token(.success(value)):
+                    self.broadcast(.success(value))
+                case let .token(.failure(error)):
                     do {
                         try catcher(error)
                     } catch {
-                        self.broadcast(.error(error))
+                        self.broadcast(.failure(error))
                     }
                 case let .finish(reason):
                     self.finish(reason)

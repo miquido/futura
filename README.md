@@ -4,7 +4,7 @@
 [![codecov](https://codecov.io/gh/miquido/futura/branch/master/graph/badge.svg)](https://codecov.io/gh/miquido/futura)
 [![Platforms](https://img.shields.io/badge/platform-iOS%20|%20macOS-gray.svg?style=flat)]()
 [![Swift Package Manager compatible](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg)](https://github.com/apple/swift-package-manager)
-[![SwiftVersion](https://img.shields.io/badge/Swift-4.2-brightgreen.svg)]()
+[![SwiftVersion](https://img.shields.io/badge/Swift-5.0-brightgreen.svg)]()
 
 Futura is a library that provides simple yet powerful tools for working with asynchronous and concurrent code in Swift.
 

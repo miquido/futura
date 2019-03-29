@@ -28,7 +28,7 @@ public final class Future<Value> {
     /// - Parameter executionContext: ExecutionContext that will be used for all
     /// transformations and handlers made on this Future. Default is .undefined.
     public convenience init(succeededWith result: Value, executionContext: ExecutionContext = .undefined) {
-        self.init(with: .value(result), executionContext: executionContext)
+        self.init(with: .success(result), executionContext: executionContext)
     }
 
     /// Creates already finished Future with given error and context.
@@ -37,10 +37,10 @@ public final class Future<Value> {
     /// - Parameter executionContext: ExecutionContext that will be used for all
     /// transformations and handlers made on this Future. Default is .undefined.
     public convenience init(failedWith reason: Error, executionContext: ExecutionContext = .undefined) {
-        self.init(with: .error(reason), executionContext: executionContext)
+        self.init(with: .failure(reason), executionContext: executionContext)
     }
 
-    internal init(with result: Result<Value>? = nil, executionContext: ExecutionContext) {
+    internal init(with result: Result<Value, Error>? = nil, executionContext: ExecutionContext) {
         self.executionContext = executionContext
         if let result = result {
             self.state = .resulted(with: result)
@@ -73,7 +73,7 @@ public extension Future {
     @discardableResult
     func value(_ handler: @escaping (Value) -> Void) -> Self {
         observe { state in
-            guard case let .resulted(.value(value)) = state else { return }
+            guard case let .resulted(.success(value)) = state else { return }
             handler(value)
         }
         return self
@@ -90,7 +90,7 @@ public extension Future {
     @discardableResult
     func error(_ handler: @escaping (Error) -> Void) -> Self {
         observe { state in
-            guard case let .resulted(.error(reason)) = state else { return }
+            guard case let .resulted(.failure(reason)) = state else { return }
             handler(reason)
         }
         return self
@@ -141,14 +141,14 @@ public extension Future {
         let future: Future<T> = .init(executionContext: executionContext)
         observe { state in
             switch state {
-                case let .resulted(.value(value)):
+                case let .resulted(.success(value)):
                     do {
-                        try future.become(.resulted(with: .value(transformation(value))))
+                        try future.become(.resulted(with: .success(transformation(value))))
                     } catch {
-                        future.become(.resulted(with: .error(error)))
+                        future.become(.resulted(with: .failure(error)))
                     }
-                case let .resulted(.error(reason)):
-                    future.become(.resulted(with: .error(reason)))
+                case let .resulted(.failure(reason)):
+                    future.become(.resulted(with: .failure(reason)))
                 case .canceled:
                     future.become(.canceled)
                 case .waiting: break
@@ -171,16 +171,16 @@ public extension Future {
         let future: Future<T> = .init(executionContext: executionContext)
         observe { state in
             switch state {
-                case let .resulted(.value(value)):
+                case let .resulted(.success(value)):
                     do {
                         try transformation(value).observe {
                             future.become($0)
                         }
                     } catch {
-                        future.become(.resulted(with: .error(error)))
+                        future.become(.resulted(with: .failure(error)))
                     }
-                case let .resulted(.error(reason)):
-                    future.become(.resulted(with: .error(reason)))
+                case let .resulted(.failure(reason)):
+                    future.become(.resulted(with: .failure(reason)))
                 case .canceled:
                     future.become(.canceled)
                 case .waiting: break
@@ -216,14 +216,14 @@ public extension Future {
         let future: Future<Value> = .init(executionContext: executionContext)
         observe { state in
             switch state {
-            case let .resulted(.value(value)):
-                future.become(.resulted(with: .value(value)))
-            case let .resulted(.error(reason)):
+            case let .resulted(.success(value)):
+                future.become(.resulted(with: .success(value)))
+            case let .resulted(.failure(reason)):
                 do {
                     try transformation(reason)
                     future.become(.canceled)
                 } catch {
-                    future.become(.resulted(with: .error(error)))
+                    future.become(.resulted(with: .failure(error)))
                 }
             case .canceled:
                 future.become(.canceled)
@@ -247,13 +247,13 @@ public extension Future {
         let future: Future<Value> = .init(executionContext: executionContext)
         observe { state in
             switch state {
-            case let .resulted(.value(value)):
-                future.become(.resulted(with: .value(value)))
-            case let .resulted(.error(reason)):
+            case let .resulted(.success(value)):
+                future.become(.resulted(with: .success(value)))
+            case let .resulted(.failure(reason)):
                 do {
-                    try future.become(.resulted(with: .value(transformation(reason))))
+                    try future.become(.resulted(with: .success(transformation(reason))))
                 } catch {
-                    future.become(.resulted(with: .error(error)))
+                    future.become(.resulted(with: .failure(error)))
                 }
             case .canceled:
                 future.become(.canceled)
@@ -283,7 +283,7 @@ public extension Future {
 internal extension Future {
     enum State {
         case waiting
-        case resulted(with: Result<Value>)
+        case resulted(with: Result<Value, Error>)
         case canceled
     }
 
@@ -336,16 +336,16 @@ public func zip<T, U>(_ f1: Future<T>, _ f2: Future<U>) -> Future<(T, U)> {
 
     f1.observe { state in
         switch state {
-            case let .resulted(.value(value)):
+            case let .resulted(.success(value)):
                 lock.lock()
                 defer { lock.unlock() }
                 if case let (_, r2?) = results {
-                    future.become(.resulted(with: .value((value, r2))))
+                    future.become(.resulted(with: .success((value, r2))))
                 } else {
                     results = (value, nil)
                 }
-            case let .resulted(.error(reason)):
-                future.become(.resulted(with: .error(reason)))
+            case let .resulted(.failure(reason)):
+                future.become(.resulted(with: .failure(reason)))
             case .canceled:
                 future.become(.canceled)
             case .waiting: break
@@ -353,16 +353,16 @@ public func zip<T, U>(_ f1: Future<T>, _ f2: Future<U>) -> Future<(T, U)> {
     }
     f2.observe { state in
         switch state {
-            case let .resulted(.value(value)):
+            case let .resulted(.success(value)):
                 lock.lock()
                 defer { lock.unlock() }
                 if case let (r1?, _) = results {
-                    future.become(.resulted(with: .value((r1, value))))
+                    future.become(.resulted(with: .success((r1, value))))
                 } else {
                     results = (nil, value)
                 }
-            case let .resulted(.error(reason)):
-                future.become(.resulted(with: .error(reason)))
+            case let .resulted(.failure(reason)):
+                future.become(.resulted(with: .failure(reason)))
             case .canceled:
                 future.become(.canceled)
             case .waiting: break
@@ -388,14 +388,14 @@ public func zip<T>(_ futures: [Future<T>]) -> Future<[T]> {
     for future in futures {
         future.observe { state in
             switch state {
-                case let .resulted(.value(value)):
+                case let .resulted(.success(value)):
                     lock.lock()
                     defer { lock.unlock() }
                     results.append(value)
                     guard results.count == count else { return }
-                    zippedFuture.become(.resulted(with: .value(results)))
-                case let .resulted(.error(reason)):
-                    zippedFuture.become(.resulted(with: .error(reason)))
+                    zippedFuture.become(.resulted(with: .success(results)))
+                case let .resulted(.failure(reason)):
+                    zippedFuture.become(.resulted(with: .failure(reason)))
                 case .canceled:
                     zippedFuture.become(.canceled)
                 case .waiting: break
@@ -417,9 +417,9 @@ public func future<T>(on worker: Worker = OperationQueue(), _ body: @escaping ()
     let future: Future<T> = .init(executionContext: .explicit(worker))
     worker.schedule {
         do {
-            try future.become(.resulted(with: .value(body())))
+            try future.become(.resulted(with: .success(body())))
         } catch {
-            future.become(.resulted(with: .error(error)))
+            future.become(.resulted(with: .failure(error)))
         }
     }
     return future
