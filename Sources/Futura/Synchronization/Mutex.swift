@@ -12,10 +12,25 @@
  See the License for the specific language governing permissions and
  limitations under the License. */
 
+#if os(Linux)
+import Glibc
+#else
 import Darwin.POSIX
+#endif
+
+#if os(Linux)
+fileprivate let nSecMsec: __time_t = 1_000_000
+fileprivate let mSecSec: __time_t = 1_000 * nSecMsec
+#else
+fileprivate let nSecMsec: __darwin_time_t = 1_000_000
+fileprivate let mSecSec: __darwin_time_t = 1_000 * nSecMsec
+#endif
 
 /// pthread_mutex api wrapper
 public enum Mutex {
+    /// Error thrown on mutex timeout
+    public struct Timeout: Error {}
+    
     /// pthread_mutex_t pointer type
     public typealias Pointer = UnsafeMutablePointer<pthread_mutex_t>
 
@@ -24,6 +39,7 @@ public enum Mutex {
     /// to deallocate it manually by calling destroy function.
     ///
     /// - Parameter recursive: Tells if created mutex should be recursive or not.
+    /// - Returns: Pointer to new mutex instance
     @inline(__always)
     public static func make(recursive: Bool) -> Pointer {
         let pointer: UnsafeMutablePointer<pthread_mutex_t> = .allocate(capacity: 1)
@@ -54,6 +70,33 @@ public enum Mutex {
     @inline(__always)
     public static func lock(_ pointer: Pointer) {
         pthread_mutex_lock(pointer)
+    }
+    
+    /// Locks on instance of pthread_mutex or waits until unlocked if locked.
+    /// Throws an error if time condition was not met
+    ///
+    /// - Parameter pointer: Pointer to mutex to be locked.
+    /// - Parameter timeout: Lock wait timeout in seconds.
+    @inline(__always)
+    public static func lock(_ pointer: Pointer, timeout: UInt8) throws -> Void {
+        #if os(Linux)
+        var timeout = __time_t(timeout) * mSecSec
+        #else
+        var timeout = __darwin_time_t(timeout) * mSecSec
+        #endif
+        
+        var rem = timespec(tv_sec: 0, tv_nsec: 0)
+        var req = timespec(tv_sec: 0, tv_nsec: 0)
+        while pthread_mutex_trylock(pointer) != 0 {
+            req.tv_nsec = timeout < nSecMsec ? timeout : nSecMsec
+            while nanosleep(&req, &rem) == EINTR {
+                req.tv_nsec = rem.tv_nsec
+            }
+            timeout -= (req.tv_nsec - rem.tv_nsec)
+            if timeout <= 0 {
+                throw Timeout()
+            } else { continue }
+        }
     }
 
     /// Tries to lock on instance of pthread_mutex. Locks if unlocked or passes if locked.

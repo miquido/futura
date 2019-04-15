@@ -13,6 +13,7 @@
  limitations under the License. */
 
 import Futura
+import FuturaTest
 import XCTest
 
 class RecursiveLockTests: XCTestCase {
