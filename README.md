@@ -132,23 +132,23 @@ There are two helpers here. Easy to use pthread_mutex wrapper (Mutex) and even e
 
 ### Atomics
 
-Currently there is only one atomic here. It is easy to use  atomic_flag wrapper - AtomicFlag.
+Currently, there is only one atomic here. It is easy to use atomic_flag wrapper - AtomicFlag.
 
 ### Future
 
-For tasks that are performed only once, there is a nice and performant promise implementation. It enables you to make your code better organized and easier to read. Specially useful when dealing with network requests, database transactions and other one time tasks.
+For tasks that are performed only once, there is a nice and performant promise implementation. It enables you to make your code better organized and easier to read. Especially useful when dealing with network requests, database transactions, and other one time tasks.
 
 ### Signal
 
-If you have continous stream of data or unpredictable events you should use Signal. It allows you to react on events or transform data that comes asynchronously. It works really nice for handling user interactions or network data streams. Note here that it is not Rx implementation, it is not compatible and behaves different than it.
+If you have continuous stream of data or unpredictable events you should use Signal. It allows you to react to events or transform data that comes asynchronously. It works really nice for handling user interactions or network data streams. Note here that it is not Rx implementation, it is not compatible and behaves differently than it.
 
 ### FuturaTest
 
-It is set of tools and extensions that helps writing unit tests. You can use it to simplify asynchronous code tests (i.e. asyncTest extesnion for XCTestCase) or even make it synchronous in some cases (with TestWorker support). Lot of those tools are used to perform tests internally.
+It is a set of tools and extensions that help writing unit tests. You can use it to simplify asynchronous code tests (i.e. asyncTest extension for XCTestCase) or even make it synchronous in some cases (with TestWorker support). A lot of those tools are used to perform tests internally.
 
 ## How to get involved?
 
-Since Futura is open source project you can feel invited to make it even better. If you have found any kind of bug please make an issue. If any part of documentation is missing or not comperhensive propose some change or describe it using issue. If you feel that there is smoething can be done better just fork this repository and propose some changes!
+Since Futura is open source project you can feel invited to make it even better. If you have found any kind of bug please make an issue. If any part of the documentation is missing or not comprehensive propose some change or describe it using issue. If you feel that there is something can be done better just fork this repository and propose some changes!
 
 ## License
 
