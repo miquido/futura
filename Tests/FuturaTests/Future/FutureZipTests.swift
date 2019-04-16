@@ -602,9 +602,7 @@ class FutureZipTests: XCTestCase {
 
     // make sure that tests run with thread sanitizer enabled
     func testShouldWorkProperly_WhenCompletingWithValueOnManyThreads() {
-        asyncTest(timeoutBody: {
-            XCTFail("Not in time - possible deadlock or fail")
-        }) { complete in
+        asyncTest { complete in
             var promises: [Promise<Int>] = Array()
             promises.reserveCapacity(101)
             for _ in 0 ... 100 {
@@ -669,9 +667,7 @@ class FutureZipTests: XCTestCase {
 
     // make sure that tests run with thread sanitizer enabled
     func testShouldWorkProperly_WhenCompletingWithErrorOnManyThreads() {
-        asyncTest(timeoutBody: {
-            XCTFail("Not in time - possible deadlock or fail")
-        }) { complete in
+        asyncTest { complete in
             var promises: [Promise<Int>] = Array()
             promises.reserveCapacity(101)
             for _ in 0 ... 100 {
@@ -736,9 +732,7 @@ class FutureZipTests: XCTestCase {
 
     // make sure that tests run with thread sanitizer enabled
     func testShouldWorkProperly_WhenCompletingWithCancelOnManyThreads() {
-        asyncTest(timeoutBody: {
-            XCTFail("Not in time - possible deadlock or fail")
-        }) { complete in
+        asyncTest { complete in
             var promises: [Promise<Int>] = Array()
             promises.reserveCapacity(101)
             for _ in 0 ... 100 {
@@ -803,9 +797,7 @@ class FutureZipTests: XCTestCase {
 
     // make sure that tests run with thread sanitizer enabled
     func testShouldWorkProperly_WhenCompletingWithValueOnManyThreads_UsingArray() {
-        asyncTest(timeoutBody: {
-            XCTFail("Not in time - possible deadlock or fail")
-        }) { complete in
+        asyncTest { complete in
             var promises: [Promise<Int>] = Array()
             promises.reserveCapacity(101)
             for _ in 0 ... 100 {
@@ -864,9 +856,7 @@ class FutureZipTests: XCTestCase {
 
     // make sure that tests run with thread sanitizer enabled
     func testShouldWorkProperly_WhenCompletingWithErrorOnManyThreads_UsingArray() {
-        asyncTest(timeoutBody: {
-            XCTFail("Not in time - possible deadlock or fail")
-        }) { complete in
+        asyncTest { complete in
             var promises: [Promise<Int>] = Array()
             promises.reserveCapacity(101)
             for _ in 0 ... 100 {
@@ -925,9 +915,7 @@ class FutureZipTests: XCTestCase {
 
     // make sure that tests run with thread sanitizer enabled
     func testShouldWorkProperly_WhenCompletingWithCancelOnManyThreads_UsingArray() {
-        asyncTest(timeoutBody: {
-            XCTFail("Not in time - possible deadlock or fail")
-        }) { complete in
+        asyncTest { complete in
             var promises: [Promise<Int>] = Array()
             promises.reserveCapacity(101)
             for _ in 0 ... 100 {

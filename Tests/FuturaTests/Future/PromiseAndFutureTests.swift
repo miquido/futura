@@ -31,6 +31,57 @@ class PromiseAndFutureTestsTests: XCTestCase {
     // MARK: -
 
     // MARK: completing
+    
+    func testX() {
+        var promise: Promise<Int> = .init()
+        
+        var e = promise.future.expectValue(timeout: 1)
+        promise.future.expectValue({ $0 == 1 }, timeout: 1)
+        promise.future.expectError(timeout: 1)
+        promise.future.expectError({ $0 is String }, timeout: 1)
+        promise.future.expectCancelled(timeout: 1)
+        e.waitForExpectation()
+        
+        promise = .init()
+        promise.fulfill(with: 0)
+        
+        e = promise.future.expectValue(timeout: 1)
+        promise.future.expectValue({ $0 == 1 }, timeout: 1)
+        promise.future.expectError(timeout: 1)
+        promise.future.expectError({ $0 is String }, timeout: 1)
+        promise.future.expectCancelled(timeout: 1)
+        e.waitForExpectation()
+        
+        promise = .init()
+        promise.fulfill(with: 1)
+        
+        e = promise.future.expectValue(timeout: 1)
+        promise.future.expectValue({ $0 == 1 }, timeout: 1)
+        promise.future.expectError(timeout: 1)
+        promise.future.expectError({ $0 is String }, timeout: 1)
+        promise.future.expectCancelled(timeout: 1)
+        e.waitForExpectation()
+        
+        promise = .init()
+        promise.break(with: testError)
+        
+        e = promise.future.expectValue(timeout: 1)
+        promise.future.expectValue({ $0 == 1 }, timeout: 1)
+        promise.future.expectError(timeout: 1)
+        promise.future.expectError({ $0 is String }, timeout: 1)
+        promise.future.expectCancelled(timeout: 1)
+        e.waitForExpectation()
+        
+        promise = .init()
+        promise.cancel()
+        
+        e = promise.future.expectValue(timeout: 1)
+        promise.future.expectValue({ $0 == 1 }, timeout: 1)
+        promise.future.expectError(timeout: 1)
+        promise.future.expectError({ $0 is String }, timeout: 1)
+        promise.future.expectCancelled(timeout: 1)
+        e.waitForExpectation()
+    }
 
     func testShouldHandleValue_WhenCompletingWithValue() {
         promise.future
@@ -1387,10 +1438,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
 
     // make sure that tests run with thread sanitizer enabled
     func testShouldWorkProperly_WhenAccessingOnManyThreads() {
-        asyncTest(iterationTimeout: 5,
-                  timeoutBody: {
-                      XCTFail("Not in time - possible deadlock or fail")
-        }) { complete in
+        asyncTest { complete in
             let future: Future<Int> = Future<Int>(succeededWith: 0)
 
             let dispatchQueue: DispatchQueue = DispatchQueue(label: "test", qos: .default, attributes: .concurrent)
@@ -1439,10 +1487,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
 
     // make sure that tests run with thread sanitizer enabled
     func testShouldWorkProperly_WhenTransformingOnManyThreads() {
-        asyncTest(iterationTimeout: 5,
-                  timeoutBody: {
-                      XCTFail("Not in time - possible deadlock or fail")
-        }) { complete in
+        asyncTest { complete in
             let future: Future<Int> = Future<Int>(succeededWith: 0)
 
             let dispatchQueue: DispatchQueue = DispatchQueue(label: "test", qos: .default, attributes: .concurrent)

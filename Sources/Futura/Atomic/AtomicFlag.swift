@@ -1,4 +1,4 @@
-/* Copyright 2018 Miquido
+/* Copyright 2019 Miquido
  
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ public enum AtomicFlag {
     /// atomic_flag pointer type
     public typealias Pointer = UnsafeMutablePointer<atomic_flag>
     
+    /// Atomic flag is initialized not set (false)
     ///
     /// - Returns: Pointer to new ataomic flag instance
     @inline(__always)
@@ -28,7 +29,7 @@ public enum AtomicFlag {
         return pointer
     }
     
-     /// - Parameter pointer: Pointer to flag to be destroyed.
+    /// - Parameter pointer: Pointer to flag to be destroyed.
     @inline(__always)
     public static func destroy(_ pointer: Pointer) {
         pointer.deinitialize(count: 1)

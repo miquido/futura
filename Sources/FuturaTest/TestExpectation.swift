@@ -1,4 +1,4 @@
-/* Copyright 2018 Miquido
+/* Copyright 2019 Miquido
  
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -24,28 +24,43 @@ import XCTest
 /// Waiting will not be performed if already done.
 public final class TestExpectation {
     
-    private let waitingMutex: Mutex.Pointer
+    private let waitingMutex: Mutex.Pointer = Mutex.make(recursive: false)
     private let timeout: UInt8
+    private let timeoutFlag: AtomicFlag.Pointer = AtomicFlag.make()
     private let file: StaticString
     private let line: UInt
     private var executed: AtomicFlag.Pointer = AtomicFlag.make()
 
-    internal init(_ waitingMutex: Mutex.Pointer,
-                  timeout: UInt8,
+    internal init(timeout: UInt8,
                   file: StaticString = #file,
                   line: UInt = #line)
     {
-        assert(!Mutex.tryLock(waitingMutex), "Invalid expectation")
-        self.waitingMutex = waitingMutex
         self.timeout = timeout
         self.file = file
         self.line = line
+        Mutex.lock(waitingMutex)
     }
     
     deinit {
-        defer { Mutex.destroy(waitingMutex) }
-        defer { AtomicFlag.destroy(executed) }
         waitForExpectation()
+        AtomicFlag.destroy(executed)
+        AtomicFlag.destroy(timeoutFlag)
+        Mutex.destroy(waitingMutex)
+    }
+    
+    internal func fulfill() {
+        Mutex.unlock(waitingMutex)
+    }
+    
+    internal var timedOut: Bool {
+        guard !AtomicFlag.readAndSet(timeoutFlag) else {
+            return true
+        }
+        // clearing flag here might cause extreamly rare cases
+        // where flag was set outside and cleared here
+        // it have to be used in a way that after reading this value
+        // it should not be read again
+        return false
     }
     
     /// Waits for given expectation until done or times out.
@@ -57,13 +72,8 @@ public final class TestExpectation {
         do {
             try Mutex.lock(waitingMutex, timeout: timeout)
         } catch {
+            AtomicFlag.readAndSet(timeoutFlag)
             return XCTFail("Timed out", file: file, line: line)
         }
-    }
-}
-
-extension Array where Element == TestExpectation {
-    public func waitForExpectations() {
-        fatalError() // not completed yet
     }
 }

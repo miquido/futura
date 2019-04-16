@@ -1676,10 +1676,7 @@ class SignalTests: XCTestCase {
 
     // make sure that tests run with thread sanitizer enabled
     func testShouldWorkProperly_WhenAccessingOnManyThreads() {
-        asyncTest(iterationTimeout: 5,
-                  timeoutBody: {
-                      XCTFail("Not in time - possible deadlock or fail")
-        }) { complete in
+        asyncTest { complete in
             let dispatchQueue: DispatchQueue = DispatchQueue(label: "test", qos: .default, attributes: .concurrent)
             let lock_1: RecursiveLock = .init()
             let lock_2: RecursiveLock = .init()

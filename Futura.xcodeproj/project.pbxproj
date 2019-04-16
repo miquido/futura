@@ -10,6 +10,8 @@
 		4224E6E12264A90700815E20 /* Future+Expectation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4224E6E02264A90700815E20 /* Future+Expectation.swift */; };
 		4224E6E32264C1E800815E20 /* TestExpectation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4224E6E22264C1E800815E20 /* TestExpectation.swift */; };
 		4224E6E52264C85300815E20 /* AtomicFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4224E6E42264C85300815E20 /* AtomicFlag.swift */; };
+		4224E6E92265B8BE00815E20 /* Signal+Expectation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4224E6E82265B8BE00815E20 /* Signal+Expectation.swift */; };
+		4224E6F12265BE5400815E20 /* AtomicFlagTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4224E6F02265BE5400815E20 /* AtomicFlagTests.swift */; };
 		OBJ_108 /* FuturaPerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_39 /* FuturaPerformanceTests.swift */; };
 		OBJ_110 /* FuturaTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Futura::FuturaTest::Product" /* FuturaTest.framework */; };
 		OBJ_111 /* Futura.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Futura::Futura::Product" /* Futura.framework */; };
@@ -92,6 +94,8 @@
 		4224E6E02264A90700815E20 /* Future+Expectation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Future+Expectation.swift"; sourceTree = "<group>"; };
 		4224E6E22264C1E800815E20 /* TestExpectation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestExpectation.swift; sourceTree = "<group>"; };
 		4224E6E42264C85300815E20 /* AtomicFlag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AtomicFlag.swift; sourceTree = "<group>"; };
+		4224E6E82265B8BE00815E20 /* Signal+Expectation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Signal+Expectation.swift"; sourceTree = "<group>"; };
+		4224E6F02265BE5400815E20 /* AtomicFlagTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AtomicFlagTests.swift; sourceTree = "<group>"; };
 		"Futura::Futura::Product" /* Futura.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Futura.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Futura::FuturaPerformanceTests::Product" /* FuturaPerformanceTests.xctest */ = {isa = PBXFileReference; lastKnownFileType = file; path = FuturaPerformanceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Futura::FuturaTest::Product" /* FuturaTest.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FuturaTest.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -174,6 +178,55 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4224E6EA2265B92000815E20 /* Future */ = {
+			isa = PBXGroup;
+			children = (
+				OBJ_42 /* PromiseAndFutureTests.swift */,
+				OBJ_41 /* FutureZipTests.swift */,
+			);
+			path = Future;
+			sourceTree = "<group>";
+		};
+		4224E6EB2265B92A00815E20 /* Signal */ = {
+			isa = PBXGroup;
+			children = (
+				OBJ_44 /* SignalTests.swift */,
+			);
+			path = Signal;
+			sourceTree = "<group>";
+		};
+		4224E6EC2265B93100815E20 /* Synchrnization */ = {
+			isa = PBXGroup;
+			children = (
+				OBJ_43 /* RecursiveLockTests.swift */,
+			);
+			path = Synchrnization;
+			sourceTree = "<group>";
+		};
+		4224E6ED2265B93B00815E20 /* Worker */ = {
+			isa = PBXGroup;
+			children = (
+				OBJ_50 /* WorkerTests.swift */,
+			);
+			path = Worker;
+			sourceTree = "<group>";
+		};
+		4224E6EE2265BCB400815E20 /* Atomic */ = {
+			isa = PBXGroup;
+			children = (
+				4224E6E42264C85300815E20 /* AtomicFlag.swift */,
+			);
+			path = Atomic;
+			sourceTree = "<group>";
+		};
+		4224E6EF2265BE1800815E20 /* Atomic */ = {
+			isa = PBXGroup;
+			children = (
+				4224E6F02265BE5400815E20 /* AtomicFlagTests.swift */,
+			);
+			path = Atomic;
+			sourceTree = "<group>";
+		};
 		OBJ_12 /* Signal */ = {
 			isa = PBXGroup;
 			children = (
@@ -199,7 +252,6 @@
 			isa = PBXGroup;
 			children = (
 				OBJ_28 /* Mutex.swift */,
-				4224E6E42264C85300815E20 /* AtomicFlag.swift */,
 				OBJ_29 /* RecursiveLock.swift */,
 			);
 			path = Synchronization;
@@ -220,8 +272,9 @@
 			isa = PBXGroup;
 			children = (
 				OBJ_36 /* TestWorker.swift */,
-				4224E6E02264A90700815E20 /* Future+Expectation.swift */,
 				4224E6E22264C1E800815E20 /* TestExpectation.swift */,
+				4224E6E02264A90700815E20 /* Future+Expectation.swift */,
+				4224E6E82265B8BE00815E20 /* Signal+Expectation.swift */,
 			);
 			name = FuturaTest;
 			path = Sources/FuturaTest;
@@ -248,11 +301,11 @@
 		OBJ_40 /* FuturaTests */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_50 /* WorkerTests.swift */,
-				OBJ_42 /* PromiseAndFutureTests.swift */,
-				OBJ_41 /* FutureZipTests.swift */,
-				OBJ_43 /* RecursiveLockTests.swift */,
-				OBJ_44 /* SignalTests.swift */,
+				4224E6EF2265BE1800815E20 /* Atomic */,
+				4224E6ED2265B93B00815E20 /* Worker */,
+				4224E6EC2265B93100815E20 /* Synchrnization */,
+				4224E6EB2265B92A00815E20 /* Signal */,
+				4224E6EA2265B92000815E20 /* Future */,
 				OBJ_45 /* Support */,
 			);
 			name = FuturaTests;
@@ -269,7 +322,7 @@
 			path = Support;
 			sourceTree = "<group>";
 		};
-		OBJ_5 /*  */ = {
+		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
@@ -283,7 +336,6 @@
 				OBJ_60 /* logo.jpeg */,
 				OBJ_61 /* Futura.podspec */,
 			);
-			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_51 /* Products */ = {
@@ -309,10 +361,11 @@
 		OBJ_8 /* Futura */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_9 /* Future */,
-				OBJ_12 /* Signal */,
+				4224E6EE2265BCB400815E20 /* Atomic */,
 				OBJ_27 /* Synchronization */,
 				OBJ_30 /* Worker */,
+				OBJ_9 /* Future */,
+				OBJ_12 /* Signal */,
 			);
 			name = Futura;
 			path = Sources/Futura;
@@ -430,7 +483,7 @@
 				English,
 				en,
 			);
-			mainGroup = OBJ_5 /*  */;
+			mainGroup = OBJ_5;
 			productRefGroup = OBJ_51 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -457,7 +510,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
+				4224E6E92265B8BE00815E20 /* Signal+Expectation.swift in Sources */,
 				4224E6E12264A90700815E20 /* Future+Expectation.swift in Sources */,
+				4224E6F12265BE5400815E20 /* AtomicFlagTests.swift in Sources */,
 				4224E6E32264C1E800815E20 /* TestExpectation.swift in Sources */,
 				4224E6E52264C85300815E20 /* AtomicFlag.swift in Sources */,
 				OBJ_119 /* TestWorker.swift in Sources */,

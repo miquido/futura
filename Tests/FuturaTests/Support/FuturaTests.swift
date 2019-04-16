@@ -20,6 +20,7 @@ struct TestError: Error {}
 let testError: TestError = TestError()
 let testErrorDescription: String = testDescription(of: testError)
 
+let testQueue: DispatchQueue = .global()
 let markedQueueKey = DispatchSpecificKey<Void>()
 let markedQueue: DispatchQueue = {
     let queue = DispatchQueue(label: "MarkedQueue")
@@ -36,9 +37,9 @@ extension DispatchQueue {
 extension XCTestCase {
     func asyncTest(iterationTimeout: TimeInterval = 3,
                    iterations: UInt = 1,
-                   timeoutBody: @escaping () -> Void,
+                   file: StaticString = #file,
+                   line: UInt = #line,
                    testBody: @escaping (@escaping () -> Void) -> Void) {
-        let testQueue = DispatchQueue(label: "AsyncTestQueue")
         (0 ..< iterations).forEach { _ in
             let lock = NSConditionLock()
             lock.lock()
@@ -46,7 +47,7 @@ extension XCTestCase {
                 testBody { lock.unlock() }
             }
             guard lock.lock(before: Date(timeIntervalSinceNow: iterationTimeout)) else {
-                return timeoutBody()
+                return XCTFail("Not in time - possible deadlock or fail", file: file, line: line)
             }
         }
     }

@@ -1,3 +1,4 @@
 ignore:
 - "Tests/*"
+- "Sources/FuturaTest/*"
 - "Package.swift"
