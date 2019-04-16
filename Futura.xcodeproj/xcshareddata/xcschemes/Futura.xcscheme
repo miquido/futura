@@ -4,7 +4,7 @@
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
-      buildImplicitDependencies = "NO">
+      buildImplicitDependencies = "YES">
       <BuildActionEntries>
          <BuildActionEntry
             buildForTesting = "YES"
@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "423F0F1A225DD502004DFA44"
+               BlueprintIdentifier = "Futura::Futura"
                BuildableName = "Futura.framework"
-               BlueprintName = "Futura-macOS"
+               BlueprintName = "Futura"
                ReferencedContainer = "container:Futura.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -29,26 +29,7 @@
       enableThreadSanitizer = "YES"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Futura::FuturaTests"
-               BuildableName = "FuturaTests.xctest"
-               BlueprintName = "FuturaTests"
-               ReferencedContainer = "container:Futura.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "423F0F1A225DD502004DFA44"
-            BuildableName = "Futura.framework"
-            BlueprintName = "Futura-macOS"
-            ReferencedContainer = "container:Futura.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>
@@ -65,9 +46,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "423F0F1A225DD502004DFA44"
+            BlueprintIdentifier = "Futura::Futura"
             BuildableName = "Futura.framework"
-            BlueprintName = "Futura-macOS"
+            BlueprintName = "Futura"
             ReferencedContainer = "container:Futura.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -83,9 +64,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "423F0F1A225DD502004DFA44"
+            BlueprintIdentifier = "Futura::Futura"
             BuildableName = "Futura.framework"
-            BlueprintName = "Futura-macOS"
+            BlueprintName = "Futura"
             ReferencedContainer = "container:Futura.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

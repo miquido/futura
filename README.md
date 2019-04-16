@@ -10,15 +10,15 @@ Futura is a library that provides simple yet powerful tools for working with asy
 
 ## What it is about?
 
-The main goal of Futura is to keep things simple. This means that it provides easy to use and flexible tools that have compact and understandable implementation. You should not be worried about fixing or extending any of those because of massive code base or complicated architecture. This also means that Futura does not provide ultimate solution to all concurrency problems. It only simplifies many of them with proper tool for each problem.
+The main goal is to keep things simple and swifty. This means that it provides easy to use and flexible tools while not being afraid of diving deep into primitives. Futura does not provide an ultimate solution to all concurrency problems. It only simplifies many of them with a proper tool for each problem. The secondary goal of this library is to allow easy testing of asynchronous code. Everything is not only designed to be testable but there is also an additional library, dedicated to improve testing of asynchronous code.
 
 ## What it is not about?
 
-Futura is not any kind of framework. It does not provide single universal solution for all problems but available tools are flexible enough to cover most cases. It also does not try to pack extra features where it not fits or feels right. This repository does not contain any platform or library specific extensions too.
+Futura is not any kind of framework. It does not provide a single universal solution for all problems but available tools are flexible enough to cover most cases. It also does not try to pack extra features were it not fits or feels right. This repository does not contain any platform or library specific extensions too. You can although find some use cases and examples in the attached Playground.
 
 ## Is that for me?
 
-If you are wondering if you should use Futura in your code base or what it is actually about please take a minute and look at sample code below. One of basic tools provided with this library is implementation of promises. With promises you can convert single asynchronous task to be more predictable and better handled. In example you can change URLSession requests like this:
+If you are wondering if you should use Futura in your code base or what it is actually about please take a minute and look at the sample code below. One of the basic tools provided with this library is the implementation of promises. With promises, you can convert a single asynchronous task to be more predictable and better handled. In the example you can change URLSession requests like this:
 
 ``` swift
 make(request: URLRequest.init(url: "www.github.com"), using: URLSession.shared) { (data, response, error) in
@@ -92,7 +92,7 @@ futureData
     }
 ```
 
-This conversion not only simplifies the code keeping the same functionality and multithreading execution but it also splits things to be more manageable and testable. Each part - database, presentation and logs - is clearly separated from each other and may be applied in different more suitable places.
+This conversion not only simplifies the code keeping the same functionality and multithreading execution but it also splits things to be more manageable and testable. Each part - database, presentation, and logs - are clearly separated from each other and may be applied in different more suitable places.
 
 For more usage examples please look at attached Playground.
 
@@ -109,38 +109,46 @@ and integrate it with your code base.
 You can also use Carthage with a little less flexibility.
 
 ```
-github "miquido/futura" ~> 2.1
+github "miquido/futura" ~> 2.0
 ```
 
 You can even use CocoaPods, but since this library hasn't been added yet to the official CocoaPods spec repository you must point to it explicitly.
 
 ```
-pod 'Futura', :git => 'https://github.com/miquido/futura.git', :tag => '2.1.0'
+pod 'Futura', :git => 'https://github.com/miquido/futura.git', :tag ~> '2.0'
 ```
 
 ## What it is exactly?
 
 Futura consists of a set of tools that helps you manage asynchronous and concurrent code.
 
-### Lock
+### Worker
+
+Worker is a fundamental tool of Futura. It is an abstraction on execution of tasks that allows using any kind of threading solution. If you need any custom scheduling or thread implementation you can conform to Worker protocol and use that one in your code base. There is no implicit or forced usage of any concrete Worker across all tools (with one exception). Proper usage of workers allows you to write completely synchronous unit tests. No more XCTestExpectation or timeouts, just look how Futura is tested internally.
+
+### Synchronization
 
 There are two helpers here. Easy to use pthread_mutex wrapper (Mutex) and even easier to use RecursiveLock based on it. Both are used internally to provide fast and reliable synchronization.
 
-### Worker
+### Atomics
 
-Worker is a fundamental tool of Futura. It is abstraction on execution of tasks that allows to use any kind of threading solution. If you need any custom scheduling or thread implementation you can conform to Worker protocol and use that one in your code base. There is no implicit or forced usage of any concrete Worker across all tools (with one exception). Proper usage of workers allows you to write completely synchronous unit tests. No more XCTestExpectation or timeouts, just look how Futura is tested internally.
+Currently, there is only one atomic here. It is easy to use atomic_flag wrapper - AtomicFlag.
 
 ### Future
 
-For tasks that are performed only once, there is a nice promise implementation. It enables you to make your code better organized and easier to read. Specially useful when dealing with network requests, database transactions and other one time tasks.
+For tasks that are performed only once, there is a nice and performant promise implementation. It enables you to make your code better organized and easier to read. Especially useful when dealing with network requests, database transactions, and other one time tasks.
 
 ### Signal
 
-If you have continous stream of data or unpredictable events you should use Signal. It allows you to react on events or transform data that comes asynchronously. It works really nice for handling user interactions or network data streams.
+If you have continuous stream of data or unpredictable events you should use Signal. It allows you to react to events or transform data that comes asynchronously. It works really nice for handling user interactions or network data streams. Note here that it is not Rx implementation, it is not compatible and behaves differently than it.
+
+### FuturaTest
+
+It is a set of tools and extensions that help writing unit tests. You can use it to simplify asynchronous code tests (i.e. asyncTest extension for XCTestCase) or even make it synchronous in some cases (with TestWorker support). A lot of those tools are used to perform tests internally.
 
 ## How to get involved?
 
-Since Futura is open source project you can feel invited to make it even better. If you have found any kind of bug please make an issue. If any part of documentation is missing or not comperhensive propose some change or describe it using issue. If you feel that there is smoething can be done better just fork this repository and propose some changes!
+Since Futura is open source project you can feel invited to make it even better. If you have found any kind of bug please make an issue. If any part of the documentation is missing or not comprehensive propose some change or describe it using issue. If you feel that there is something can be done better just fork this repository and propose some changes!
 
 ## License
 

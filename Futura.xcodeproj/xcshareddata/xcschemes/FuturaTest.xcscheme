@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Futura::FuturaPackageTests::ProductTarget"
-               BuildableName = "FuturaPackageTests"
-               BlueprintName = "FuturaPackageTests"
+               BlueprintIdentifier = "Futura::FuturaTest"
+               BuildableName = "FuturaTest.framework"
+               BlueprintName = "FuturaTest"
                ReferencedContainer = "container:Futura.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -27,7 +27,6 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       enableThreadSanitizer = "YES"
-      codeCoverageEnabled = "YES"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
          <TestableReference
@@ -54,9 +53,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "Futura::FuturaPackageTests::ProductTarget"
-            BuildableName = "FuturaPackageTests"
-            BlueprintName = "FuturaPackageTests"
+            BlueprintIdentifier = "Futura::FuturaTest"
+            BuildableName = "FuturaTest.framework"
+            BlueprintName = "FuturaTest"
             ReferencedContainer = "container:Futura.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -76,9 +75,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "Futura::FuturaPackageTests::ProductTarget"
-            BuildableName = "FuturaPackageTests"
-            BlueprintName = "FuturaPackageTests"
+            BlueprintIdentifier = "Futura::FuturaTest"
+            BuildableName = "FuturaTest.framework"
+            BlueprintName = "FuturaTest"
             ReferencedContainer = "container:Futura.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -94,9 +93,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "Futura::FuturaPackageTests::ProductTarget"
-            BuildableName = "FuturaPackageTests"
-            BlueprintName = "FuturaPackageTests"
+            BlueprintIdentifier = "Futura::FuturaTest"
+            BuildableName = "FuturaTest.framework"
+            BlueprintName = "FuturaTest"
             ReferencedContainer = "container:Futura.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

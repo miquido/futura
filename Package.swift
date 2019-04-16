@@ -7,18 +7,26 @@ let package = Package(
     products: [
         .library(
             name: "Futura",
-            targets: ["Futura"]),
+            targets: ["Futura"]
+        ),
+        .library(
+            name: "FuturaTest",
+            targets: ["FuturaTest"]
+        ),
     ],
     dependencies: [],
     targets: [
         .target(
             name: "Futura",
             dependencies: []),
+        .target(
+            name: "FuturaTest",
+            dependencies: ["Futura"]),
         .testTarget(
             name: "FuturaPerformanceTests",
-            dependencies: ["Futura"]),
+            dependencies: ["Futura", "FuturaTest"]),
         .testTarget(
             name: "FuturaTests",
-            dependencies: ["Futura"]),
+            dependencies: ["Futura", "FuturaTest"]),
     ]
 )

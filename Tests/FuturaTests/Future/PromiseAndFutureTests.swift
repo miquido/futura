@@ -13,6 +13,7 @@
  limitations under the License. */
 
 import Futura
+import FuturaTest
 import XCTest
 
 class PromiseAndFutureTestsTests: XCTestCase {
@@ -1386,10 +1387,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
 
     // make sure that tests run with thread sanitizer enabled
     func testShouldWorkProperly_WhenAccessingOnManyThreads() {
-        asyncTest(iterationTimeout: 5,
-                  timeoutBody: {
-                      XCTFail("Not in time - possible deadlock or fail")
-        }) { complete in
+        asyncTest { complete in
             let future: Future<Int> = Future<Int>(succeededWith: 0)
 
             let dispatchQueue: DispatchQueue = DispatchQueue(label: "test", qos: .default, attributes: .concurrent)
@@ -1438,10 +1436,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
 
     // make sure that tests run with thread sanitizer enabled
     func testShouldWorkProperly_WhenTransformingOnManyThreads() {
-        asyncTest(iterationTimeout: 5,
-                  timeoutBody: {
-                      XCTFail("Not in time - possible deadlock or fail")
-        }) { complete in
+        asyncTest { complete in
             let future: Future<Int> = Future<Int>(succeededWith: 0)
 
             let dispatchQueue: DispatchQueue = DispatchQueue(label: "test", qos: .default, attributes: .concurrent)

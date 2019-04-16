@@ -12,6 +12,31 @@
  See the License for the specific language governing permissions and
  limitations under the License. */
 
+import Futura
+
+extension Futura.Signal {
+    @discardableResult
+    func logResults(with workLog: StreamWorkLog) -> Self {
+        self
+            .values {
+                workLog.log(.values(testDescription(of: $0)))
+            }
+            .errors {
+                workLog.log(.errors(testDescription(of: $0)))
+            }
+            .ended {
+                workLog.log(.ended)
+            }
+            .terminated {
+                workLog.log(.terminated(testDescription(of: $0)))
+            }
+            .finished {
+                workLog.log(.finished)
+        }
+        return self
+    }
+}
+
 final class StreamWorkLog: Equatable {
     private var log: [Event]
 

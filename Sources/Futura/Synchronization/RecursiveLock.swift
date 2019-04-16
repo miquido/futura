@@ -34,6 +34,15 @@ public final class RecursiveLock {
     public func lock() {
         Mutex.lock(mtx)
     }
+    
+    /// Locks if possible or waits until unlocked.
+    /// Throws an error if time condition was not met
+    ///
+    /// - Parameter timeout: Lock wait timeout in seconds.
+    @inline(__always)
+    public func lock(timeout: UInt8) throws -> Void {
+        try Mutex.lock(mtx, timeout: timeout)
+    }
 
     /// Locks if possible and returns true or returns false otherwise without locking.
     /// Since RecursiveLock is recursive it will returns true when already locked on same thread.

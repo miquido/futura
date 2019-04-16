@@ -18,9 +18,7 @@ import Dispatch
 
 class WorkerTests: XCTestCase {
     func testShouldPerformTask_WithDispatchQueue_AfterWorkScheduled() {
-        asyncTest(timeoutBody: {
-            XCTFail("Not in time - possible deadlock or fail")
-        }) { complete in
+        asyncTest { complete in
             let worker: Worker = DispatchQueue.global()
             worker.schedule { () -> Void in
                 complete()
@@ -29,9 +27,7 @@ class WorkerTests: XCTestCase {
     }
 
     func testShouldPerformTasks_WithDispatchQueue_AfterWorkScheduledRecursively() {
-        asyncTest(timeoutBody: {
-            XCTFail("Not in time - possible deadlock or fail")
-        }) { complete in
+        asyncTest { complete in
             let worker: Worker = DispatchQueue.global()
             worker.schedule { () -> Void in
                 worker.schedule { () -> Void in
@@ -44,9 +40,7 @@ class WorkerTests: XCTestCase {
     }
     
     func testShouldPerformTask_WithOperationQueue_AfterWorkScheduled() {
-        asyncTest(timeoutBody: {
-            XCTFail("Not in time - possible deadlock or fail")
-        }) { complete in
+        asyncTest { complete in
             let worker: Worker = OperationQueue.init()
             worker.schedule { () -> Void in
                 complete()
@@ -55,9 +49,7 @@ class WorkerTests: XCTestCase {
     }
     
     func testShouldPerformTasks_WithOperationQueue_AfterWorkScheduledRecursively() {
-        asyncTest(timeoutBody: {
-            XCTFail("Not in time - possible deadlock or fail")
-        }) { complete in
+        asyncTest { complete in
             let worker: Worker = OperationQueue.init()
             worker.schedule { () -> Void in
                 worker.schedule { () -> Void in

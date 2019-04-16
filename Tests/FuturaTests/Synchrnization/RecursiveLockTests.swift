@@ -13,6 +13,7 @@
  limitations under the License. */
 
 import Futura
+import FuturaTest
 import XCTest
 
 class RecursiveLockTests: XCTestCase {
@@ -22,9 +23,7 @@ class RecursiveLockTests: XCTestCase {
 
     // make sure that tests run with thread sanitizer enabled
     func testShouldLockAndUnlock_WhenCalledOnDistinctThreads() {
-        asyncTest(timeoutBody: {
-            XCTFail("Not in time - possible deadlock or fail")
-        }) { complete in
+        asyncTest { complete in
             let lock: RecursiveLock = .init()
             var completed: Bool = false
 
@@ -41,9 +40,7 @@ class RecursiveLockTests: XCTestCase {
     }
 
     func testShouldLockAndUnlock_WhenCalledOnSameThread() {
-        asyncTest(timeoutBody: {
-            XCTFail("Not in time - possible deadlock or fail")
-        }) { complete in
+        asyncTest { complete in
             let lock: RecursiveLock = .init()
 
             lock.lock()
@@ -76,9 +73,7 @@ class RecursiveLockTests: XCTestCase {
 
     // make sure that tests run with thread sanitizer enabled
     func testShouldFailTryLock_WhenLockedOnOtherThread() {
-        asyncTest(timeoutBody: {
-            XCTFail("Not in time - possible deadlock or fail")
-        }) { complete in
+        asyncTest { complete in
             let lock: RecursiveLock = .init()
             lock.lock()
 
@@ -94,9 +89,7 @@ class RecursiveLockTests: XCTestCase {
 
     // make sure that tests run with thread sanitizer enabled
     func testShouldSynchronizeBlock_WhenCalledOnDistinctThreads() {
-        asyncTest(timeoutBody: {
-            XCTFail("Not in time - possible deadlock or fail")
-        }) { complete in
+        asyncTest { complete in
             let lock: RecursiveLock = .init()
             var testValue = 0
 
@@ -118,10 +111,7 @@ class RecursiveLockTests: XCTestCase {
 
     // make sure that tests run with thread sanitizer enabled
     func testShouldNotCauseDeadlock_WhenSynchronizedCalledRecursively() {
-        asyncTest(iterationTimeout: 6,
-                  timeoutBody: {
-                      XCTFail("Not in time - possible deadlock or fail")
-        }) { complete in
+        asyncTest(timeout: 6) { complete in
             let lock: RecursiveLock = .init()
             var completed: Bool = false
 
