@@ -13,7 +13,7 @@
  limitations under the License. */
 
 internal class SignalForwarder<V1, V2>: Signal<V2> {
-    fileprivate weak var source: Signal<V1>?
+    internal fileprivate(set) weak var source: Signal<V1>?
 
     internal init(source: Signal<V1>, collector: SubscriptionCollector?) {
         self.source = source

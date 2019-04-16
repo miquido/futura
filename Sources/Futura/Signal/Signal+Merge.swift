@@ -20,9 +20,18 @@
 /// - Parameter signals: Signals to merge
 /// - Returns: New Signal instance merging provided Signals
 public func merge<Value>(_ signals: Signal<Value>...) -> Signal<Value> {
+    
+    #if FUTURA_DEBUG
+    let mergedSignal: Signal<Value> = .init(collector: nil, debug: signals.reduce(DebugMode.disabled) { $0.combined(with: $1.debugMode) })
+    mergedSignal.debugLog("+merge from \(signals.map { "[\($0.debugDescription)]" })")
+    #else
     let mergedSignal: Signal<Value> = .init(collector: nil)
-    signals.forEach { signal in
-        mergedSignal.collect(signal.subscribe({ event in
+    #endif
+    signals.forEach { (signal: Signal<Value>) -> Void in
+        mergedSignal.collect(signal.subscribe({ [weak signal] (event) -> Void in
+            #if FUTURA_DEBUG
+            mergedSignal.debugLog("merge([\(signal?.debugDescription ?? "[dealocated]")])")
+            #endif
             switch event {
                 case let .token(token):
                     mergedSignal.broadcast(token)

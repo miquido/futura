@@ -21,7 +21,12 @@ public extension Signal {
     /// - Parameter filter: Filtering function returning true for values that can be passed
     /// - Returns: New Signal instance passing filtered values and all errors.
     func filter(_ filter: @escaping (Value) -> Bool) -> Signal<Value> {
-        return SignalFilter(source: self, filter: filter)
+        let next: SignalFilter = .init(source: self, filter: filter)
+        #if FUTURA_DEBUG
+        next.debugMode = self.debugMode.propagated
+        self.debugLog("+filter -> \(next.debugDescription)")
+        #endif
+        return next
     }
 
     /// Transforms Signal into new Signal instance using duplicate filter
@@ -61,7 +66,10 @@ public extension Signal where Value: Equatable {
 internal final class SignalFilter<Value>: SignalForwarder<Value, Value> {
     internal init(source: Signal<Value>, filter: @escaping (Value) -> Bool) {
         super.init(source: source, collector: source.collector)
-        collect(source.subscribe { event in
+        collect(source.subscribe { [weak source] event in
+            #if FUTURA_DEBUG
+            source?.debugLog("filter() -> \(self.debugDescription)")
+            #endif
             switch event {
                 case let .token(.success(value)):
                     guard filter(value) else { return }

@@ -27,7 +27,12 @@ public extension Signal {
     /// Returned Signal will be flattened. Might throw to pass errors.
     /// - Returns: New Signal instance passing transformed tokens.
     func flatMapLatest<T>(_ transform: @escaping (Value) throws -> Signal<T>) -> Signal<T> {
-        return SignalFlatMapperLatest(source: self, transform: transform)
+        let next: SignalFlatMapperLatest = .init(source: self, transform: transform)
+        #if FUTURA_DEBUG
+        next.debugMode = self.debugMode.propagated
+        self.debugLog("+flatMapLatest -> \(next.debugDescription)")
+        #endif
+        return next
     }
 }
 
@@ -36,14 +41,20 @@ internal final class SignalFlatMapperLatest<SourceValue, Value>: SignalForwarder
 
     internal init(source: Signal<SourceValue>, transform: @escaping (SourceValue) throws -> Signal<Value>) {
         super.init(source: source, collector: source.collector)
-        collect(source.subscribe { event in
+        collect(source.subscribe { [weak source] event in
             self.mappedCollector.deactivate()
             self.mappedCollector = .init()
+            #if FUTURA_DEBUG
+            source?.debugLog("flatMapLatest() -> \(self.debugDescription)")
+            #endif
             switch event {
                 case let .token(.success(value)):
                     do {
                         let subscribtion = try transform(value).subscribe { [weak self] event in
                             guard let self = self else { return }
+                            #if FUTURA_DEBUG
+                            source?.debugLog("flatMapLatestInner() -> \(self.debugDescription)")
+                            #endif
                             switch event {
                                 case let .token(.success(value)):
                                     self.broadcast(.success(value))

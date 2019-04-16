@@ -23,14 +23,22 @@ public extension Signal {
     /// - Parameter catcher: Error catching function, may throw to pass error further.
     /// - Returns: New Signal instance passing all values and filtered errors.
     func `catch`(_ catcher: @escaping (Error) throws -> Void) -> Signal<Value> {
-        return SignalErrorCatcher(source: self, catcher: catcher)
+        let next: SignalErrorCatcher = .init(source: self, catcher: catcher)
+        #if FUTURA_DEBUG
+        next.debugMode = self.debugMode.propagated
+        self.debugLog("+catch -> \(next.debugDescription)")
+        #endif
+        return next
     }
 }
 
 internal final class SignalErrorCatcher<Value>: SignalForwarder<Value, Value> {
     internal init(source: Signal<Value>, catcher: @escaping (Error) throws -> Void) {
         super.init(source: source, collector: source.collector)
-        collect(source.subscribe { event in
+        collect(source.subscribe { [weak source] event in
+            #if FUTURA_DEBUG
+            source?.debugLog("catch() -> \(self.debugDescription)")
+            #endif
             switch event {
                 case let .token(.success(value)):
                     self.broadcast(.success(value))

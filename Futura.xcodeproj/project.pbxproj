@@ -13,6 +13,14 @@
 		4224E6E92265B8BE00815E20 /* Signal+Expectation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4224E6E82265B8BE00815E20 /* Signal+Expectation.swift */; };
 		4224E6F12265BE5400815E20 /* AtomicFlagTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4224E6F02265BE5400815E20 /* AtomicFlagTests.swift */; };
 		4224E6F32265E7A200815E20 /* XCTestCase+Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4224E6F22265E7A200815E20 /* XCTestCase+Async.swift */; };
+		42C32F75226603D300C806A4 /* Future+Handlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42C32F74226603D300C806A4 /* Future+Handlers.swift */; };
+		42C32F77226603F200C806A4 /* Future+Transformations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42C32F76226603F200C806A4 /* Future+Transformations.swift */; };
+		42C32F792266040000C806A4 /* Future+Zip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42C32F782266040000C806A4 /* Future+Zip.swift */; };
+		42C32F7B2266040C00C806A4 /* Future+Debug.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42C32F7A2266040C00C806A4 /* Future+Debug.swift */; };
+		42C32F7E2266068400C806A4 /* DebugMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42C32F7D2266068400C806A4 /* DebugMode.swift */; };
+		42C32F802266069400C806A4 /* FuturaDebug.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42C32F7F2266069400C806A4 /* FuturaDebug.swift */; };
+		42C32F822266075D00C806A4 /* Signal+Debug.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42C32F812266075D00C806A4 /* Signal+Debug.swift */; };
+		42C32F8422660FA700C806A4 /* Signal+Handlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42C32F8322660FA700C806A4 /* Signal+Handlers.swift */; };
 		OBJ_108 /* FuturaPerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_39 /* FuturaPerformanceTests.swift */; };
 		OBJ_110 /* FuturaTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Futura::FuturaTest::Product" /* FuturaTest.framework */; };
 		OBJ_111 /* Futura.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Futura::Futura::Product" /* Futura.framework */; };
@@ -98,10 +106,18 @@
 		4224E6E82265B8BE00815E20 /* Signal+Expectation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Signal+Expectation.swift"; sourceTree = "<group>"; };
 		4224E6F02265BE5400815E20 /* AtomicFlagTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AtomicFlagTests.swift; sourceTree = "<group>"; };
 		4224E6F22265E7A200815E20 /* XCTestCase+Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XCTestCase+Async.swift"; sourceTree = "<group>"; };
+		42C32F74226603D300C806A4 /* Future+Handlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Future+Handlers.swift"; sourceTree = "<group>"; };
+		42C32F76226603F200C806A4 /* Future+Transformations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Future+Transformations.swift"; sourceTree = "<group>"; };
+		42C32F782266040000C806A4 /* Future+Zip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Future+Zip.swift"; sourceTree = "<group>"; };
+		42C32F7A2266040C00C806A4 /* Future+Debug.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Future+Debug.swift"; sourceTree = "<group>"; };
+		42C32F7D2266068400C806A4 /* DebugMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugMode.swift; sourceTree = "<group>"; };
+		42C32F7F2266069400C806A4 /* FuturaDebug.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuturaDebug.swift; sourceTree = "<group>"; };
+		42C32F812266075D00C806A4 /* Signal+Debug.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Signal+Debug.swift"; sourceTree = "<group>"; };
+		42C32F8322660FA700C806A4 /* Signal+Handlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Signal+Handlers.swift"; sourceTree = "<group>"; };
 		"Futura::Futura::Product" /* Futura.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Futura.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		"Futura::FuturaPerformanceTests::Product" /* FuturaPerformanceTests.xctest */ = {isa = PBXFileReference; lastKnownFileType = file; path = FuturaPerformanceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		"Futura::FuturaPerformanceTests::Product" /* FuturaPerformanceTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = FuturaPerformanceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Futura::FuturaTest::Product" /* FuturaTest.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FuturaTest.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		"Futura::FuturaTests::Product" /* FuturaTests.xctest */ = {isa = PBXFileReference; lastKnownFileType = file; path = FuturaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		"Futura::FuturaTests::Product" /* FuturaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = FuturaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		OBJ_10 /* Future.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Future.swift; sourceTree = "<group>"; };
 		OBJ_11 /* Promise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Promise.swift; sourceTree = "<group>"; };
 		OBJ_13 /* Emitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Emitter.swift; sourceTree = "<group>"; };
@@ -229,10 +245,21 @@
 			path = Atomic;
 			sourceTree = "<group>";
 		};
+		42C32F7C2266067800C806A4 /* Debug */ = {
+			isa = PBXGroup;
+			children = (
+				42C32F7F2266069400C806A4 /* FuturaDebug.swift */,
+				42C32F7D2266068400C806A4 /* DebugMode.swift */,
+			);
+			path = Debug;
+			sourceTree = "<group>";
+		};
 		OBJ_12 /* Signal */ = {
 			isa = PBXGroup;
 			children = (
 				OBJ_13 /* Emitter.swift */,
+				OBJ_23 /* Signal.swift */,
+				42C32F8322660FA700C806A4 /* Signal+Handlers.swift */,
 				OBJ_14 /* Signal+Catch.swift */,
 				OBJ_15 /* Signal+Filter.swift */,
 				OBJ_16 /* Signal+FlatMap.swift */,
@@ -242,7 +269,7 @@
 				OBJ_20 /* Signal+Map.swift */,
 				OBJ_21 /* Signal+Merge.swift */,
 				OBJ_22 /* Signal+Switch.swift */,
-				OBJ_23 /* Signal.swift */,
+				42C32F812266075D00C806A4 /* Signal+Debug.swift */,
 				OBJ_24 /* Subscription.swift */,
 				OBJ_25 /* SubscriptionCollector.swift */,
 				OBJ_26 /* TimedEmitter.swift */,
@@ -364,6 +391,7 @@
 		OBJ_8 /* Futura */ = {
 			isa = PBXGroup;
 			children = (
+				42C32F7C2266067800C806A4 /* Debug */,
 				4224E6EE2265BCB400815E20 /* Atomic */,
 				OBJ_27 /* Synchronization */,
 				OBJ_30 /* Worker */,
@@ -377,8 +405,12 @@
 		OBJ_9 /* Future */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_10 /* Future.swift */,
 				OBJ_11 /* Promise.swift */,
+				OBJ_10 /* Future.swift */,
+				42C32F74226603D300C806A4 /* Future+Handlers.swift */,
+				42C32F76226603F200C806A4 /* Future+Transformations.swift */,
+				42C32F782266040000C806A4 /* Future+Zip.swift */,
+				42C32F7A2266040C00C806A4 /* Future+Debug.swift */,
 			);
 			path = Future;
 			sourceTree = "<group>";
@@ -544,25 +576,33 @@
 			files = (
 				OBJ_67 /* Future.swift in Sources */,
 				OBJ_68 /* Promise.swift in Sources */,
+				42C32F75226603D300C806A4 /* Future+Handlers.swift in Sources */,
 				OBJ_69 /* Emitter.swift in Sources */,
+				42C32F8422660FA700C806A4 /* Signal+Handlers.swift in Sources */,
 				OBJ_70 /* Signal+Catch.swift in Sources */,
 				OBJ_71 /* Signal+Filter.swift in Sources */,
 				OBJ_72 /* Signal+FlatMap.swift in Sources */,
 				OBJ_73 /* Signal+FlatMapLatest.swift in Sources */,
 				OBJ_74 /* Signal+Forward.swift in Sources */,
+				42C32F822266075D00C806A4 /* Signal+Debug.swift in Sources */,
 				OBJ_75 /* Signal+FutureFlatMap.swift in Sources */,
 				OBJ_76 /* Signal+Map.swift in Sources */,
 				OBJ_77 /* Signal+Merge.swift in Sources */,
 				OBJ_78 /* Signal+Switch.swift in Sources */,
 				OBJ_79 /* Signal.swift in Sources */,
+				42C32F802266069400C806A4 /* FuturaDebug.swift in Sources */,
+				42C32F7B2266040C00C806A4 /* Future+Debug.swift in Sources */,
 				OBJ_80 /* Subscription.swift in Sources */,
+				42C32F77226603F200C806A4 /* Future+Transformations.swift in Sources */,
 				OBJ_81 /* SubscriptionCollector.swift in Sources */,
 				OBJ_82 /* TimedEmitter.swift in Sources */,
 				OBJ_83 /* Mutex.swift in Sources */,
 				OBJ_84 /* RecursiveLock.swift in Sources */,
 				OBJ_85 /* DispatchQueueWorker.swift in Sources */,
+				42C32F792266040000C806A4 /* Future+Zip.swift in Sources */,
 				OBJ_86 /* ExecutionContext.swift in Sources */,
 				OBJ_87 /* OperationQueueWorker.swift in Sources */,
+				42C32F7E2266068400C806A4 /* DebugMode.swift in Sources */,
 				OBJ_88 /* Worker.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -617,17 +657,17 @@
 				);
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = Futura.xcodeproj/FuturaPerformanceTests_Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @loader_path/../Frameworks @loader_path/Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "$(inherited)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
 				SWIFT_VERSION = 5.0;
 				TARGET_NAME = FuturaPerformanceTests;
-				TVOS_DEPLOYMENT_TARGET = 9.0;
-				WATCHOS_DEPLOYMENT_TARGET = 2.0;
+				TVOS_DEPLOYMENT_TARGET = 10.0;
+				WATCHOS_DEPLOYMENT_TARGET = 4.0;
 			};
 			name = Debug;
 		};
@@ -642,17 +682,17 @@
 				);
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = Futura.xcodeproj/FuturaPerformanceTests_Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @loader_path/../Frameworks @loader_path/Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "$(inherited)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
 				SWIFT_VERSION = 5.0;
 				TARGET_NAME = FuturaPerformanceTests;
-				TVOS_DEPLOYMENT_TARGET = 9.0;
-				WATCHOS_DEPLOYMENT_TARGET = 2.0;
+				TVOS_DEPLOYMENT_TARGET = 10.0;
+				WATCHOS_DEPLOYMENT_TARGET = 4.0;
 			};
 			name = Release;
 		};
@@ -666,9 +706,9 @@
 				);
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = Futura.xcodeproj/FuturaTest_Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) $(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "$(inherited)";
@@ -680,8 +720,8 @@
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
 				SWIFT_VERSION = 5.0;
 				TARGET_NAME = FuturaTest;
-				TVOS_DEPLOYMENT_TARGET = 9.0;
-				WATCHOS_DEPLOYMENT_TARGET = 2.0;
+				TVOS_DEPLOYMENT_TARGET = 10.0;
+				WATCHOS_DEPLOYMENT_TARGET = 4.0;
 			};
 			name = Debug;
 		};
@@ -695,9 +735,9 @@
 				);
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = Futura.xcodeproj/FuturaTest_Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) $(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "$(inherited)";
@@ -709,8 +749,8 @@
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
 				SWIFT_VERSION = 5.0;
 				TARGET_NAME = FuturaTest;
-				TVOS_DEPLOYMENT_TARGET = 9.0;
-				WATCHOS_DEPLOYMENT_TARGET = 2.0;
+				TVOS_DEPLOYMENT_TARGET = 10.0;
+				WATCHOS_DEPLOYMENT_TARGET = 4.0;
 			};
 			name = Release;
 		};
@@ -725,17 +765,17 @@
 				);
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = Futura.xcodeproj/FuturaTests_Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @loader_path/../Frameworks @loader_path/Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "$(inherited)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
 				SWIFT_VERSION = 5.0;
 				TARGET_NAME = FuturaTests;
-				TVOS_DEPLOYMENT_TARGET = 9.0;
-				WATCHOS_DEPLOYMENT_TARGET = 2.0;
+				TVOS_DEPLOYMENT_TARGET = 10.0;
+				WATCHOS_DEPLOYMENT_TARGET = 4.0;
 			};
 			name = Debug;
 		};
@@ -750,17 +790,17 @@
 				);
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = Futura.xcodeproj/FuturaTests_Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @loader_path/../Frameworks @loader_path/Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "$(inherited)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
 				SWIFT_VERSION = 5.0;
 				TARGET_NAME = FuturaTests;
-				TVOS_DEPLOYMENT_TARGET = 9.0;
-				WATCHOS_DEPLOYMENT_TARGET = 2.0;
+				TVOS_DEPLOYMENT_TARGET = 10.0;
+				WATCHOS_DEPLOYMENT_TARGET = 4.0;
 			};
 			name = Release;
 		};
@@ -779,13 +819,13 @@
 					"SWIFT_PACKAGE=1",
 					"DEBUG=1",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_SWIFT_FLAGS = "-DXcode";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SUPPORTED_PLATFORMS = "macosx iphoneos iphonesimulator appletvos appletvsimulator watchos watchsimulator";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) SWIFT_PACKAGE DEBUG";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) SWIFT_PACKAGE DEBUG FUTURA_DEBUG";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				USE_HEADERMAP = NO;
 			};
@@ -804,7 +844,7 @@
 					"$(inherited)",
 					"SWIFT_PACKAGE=1",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				OTHER_SWIFT_FLAGS = "-DXcode";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -825,9 +865,9 @@
 				);
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = Futura.xcodeproj/Futura_Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) $(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "$(inherited)";
@@ -839,9 +879,9 @@
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
 				SWIFT_VERSION = 5.0;
 				TARGET_NAME = Futura;
-				TVOS_DEPLOYMENT_TARGET = 9.0;
+				TVOS_DEPLOYMENT_TARGET = 10.0;
 				VALID_ARCHS = "arm64 arm64e armv7 armv7s x86_64 i386";
-				WATCHOS_DEPLOYMENT_TARGET = 2.0;
+				WATCHOS_DEPLOYMENT_TARGET = 4.0;
 			};
 			name = Debug;
 		};
@@ -855,9 +895,9 @@
 				);
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = Futura.xcodeproj/Futura_Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) $(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "$(inherited)";
@@ -869,9 +909,9 @@
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
 				SWIFT_VERSION = 5.0;
 				TARGET_NAME = Futura;
-				TVOS_DEPLOYMENT_TARGET = 9.0;
+				TVOS_DEPLOYMENT_TARGET = 10.0;
 				VALID_ARCHS = "arm64 arm64e armv7 armv7s x86_64 i386";
-				WATCHOS_DEPLOYMENT_TARGET = 2.0;
+				WATCHOS_DEPLOYMENT_TARGET = 4.0;
 			};
 			name = Release;
 		};
@@ -879,6 +919,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				LD = /usr/bin/true;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				OTHER_SWIFT_FLAGS = "-swift-version 5 -I $(TOOLCHAIN_DIR)/usr/lib/swift/pm/4_2 -target x86_64-apple-macosx10.10 -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk";
 				SWIFT_VERSION = 5.0;
 			};
@@ -888,6 +929,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				LD = /usr/bin/true;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				OTHER_SWIFT_FLAGS = "-swift-version 5 -I $(TOOLCHAIN_DIR)/usr/lib/swift/pm/4_2 -target x86_64-apple-macosx10.10 -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk";
 				SWIFT_VERSION = 5.0;
 			};
