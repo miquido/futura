@@ -13,3 +13,8 @@
  limitations under the License. */
 
 import Futura
+import XCTest
+
+public extension Signal {
+    // TODO: will be in future :)
+}

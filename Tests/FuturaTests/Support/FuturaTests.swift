@@ -20,7 +20,6 @@ struct TestError: Error {}
 let testError: TestError = TestError()
 let testErrorDescription: String = testDescription(of: testError)
 
-let testQueue: DispatchQueue = .global()
 let markedQueueKey = DispatchSpecificKey<Void>()
 let markedQueue: DispatchQueue = {
     let queue = DispatchQueue(label: "MarkedQueue")
@@ -31,68 +30,6 @@ let markedQueue: DispatchQueue = {
 extension DispatchQueue {
     static var isOnMarkedQueue: Bool {
         return DispatchQueue.getSpecific(key: markedQueueKey) != nil
-    }
-}
-
-extension XCTestCase {
-    func asyncTest(iterationTimeout: TimeInterval = 3,
-                   iterations: UInt = 1,
-                   file: StaticString = #file,
-                   line: UInt = #line,
-                   testBody: @escaping (@escaping () -> Void) -> Void) {
-        (0 ..< iterations).forEach { _ in
-            let lock = NSConditionLock()
-            lock.lock()
-            testQueue.async {
-                testBody { lock.unlock() }
-            }
-            guard lock.lock(before: Date(timeIntervalSinceNow: iterationTimeout)) else {
-                return XCTFail("Not in time - possible deadlock or fail", file: file, line: line)
-            }
-        }
-    }
-}
-
-extension Future {
-    @discardableResult
-    func logResults(with workLog: FutureWorkLog) -> Self {
-        self
-            .value { value in
-                workLog.log(.value(testDescription(of: value)))
-            }
-            .error { reason in
-                workLog.log(.error(testDescription(of: reason)))
-            }
-            .resulted {
-                workLog.log(.resulted)
-            }
-            .always {
-                workLog.log(.always)
-            }
-        return self
-    }
-}
-
-extension Futura.Signal {
-    @discardableResult
-    func logResults(with workLog: StreamWorkLog) -> Self {
-        self
-            .values {
-                workLog.log(.values(testDescription(of: $0)))
-            }
-            .errors {
-                workLog.log(.errors(testDescription(of: $0)))
-            }
-            .ended {
-                workLog.log(.ended)
-            }
-            .terminated {
-                workLog.log(.terminated(testDescription(of: $0)))
-            }
-            .finished {
-                workLog.log(.finished)
-            }
-        return self
     }
 }
 

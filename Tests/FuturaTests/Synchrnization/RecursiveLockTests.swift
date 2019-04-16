@@ -111,7 +111,7 @@ class RecursiveLockTests: XCTestCase {
 
     // make sure that tests run with thread sanitizer enabled
     func testShouldNotCauseDeadlock_WhenSynchronizedCalledRecursively() {
-        asyncTest(iterationTimeout: 6) { complete in
+        asyncTest(timeout: 6) { complete in
             let lock: RecursiveLock = .init()
             var completed: Bool = false
 

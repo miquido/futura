@@ -12,6 +12,7 @@
 		4224E6E52264C85300815E20 /* AtomicFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4224E6E42264C85300815E20 /* AtomicFlag.swift */; };
 		4224E6E92265B8BE00815E20 /* Signal+Expectation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4224E6E82265B8BE00815E20 /* Signal+Expectation.swift */; };
 		4224E6F12265BE5400815E20 /* AtomicFlagTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4224E6F02265BE5400815E20 /* AtomicFlagTests.swift */; };
+		4224E6F32265E7A200815E20 /* XCTestCase+Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4224E6F22265E7A200815E20 /* XCTestCase+Async.swift */; };
 		OBJ_108 /* FuturaPerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_39 /* FuturaPerformanceTests.swift */; };
 		OBJ_110 /* FuturaTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Futura::FuturaTest::Product" /* FuturaTest.framework */; };
 		OBJ_111 /* Futura.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Futura::Futura::Product" /* Futura.framework */; };
@@ -96,6 +97,7 @@
 		4224E6E42264C85300815E20 /* AtomicFlag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AtomicFlag.swift; sourceTree = "<group>"; };
 		4224E6E82265B8BE00815E20 /* Signal+Expectation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Signal+Expectation.swift"; sourceTree = "<group>"; };
 		4224E6F02265BE5400815E20 /* AtomicFlagTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AtomicFlagTests.swift; sourceTree = "<group>"; };
+		4224E6F22265E7A200815E20 /* XCTestCase+Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XCTestCase+Async.swift"; sourceTree = "<group>"; };
 		"Futura::Futura::Product" /* Futura.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Futura.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Futura::FuturaPerformanceTests::Product" /* FuturaPerformanceTests.xctest */ = {isa = PBXFileReference; lastKnownFileType = file; path = FuturaPerformanceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Futura::FuturaTest::Product" /* FuturaTest.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FuturaTest.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -275,6 +277,7 @@
 				4224E6E22264C1E800815E20 /* TestExpectation.swift */,
 				4224E6E02264A90700815E20 /* Future+Expectation.swift */,
 				4224E6E82265B8BE00815E20 /* Signal+Expectation.swift */,
+				4224E6F22265E7A200815E20 /* XCTestCase+Async.swift */,
 			);
 			name = FuturaTest;
 			path = Sources/FuturaTest;
@@ -515,6 +518,7 @@
 				4224E6F12265BE5400815E20 /* AtomicFlagTests.swift in Sources */,
 				4224E6E32264C1E800815E20 /* TestExpectation.swift in Sources */,
 				4224E6E52264C85300815E20 /* AtomicFlag.swift in Sources */,
+				4224E6F32265E7A200815E20 /* XCTestCase+Async.swift in Sources */,
 				OBJ_119 /* TestWorker.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

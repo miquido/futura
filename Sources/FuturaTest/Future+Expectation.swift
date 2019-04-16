@@ -23,7 +23,7 @@ public extension Future {
     /// Waiting will be performed automatically if returned value is ignored.
     ///
     /// - Parameter validation: Value validation function, assertion will fail if returns false
-    /// - Parameter timeout: Wait timeout in seconds
+    /// - Parameter timeout: Wait timeout in seconds, default is 3
     /// - Returns: Test expectation of this assertion, it will wait immediately if not used
     @discardableResult
     func expectValue(_ validation: @escaping (Value) -> Bool = { _ in true },
@@ -63,7 +63,7 @@ public extension Future {
     /// Waiting will be performed automatically if returned value is ignored.
     ///
     /// - Parameter validation: Error validation function, assertion will fail if returns false
-    /// - Parameter timeout: Wait timeout in seconds
+    /// - Parameter timeout: Wait timeout in seconds, default is 3
     /// - Returns: Test expectation of this assertion, it will wait immediately if not used
     @discardableResult
     func expectError(_ validation: @escaping (Error) -> Bool = { _ in true },
@@ -103,7 +103,7 @@ public extension Future {
     /// Note that waiting for expectation will block current thread.
     /// Waiting will be performed automatically if returned value is ignored.
     ///
-    /// - Parameter timeout: Wait timeout in seconds
+    /// - Parameter timeout: Wait timeout in seconds, default is 3
     /// - Returns: Test expectation of this assertion, it will wait immediately if not used
     @discardableResult
     func expectCancelled(timeout: UInt8 = 3,

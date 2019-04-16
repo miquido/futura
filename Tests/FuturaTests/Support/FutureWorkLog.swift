@@ -12,6 +12,28 @@
  See the License for the specific language governing permissions and
  limitations under the License. */
 
+import Futura
+
+extension Future {
+    @discardableResult
+    func logResults(with workLog: FutureWorkLog) -> Self {
+        self
+            .value { value in
+                workLog.log(.value(testDescription(of: value)))
+            }
+            .error { reason in
+                workLog.log(.error(testDescription(of: reason)))
+            }
+            .resulted {
+                workLog.log(.resulted)
+            }
+            .always {
+                workLog.log(.always)
+        }
+        return self
+    }
+}
+
 final class FutureWorkLog: Equatable {
     private var log: [Event]
 
