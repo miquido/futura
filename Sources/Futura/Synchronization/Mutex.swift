@@ -80,22 +80,23 @@ public enum Mutex {
     @inline(__always)
     public static func lock(_ pointer: Pointer, timeout: UInt8) throws -> Void {
         #if os(Linux)
-        var timeout = __time_t(timeout) * mSecSec
+        var currentTimeout = __time_t(timeout) * mSecSec
         #else
-        var timeout = __darwin_time_t(timeout) * mSecSec
+        var currentTimeout = __darwin_time_t(timeout) * mSecSec
         #endif
         
         var rem = timespec(tv_sec: 0, tv_nsec: 0)
         var req = timespec(tv_sec: 0, tv_nsec: 0)
         while pthread_mutex_trylock(pointer) != 0 {
-            req.tv_nsec = timeout < nSecMsec ? timeout : nSecMsec
+            if currentTimeout <= 0 {
+                throw Timeout()
+            } else { /* continue waiting */ }
+            let requested = currentTimeout < nSecMsec ? currentTimeout : nSecMsec
+            req.tv_nsec = requested
             while nanosleep(&req, &rem) == EINTR {
                 req.tv_nsec = rem.tv_nsec
             }
-            timeout -= (req.tv_nsec - rem.tv_nsec)
-            if timeout <= 0 {
-                throw Timeout()
-            } else { continue }
+            currentTimeout -= (requested - rem.tv_nsec)
         }
     }
 
