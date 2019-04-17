@@ -26,6 +26,9 @@ extension Signal {
         Mutex.lock(mtx)
         defer { Mutex.unlock(mtx) }
         let signal: SignalForwarder<Value, Value> = .init(source: self, collector: collector)
+        #if FUTURA_DEBUG
+        self.debugLog("+collect -\(collector)-> \(signal.debugDescription)")
+        #endif
         self.forward(to: signal)
         return signal
     }
@@ -65,3 +68,14 @@ public final class SubscriptionCollector {
         Mutex.destroy(mtx)
     }
 }
+
+#if FUTURA_DEBUG
+
+extension SubscriptionCollector: CustomDebugStringConvertible {
+    public var debugDescription: String {
+        Mutex.lock(mtx)
+        defer { Mutex.unlock(mtx) }
+        return "[Collector[0x\(String(unsafeBitCast(self, to: Int.self), radix: 16))]]"
+    }
+}
+#endif

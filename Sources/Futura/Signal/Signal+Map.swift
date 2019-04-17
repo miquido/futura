@@ -23,14 +23,22 @@ public extension Signal {
     /// - Parameter transform: Value transformation function. Might throw to pass errors.
     /// - Returns: New Signal instance passing transformed tokens.
     func map<T>(_ transform: @escaping (Value) throws -> T) -> Signal<T> {
-        return SignalMapper(source: self, transform: transform)
+        let next: SignalMapper = .init(source: self, transform: transform)
+        #if FUTURA_DEBUG
+        next.debugMode = self.debugMode.propagated
+        self.debugLog("+map -> \(next.debugDescription)")
+        #endif
+        return next
     }
 }
 
 internal final class SignalMapper<SourceValue, Value>: SignalForwarder<SourceValue, Value> {
     internal init(source: Signal<SourceValue>, transform: @escaping (SourceValue) throws -> Value) {
         super.init(source: source, collector: source.collector)
-        collect(source.subscribe { event in
+        collect(source.subscribe { [weak source] event in
+            #if FUTURA_DEBUG
+            source?.debugLog("map() -> \(self.debugDescription)")
+            #endif
             switch event {
                 case let .token(.success(value)):
                     do {

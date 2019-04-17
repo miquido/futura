@@ -28,18 +28,31 @@ public extension Signal {
     /// Returned Future will be flattened. Might throw to pass errors.
     /// - Returns: New Signal instance passing flattened Futures.
     func flatMapFuture<T>(_ transform: @escaping (Value) throws -> Future<T>) -> Signal<T> {
-        return SignalFutureFlatMapper(source: self, transform: transform)
+        let next: SignalFutureFlatMapper = .init(source: self, transform: transform)
+        #if FUTURA_DEBUG
+        next.debugMode = self.debugMode.propagated
+        self.debugLog("+flatMapFuture -> \(next.debugDescription)")
+        #endif
+        return next
     }
 }
 
 internal final class SignalFutureFlatMapper<SourceValue, Value>: SignalForwarder<SourceValue, Value> {
     internal init(source: Signal<SourceValue>, transform: @escaping (SourceValue) throws -> Future<Value>) {
         super.init(source: source, collector: source.collector)
-        collect(source.subscribe { event in
+        collect(source.subscribe { [weak source] event in
+            #if FUTURA_DEBUG
+            source?.debugLog("flatMapFuture() -> \(self.debugDescription)")
+            #endif
             switch event {
                 case let .token(.success(value)):
                     do {
-                        try transform(value)
+                        let future = try transform(value)
+                        #if FUTURA_DEBUG
+                            future.debug(source?.debugMode.propagated ?? .disabled)
+                            source?.debugLog("flatMapFutureInner() -\(future.debugDescription)-> \(self.debugDescription)")
+                        #endif
+                        future
                             .value { value in
                                 self.broadcast(.success(value))
                             }

@@ -23,7 +23,12 @@ public extension Signal {
     /// transformations and handlers of new Signal.
     /// - Returns: New Signal instance operating on provided Worker.
     func `switch`(to worker: Worker) -> Signal<Value> {
-        return SignalScheduler(source: self, worker: worker)
+        let next: SignalScheduler = .init(source: self, worker: worker)
+        #if FUTURA_DEBUG
+        next.debugMode = self.debugMode.propagated
+        self.debugLog("+switch -> \(next.debugDescription)")
+        #endif
+        return next
     }
 }
 
@@ -42,6 +47,9 @@ internal final class SignalScheduler<Value>: SignalForwarder<Value, Value> {
             Mutex.lock(self.mtx)
             defer { Mutex.unlock(self.mtx) }
             for (_, subscriber) in self.subscribers {
+                #if FUTURA_DEBUG
+                self.source?.debugLog("switch() -> \(self.debugDescription)")
+                #endif
                 subscriber.recieve(.token(token))
             }
         }

@@ -29,7 +29,26 @@
       enableThreadSanitizer = "YES"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Futura::FuturaTests"
+               BuildableName = "FuturaTests.xctest"
+               BlueprintName = "FuturaTests"
+               ReferencedContainer = "container:Futura.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "Futura::Futura"
+            BuildableName = "Futura.framework"
+            BlueprintName = "Futura"
+            ReferencedContainer = "container:Futura.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>
