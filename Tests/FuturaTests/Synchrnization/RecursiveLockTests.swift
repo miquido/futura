@@ -86,6 +86,20 @@ class RecursiveLockTests: XCTestCase {
             sleep(1) // ensure that will not exit too early deallocating lock
         }
     }
+    
+    func testShouldTimeout() {
+        let lock = RecursiveLock()
+        lock.lock() // since it is recursive lock it have to be locked on other thread
+        asyncTest { complete in
+            do {
+                try lock.lock(timeout: 1)
+                XCTFail("Lock not failed to lock")
+            } catch {
+                // expected
+            }
+            complete()
+        }
+    }
 
     // make sure that tests run with thread sanitizer enabled
     func testShouldSynchronizeBlock_WhenCalledOnDistinctThreads() {
