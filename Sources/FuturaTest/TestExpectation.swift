@@ -42,7 +42,7 @@ public final class TestExpectation {
     }
     
     deinit {
-        waitForExpectation()
+        XCTAssertTrue(AtomicFlag.readAndSet(executed), "Expectation was ignored, use `waitForExpectation()` to verify this expectation", file: file, line: line)
         AtomicFlag.destroy(executed)
         AtomicFlag.destroy(timeoutFlag)
         Mutex.destroy(waitingMutex)

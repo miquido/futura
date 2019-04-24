@@ -18,14 +18,14 @@ import XCTest
 public extension Future {
 
     /// Asserts Future value if appeared. Fails if there was no value or timed out.
-    /// Assertion is performed by TestExpectation.
+    /// Timeout assertion is performed by TestExpectation when executing `waitForExpectation()`.
     /// Note that waiting for expectation will block current thread.
-    /// Waiting will be performed automatically if returned value is ignored.
+    /// Waiting have to be done manually by calling `waitForExpectation()` on returned Expectation.
     ///
     /// - Parameter validation: Value validation function, assertion will fail if returns false
     /// - Parameter timeout: Wait timeout in seconds, default is 3
-    /// - Returns: Test expectation of this assertion, it will wait immediately if not used
-    @discardableResult
+    /// - Parameter message: Custom failure message
+    /// - Returns: Test expectation of this assertion
     func expectValue(_ validation: @escaping (Value) -> Bool = { _ in true },
                      timeout: UInt8 = 3,
                      message: @escaping @autoclosure () -> String = String(),
@@ -40,9 +40,7 @@ public extension Future {
             guard let expectation = expectation else { return }
             guard !expectation.timedOut else { return }
             let result = validation(value)
-            guard !result else {
-                return
-            }
+            guard !result else { return }
             let message = message()
             XCTFail(message.isEmpty ? "Invalid value" : message, file: file, line: line)
         }
@@ -58,14 +56,14 @@ public extension Future {
     }
     
     /// Asserts Future error if appeared. Fails if there was no error or timed out.
-    /// Assertion is performed by TestExpectation.
+    /// Timeout assertion is performed by TestExpectation when executing `waitForExpectation()`.
     /// Note that waiting for expectation will block current thread.
-    /// Waiting will be performed automatically if returned value is ignored.
+    /// Waiting have to be done manually by calling `waitForExpectation()` on returned Expectation.
     ///
     /// - Parameter validation: Error validation function, assertion will fail if returns false
     /// - Parameter timeout: Wait timeout in seconds, default is 3
-    /// - Returns: Test expectation of this assertion, it will wait immediately if not used
-    @discardableResult
+    /// - Parameter message: Custom failure message
+    /// - Returns: Test expectation of this assertion
     func expectError(_ validation: @escaping (Error) -> Bool = { _ in true },
                      timeout: UInt8 = 3,
                      message: @escaping @autoclosure () -> String = String(),
@@ -75,14 +73,12 @@ public extension Future {
         let expectation: TestExpectation = .init(timeout: timeout, file: file, line: line)
         let errorAppeared: AtomicFlag.Pointer = AtomicFlag.make()
         
-        self.error {  [weak expectation] (error) in
+        self.error { [weak expectation] (error) in
             defer { AtomicFlag.readAndSet(errorAppeared) }
             guard let expectation = expectation else { return }
             guard !expectation.timedOut else { return }
             let result = validation(error)
-            guard !result else {
-                return
-            }
+            guard !result else { return }
             let message = message()
             XCTFail(message.isEmpty ? "Invalid error" : message, file: file, line: line)
             
@@ -99,13 +95,13 @@ public extension Future {
     }
     
     /// Asserts if Future was cancelled. Fails if not cancelled or timed out.
-    /// Assertion is performed by TestExpectation.
+    /// Timeout assertion is performed by TestExpectation when executing `waitForExpectation()`.
     /// Note that waiting for expectation will block current thread.
-    /// Waiting will be performed automatically if returned value is ignored.
+    /// Waiting have to be done manually by calling `waitForExpectation()` on returned Expectation.
     ///
     /// - Parameter timeout: Wait timeout in seconds, default is 3
-    /// - Returns: Test expectation of this assertion, it will wait immediately if not used
-    @discardableResult
+    /// - Parameter message: Custom failure message
+    /// - Returns: Test expectation of this assertion
     func expectCancelled(timeout: UInt8 = 3,
                          message: @escaping @autoclosure () -> String = String(),
                          file: StaticString = #file,
@@ -116,7 +112,8 @@ public extension Future {
         self.resulted { [weak expectation] in
             guard let expectation = expectation else { return }
             guard !expectation.timedOut else { return }
-            XCTFail("Future completed with result", file: file, line: line)
+            let message = message()
+            XCTFail(message.isEmpty ? "Future completed with result" : message, file: file, line: line)
         }
         self.always { [weak expectation] in
             guard let expectation = expectation else { return }
