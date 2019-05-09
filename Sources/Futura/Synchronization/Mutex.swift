@@ -19,17 +19,24 @@ import Darwin.POSIX
 #endif
 
 #if os(Linux)
+@usableFromInline
 fileprivate let nSecMsec: __time_t = 1_000_000
+@usableFromInline
 fileprivate let mSecSec: __time_t = 1_000 * nSecMsec
 #else
-fileprivate let nSecMsec: __darwin_time_t = 1_000_000
-fileprivate let mSecSec: __darwin_time_t = 1_000 * nSecMsec
+@usableFromInline
+internal let nSecMsec: __darwin_time_t = 1_000_000
+@usableFromInline
+internal let mSecSec: __darwin_time_t = 1_000 * nSecMsec
 #endif
 
 /// pthread_mutex api wrapper
 public enum Mutex {
     /// Error thrown on mutex timeout
-    public struct Timeout: Error {}
+    public struct Timeout: Error {
+        @usableFromInline
+        internal init(){}
+    }
     
     /// pthread_mutex_t pointer type
     public typealias Pointer = UnsafeMutablePointer<pthread_mutex_t>
@@ -40,7 +47,7 @@ public enum Mutex {
     ///
     /// - Parameter recursive: Tells if created mutex should be recursive or not.
     /// - Returns: Pointer to new mutex instance
-    @inline(__always)
+    @inlinable
     public static func make(recursive: Bool) -> Pointer {
         let pointer: UnsafeMutablePointer<pthread_mutex_t> = .allocate(capacity: 1)
         let attr: UnsafeMutablePointer<pthread_mutexattr_t> = .allocate(capacity: 1)
@@ -57,7 +64,7 @@ public enum Mutex {
     /// Deallocates instance of pthread_mutex
     ///
     /// - Parameter pointer: Pointer to mutex to be destroyed.
-    @inline(__always)
+    @inlinable
     public static func destroy(_ pointer: Pointer) {
         pthread_mutex_destroy(pointer)
         pointer.deinitialize(count: 1)
@@ -67,7 +74,7 @@ public enum Mutex {
     /// Locks on instance of pthread_mutex or waits until unlocked if locked.
     ///
     /// - Parameter pointer: Pointer to mutex to be locked.
-    @inline(__always)
+    @inlinable
     public static func lock(_ pointer: Pointer) {
         pthread_mutex_lock(pointer)
     }
@@ -77,7 +84,7 @@ public enum Mutex {
     ///
     /// - Parameter pointer: Pointer to mutex to be locked.
     /// - Parameter timeout: Lock wait timeout in seconds.
-    @inline(__always)
+    @inlinable
     public static func lock(_ pointer: Pointer, timeout: UInt8) throws -> Void {
         #if os(Linux)
         var currentTimeout = __time_t(timeout) * mSecSec
@@ -104,7 +111,7 @@ public enum Mutex {
     ///
     /// - Parameter pointer: Pointer to mutex to be locked.
     /// - Returns: Result of trying to lock. True if succeeded, false otherwise.
-    @inline(__always)
+    @inlinable
     public static func tryLock(_ pointer: Pointer) -> Bool {
         return pthread_mutex_trylock(pointer) == 0
     }
@@ -112,7 +119,7 @@ public enum Mutex {
     /// Unlocks on instance of pthread_mutex
     ///
     /// - Parameter pointer: Pointer to mutex to be unlocked.
-    @inline(__always)
+    @inlinable
     public static func unlock(_ pointer: Pointer) {
         pthread_mutex_unlock(pointer)
     }

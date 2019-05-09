@@ -25,7 +25,7 @@ public enum ExecutionContext {
 }
 
 internal extension ExecutionContext {
-    @inline(__always)
+    @inlinable
     func execute(_ function: @escaping () -> Void) {
         switch self {
             case .undefined:

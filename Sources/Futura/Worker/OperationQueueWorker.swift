@@ -17,6 +17,7 @@ import Foundation
 extension OperationQueue: Worker {
     /// OperationQueue as Worker assigns work to queue using addOperation method
     /// or executes it immediately if detects it is already on that queue.
+    @inlinable
     public func schedule(_ work: @escaping () -> Void) {
         if OperationQueue.current == self {
             work()
