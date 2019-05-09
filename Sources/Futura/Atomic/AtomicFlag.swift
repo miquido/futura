@@ -22,7 +22,7 @@ public enum AtomicFlag {
     /// Atomic flag is initialized not set (false)
     ///
     /// - Returns: Pointer to new ataomic flag instance
-    @inline(__always)
+    @inlinable
     public static func make() -> Pointer {
         let pointer = Pointer.allocate(capacity: 1)
         pointer.pointee = atomic_flag()
@@ -30,7 +30,7 @@ public enum AtomicFlag {
     }
     
     /// - Parameter pointer: Pointer to flag to be destroyed.
-    @inline(__always)
+    @inlinable
     public static func destroy(_ pointer: Pointer) {
         pointer.deinitialize(count: 1)
         pointer.deallocate()
@@ -39,7 +39,7 @@ public enum AtomicFlag {
     /// Reads current value of flag and sets it to true
     ///
     /// - Parameter pointer: Pointer to flag to be read and set.
-    @discardableResult @inline(__always)
+    @discardableResult @inlinable
     public static func readAndSet(_ pointer: Pointer) -> Bool {
         return atomic_flag_test_and_set(pointer)
     }
@@ -47,7 +47,7 @@ public enum AtomicFlag {
     /// Clears flag (set to false)
     ///
      /// - Parameter pointer: Pointer to flag to be cleared.
-    @inline(__always)
+    @inlinable
     public static func clear(_ pointer: Pointer) {
         atomic_flag_clear(pointer)
     }

@@ -823,11 +823,12 @@
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_SWIFT_FLAGS = "-DXcode";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
+				SDKROOT = "";
 				SUPPORTED_PLATFORMS = "macosx iphoneos iphonesimulator appletvos appletvsimulator watchos watchsimulator";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) SWIFT_PACKAGE DEBUG FUTURA_DEBUG";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				USE_HEADERMAP = NO;
+				VALID_ARCHS = "$(VALID_ARCHS)";
 			};
 			name = Debug;
 		};
@@ -847,11 +848,12 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				OTHER_SWIFT_FLAGS = "-DXcode";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
+				SDKROOT = "";
 				SUPPORTED_PLATFORMS = "macosx iphoneos iphonesimulator appletvos appletvsimulator watchos watchsimulator";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) SWIFT_PACKAGE";
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				USE_HEADERMAP = NO;
+				VALID_ARCHS = "$(VALID_ARCHS)";
 			};
 			name = Release;
 		};
@@ -880,7 +882,6 @@
 				SWIFT_VERSION = 5.0;
 				TARGET_NAME = Futura;
 				TVOS_DEPLOYMENT_TARGET = 10.0;
-				VALID_ARCHS = "arm64 arm64e armv7 armv7s x86_64 i386";
 				WATCHOS_DEPLOYMENT_TARGET = 4.0;
 			};
 			name = Debug;
@@ -910,7 +911,6 @@
 				SWIFT_VERSION = 5.0;
 				TARGET_NAME = Futura;
 				TVOS_DEPLOYMENT_TARGET = 10.0;
-				VALID_ARCHS = "arm64 arm64e armv7 armv7s x86_64 i386";
 				WATCHOS_DEPLOYMENT_TARGET = 4.0;
 			};
 			name = Release;

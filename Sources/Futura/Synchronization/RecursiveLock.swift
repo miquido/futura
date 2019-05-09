@@ -16,10 +16,8 @@
 /// It should not be used to synchronize threads from multiple processes.
 public final class RecursiveLock {
 
-    /// Reference to underlying mutex.
-    /// Should not be used - public only for optimizations.
-    /// All operations on mutex should be performed via public interface of Lock.
-    public let mtx: Mutex.Pointer = Mutex.make(recursive: true)
+    @usableFromInline
+    internal let mtx: Mutex.Pointer = Mutex.make(recursive: true)
 
     /// Creates instance of recursive lock.
     public init() {}
@@ -30,7 +28,7 @@ public final class RecursiveLock {
 
     /// Locks if possible or waits until unlocked.
     /// Since RecursiveLock is recursive it will continue when already locked on same thread.
-    @inline(__always)
+    @inlinable
     public func lock() {
         Mutex.lock(mtx)
     }
@@ -39,20 +37,20 @@ public final class RecursiveLock {
     /// Throws an error if time condition was not met
     ///
     /// - Parameter timeout: Lock wait timeout in seconds.
-    @inline(__always)
+    @inlinable
     public func lock(timeout: UInt8) throws -> Void {
         try Mutex.lock(mtx, timeout: timeout)
     }
 
     /// Locks if possible and returns true or returns false otherwise without locking.
     /// Since RecursiveLock is recursive it will returns true when already locked on same thread.
-    @inline(__always)
+    @inlinable
     public func tryLock() -> Bool {
         return Mutex.tryLock(mtx)
     }
 
     /// Unlocks a lock.
-    @inline(__always)
+    @inlinable
     public func unlock() {
         Mutex.unlock(mtx)
     }
@@ -60,7 +58,7 @@ public final class RecursiveLock {
     /// Execute closure with synchronization on self as lock.
     /// Since RecursiveLock is recursive you can call synchronized recursively on same thread.
     /// It will wait until unlocked if locked when calling.
-    @inline(__always)
+    @inlinable
     public func synchronized<T>(_ block: () throws -> T) rethrows -> T {
         Mutex.lock(mtx)
         defer { Mutex.unlock(mtx) }

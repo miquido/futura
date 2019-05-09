@@ -16,6 +16,7 @@ import Dispatch
 
 extension DispatchQueue: Worker {
     /// OperationQueue as Worker assigns work to queue using async method.
+    @inlinable
     public func schedule(_ work: @escaping () -> Void) {
         async(execute: work)
     }
