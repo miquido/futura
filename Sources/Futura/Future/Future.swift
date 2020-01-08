@@ -70,6 +70,7 @@ public final class Future<Value> {
     #endif
 
     deinit {
+        defer { Mutex.destroy(mtx) }
         guard case .waiting = state else { return }
         let observers = self.observers
         executionContext.execute {
@@ -77,7 +78,6 @@ public final class Future<Value> {
                 observer(.canceled)
             }
         }
-        Mutex.destroy(mtx)
     }
 }
 
