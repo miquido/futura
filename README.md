@@ -2,9 +2,9 @@
 
 [![Build Status](https://api.travis-ci.org/miquido/futura.svg?branch=master)](https://travis-ci.org/miquido/futura)
 [![codecov](https://codecov.io/gh/miquido/futura/branch/master/graph/badge.svg)](https://codecov.io/gh/miquido/futura)
-[![Platforms](https://img.shields.io/badge/platform-iOS%20|%20macOS-gray.svg?style=flat)]()
+[![Platforms](https://img.shields.io/badge/platform-iOS%20|iPadOS%20|%20macOS-gray.svg?style=flat)]()
 [![Swift Package Manager compatible](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg)](https://github.com/apple/swift-package-manager)
-[![SwiftVersion](https://img.shields.io/badge/Swift-5.0-brightgreen.svg)]()
+[![SwiftVersion](https://img.shields.io/badge/Swift-5.1-brightgreen.svg)]()
 
 Futura is a library that provides simple yet powerful tools for working with asynchronous and concurrent code in Swift.
 
@@ -21,7 +21,7 @@ Futura is not any kind of framework. It does not provide a single universal solu
 If you are wondering if you should use Futura in your code base or what it is actually about please take a minute and look at the sample code below. One of the basic tools provided with this library is the implementation of promises. With promises, you can convert a single asynchronous task to be more predictable and better handled. In the example you can change URLSession requests like this:
 
 ``` swift
-make(request: URLRequest.init(url: "www.github.com"), using: URLSession.shared) { (data, response, error) in
+make(request: URLRequest(url: "www.github.com"), using: URLSession.shared) { (data, response, error) in
     if let error = error {
         DispatchQueue.main.async {
             present(error: error)
@@ -59,7 +59,7 @@ to be more like this:
 
 ``` swift
 let futureData = 
-    make(request: URLRequest.init(url: "www.github.com"), using: URLSession.shared)
+    make(request: URLRequest(url: "www.github.com"), using: URLSession.shared)
     .map { (response, data) in
         if response.statusCode == 200 {
             return data
@@ -98,21 +98,28 @@ For more usage examples please look at attached Playground.
 
 ## How to get it?
 
+Swift package manager is currently best solution to use:
+
+``` swift
+.package(url: "https://github.com/miquido/futura.git", from: "2.0.0")
+```
+
 You can use Futura as git submodule
 
 ``` bash
 git submodule add https://github.com/miquido/futura.git
 ```
 
-and integrate it with your code base.
+and integrate it with your code base manually.
 
-You can also use Carthage with a little less flexibility.
+
+You can also use Carthage:
 
 ```
 github "miquido/futura" ~> 2.0
 ```
 
-You can even use CocoaPods, but since this library hasn't been added yet to the official CocoaPods spec repository you must point to it explicitly.
+You can even use CocoaPods, but since this library hasn't been added to the official CocoaPods spec repository you must point to it explicitly.
 
 ```
 pod 'Futura', :git => 'https://github.com/miquido/futura.git', :tag ~> '2.0'
