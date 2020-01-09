@@ -2,7 +2,7 @@
 
 [![Build Status](https://api.travis-ci.org/miquido/futura.svg?branch=master)](https://travis-ci.org/miquido/futura)
 [![codecov](https://codecov.io/gh/miquido/futura/branch/master/graph/badge.svg)](https://codecov.io/gh/miquido/futura)
-[![Platforms](https://img.shields.io/badge/platform-iOS%20|iPadOS%20|%20macOS-gray.svg?style=flat)]()
+[![Platforms](https://img.shields.io/badge/platform-iOS%20|%20iPadOS%20|%20macOS-gray.svg?style=flat)]()
 [![Swift Package Manager compatible](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg)](https://github.com/apple/swift-package-manager)
 [![SwiftVersion](https://img.shields.io/badge/Swift-5.1-brightgreen.svg)]()
 
