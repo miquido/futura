@@ -13,6 +13,10 @@
 		4224E6E92265B8BE00815E20 /* Signal+Expectation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4224E6E82265B8BE00815E20 /* Signal+Expectation.swift */; };
 		4224E6F12265BE5400815E20 /* AtomicFlagTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4224E6F02265BE5400815E20 /* AtomicFlagTests.swift */; };
 		4224E6F32265E7A200815E20 /* XCTestCase+Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4224E6F22265E7A200815E20 /* XCTestCase+Async.swift */; };
+		422DF99223E1CF110091957D /* Synchronized.swift in Sources */ = {isa = PBXBuildFile; fileRef = 422DF99123E1CF110091957D /* Synchronized.swift */; };
+		422DF99523E1D0E10091957D /* SynchronizedPropertyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 422DF99323E1D0C20091957D /* SynchronizedPropertyTests.swift */; };
+		422DF99723E1D5D80091957D /* Lock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 422DF99623E1D5D80091957D /* Lock.swift */; };
+		422DF99923E1D6370091957D /* LockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 422DF99823E1D6370091957D /* LockTests.swift */; };
 		42C32F75226603D300C806A4 /* Future+Handlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42C32F74226603D300C806A4 /* Future+Handlers.swift */; };
 		42C32F77226603F200C806A4 /* Future+Transformations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42C32F76226603F200C806A4 /* Future+Transformations.swift */; };
 		42C32F792266040000C806A4 /* Future+Zip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42C32F782266040000C806A4 /* Future+Zip.swift */; };
@@ -106,6 +110,10 @@
 		4224E6E82265B8BE00815E20 /* Signal+Expectation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Signal+Expectation.swift"; sourceTree = "<group>"; };
 		4224E6F02265BE5400815E20 /* AtomicFlagTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AtomicFlagTests.swift; sourceTree = "<group>"; };
 		4224E6F22265E7A200815E20 /* XCTestCase+Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XCTestCase+Async.swift"; sourceTree = "<group>"; };
+		422DF99123E1CF110091957D /* Synchronized.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Synchronized.swift; sourceTree = "<group>"; };
+		422DF99323E1D0C20091957D /* SynchronizedPropertyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynchronizedPropertyTests.swift; sourceTree = "<group>"; };
+		422DF99623E1D5D80091957D /* Lock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Lock.swift; sourceTree = "<group>"; };
+		422DF99823E1D6370091957D /* LockTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockTests.swift; sourceTree = "<group>"; };
 		42C32F74226603D300C806A4 /* Future+Handlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Future+Handlers.swift"; sourceTree = "<group>"; };
 		42C32F76226603F200C806A4 /* Future+Transformations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Future+Transformations.swift"; sourceTree = "<group>"; };
 		42C32F782266040000C806A4 /* Future+Zip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Future+Zip.swift"; sourceTree = "<group>"; };
@@ -216,7 +224,9 @@
 		4224E6EC2265B93100815E20 /* Synchrnization */ = {
 			isa = PBXGroup;
 			children = (
+				422DF99823E1D6370091957D /* LockTests.swift */,
 				OBJ_43 /* RecursiveLockTests.swift */,
+				422DF99323E1D0C20091957D /* SynchronizedPropertyTests.swift */,
 			);
 			path = Synchrnization;
 			sourceTree = "<group>";
@@ -281,7 +291,9 @@
 			isa = PBXGroup;
 			children = (
 				OBJ_28 /* Mutex.swift */,
+				422DF99623E1D5D80091957D /* Lock.swift */,
 				OBJ_29 /* RecursiveLock.swift */,
+				422DF99123E1CF110091957D /* Synchronized.swift */,
 			);
 			path = Synchronization;
 			sourceTree = "<group>";
@@ -559,6 +571,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
+				422DF99923E1D6370091957D /* LockTests.swift in Sources */,
 				OBJ_127 /* FutureZipTests.swift in Sources */,
 				OBJ_128 /* PromiseAndFutureTests.swift in Sources */,
 				OBJ_129 /* RecursiveLockTests.swift in Sources */,
@@ -566,6 +579,7 @@
 				OBJ_131 /* FuturaTests.swift in Sources */,
 				OBJ_132 /* FutureWorkLog.swift in Sources */,
 				OBJ_133 /* StreamWorkLog.swift in Sources */,
+				422DF99523E1D0E10091957D /* SynchronizedPropertyTests.swift in Sources */,
 				OBJ_135 /* WorkerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -588,6 +602,7 @@
 				OBJ_75 /* Signal+FutureFlatMap.swift in Sources */,
 				OBJ_76 /* Signal+Map.swift in Sources */,
 				OBJ_77 /* Signal+Merge.swift in Sources */,
+				422DF99723E1D5D80091957D /* Lock.swift in Sources */,
 				OBJ_78 /* Signal+Switch.swift in Sources */,
 				OBJ_79 /* Signal.swift in Sources */,
 				42C32F802266069400C806A4 /* FuturaDebug.swift in Sources */,
@@ -600,6 +615,7 @@
 				OBJ_84 /* RecursiveLock.swift in Sources */,
 				OBJ_85 /* DispatchQueueWorker.swift in Sources */,
 				42C32F792266040000C806A4 /* Future+Zip.swift in Sources */,
+				422DF99223E1CF110091957D /* Synchronized.swift in Sources */,
 				OBJ_86 /* ExecutionContext.swift in Sources */,
 				OBJ_87 /* OperationQueueWorker.swift in Sources */,
 				42C32F7E2266068400C806A4 /* DebugMode.swift in Sources */,
@@ -860,6 +876,7 @@
 		OBJ_64 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_TESTABILITY = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -870,6 +887,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) $(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MARKETING_VERSION = 2.3.0;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "$(inherited)";
@@ -889,6 +907,7 @@
 		OBJ_65 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_TESTABILITY = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -899,6 +918,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) $(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MARKETING_VERSION = 2.3.0;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "$(inherited)";

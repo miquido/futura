@@ -610,10 +610,10 @@ class FutureZipTests: XCTestCase {
             }
 
             let dispatchQueue: DispatchQueue = DispatchQueue(label: "test", qos: .default, attributes: .concurrent)
-            let lock_1: RecursiveLock = .init()
-            let lock_2: RecursiveLock = .init()
-            let lock_3: RecursiveLock = .init()
-            let lock_4: RecursiveLock = .init()
+            let lock_1: Lock = .init()
+            let lock_2: Lock = .init()
+            let lock_3: Lock = .init()
+            let lock_4: Lock = .init()
             var counter_1 = 0
             var counter_2 = 0
             var counter_3 = 0
@@ -675,10 +675,10 @@ class FutureZipTests: XCTestCase {
             }
 
             let dispatchQueue: DispatchQueue = DispatchQueue(label: "test", qos: .default, attributes: .concurrent)
-            let lock_1: RecursiveLock = .init()
-            let lock_2: RecursiveLock = .init()
-            let lock_3: RecursiveLock = .init()
-            let lock_4: RecursiveLock = .init()
+            let lock_1: Lock = .init()
+            let lock_2: Lock = .init()
+            let lock_3: Lock = .init()
+            let lock_4: Lock = .init()
             var counter_1 = 0
             var counter_2 = 0
             var counter_3 = 0
@@ -740,10 +740,10 @@ class FutureZipTests: XCTestCase {
             }
 
             let dispatchQueue: DispatchQueue = DispatchQueue(label: "test", qos: .default, attributes: .concurrent)
-            let lock_1: RecursiveLock = .init()
-            let lock_2: RecursiveLock = .init()
-            let lock_3: RecursiveLock = .init()
-            let lock_4: RecursiveLock = .init()
+            let lock_1: Lock = .init()
+            let lock_2: Lock = .init()
+            let lock_3: Lock = .init()
+            let lock_4: Lock = .init()
             var counter_1 = 0
             var counter_2 = 0
             var counter_3 = 0
@@ -805,10 +805,10 @@ class FutureZipTests: XCTestCase {
             }
 
             let dispatchQueue: DispatchQueue = DispatchQueue(label: "test", qos: .default, attributes: .concurrent)
-            let lock_1: RecursiveLock = .init()
-            let lock_2: RecursiveLock = .init()
-            let lock_3: RecursiveLock = .init()
-            let lock_4: RecursiveLock = .init()
+            let lock_1: Lock = .init()
+            let lock_2: Lock = .init()
+            let lock_3: Lock = .init()
+            let lock_4: Lock = .init()
             var counter_1 = 0
             var counter_2 = 0
             var counter_3 = 0
@@ -864,10 +864,10 @@ class FutureZipTests: XCTestCase {
             }
 
             let dispatchQueue: DispatchQueue = DispatchQueue(label: "test", qos: .default, attributes: .concurrent)
-            let lock_1: RecursiveLock = .init()
-            let lock_2: RecursiveLock = .init()
-            let lock_3: RecursiveLock = .init()
-            let lock_4: RecursiveLock = .init()
+            let lock_1: Lock = .init()
+            let lock_2: Lock = .init()
+            let lock_3: Lock = .init()
+            let lock_4: Lock = .init()
             var counter_1 = 0
             var counter_2 = 0
             var counter_3 = 0
@@ -923,10 +923,10 @@ class FutureZipTests: XCTestCase {
             }
 
             let dispatchQueue: DispatchQueue = DispatchQueue(label: "test", qos: .default, attributes: .concurrent)
-            let lock_1: RecursiveLock = .init()
-            let lock_2: RecursiveLock = .init()
-            let lock_3: RecursiveLock = .init()
-            let lock_4: RecursiveLock = .init()
+            let lock_1: Lock = .init()
+            let lock_2: Lock = .init()
+            let lock_3: Lock = .init()
+            let lock_4: Lock = .init()
             var counter_1 = 0
             var counter_2 = 0
             var counter_3 = 0
