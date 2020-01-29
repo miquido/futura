@@ -618,8 +618,8 @@ class FutureZipTests: XCTestCase {
             var counter_2 = 0
             var counter_3 = 0
 
+            lock_1.lock()
             dispatchQueue.async {
-                lock_1.lock()
                 for i in 1 ... 100 {
                     zip(promises[i - 1].future, promises[i].future).always {
                         counter_1 += 1
@@ -627,8 +627,8 @@ class FutureZipTests: XCTestCase {
                 }
                 lock_1.unlock()
             }
+            lock_2.lock()
             dispatchQueue.async {
-                lock_2.lock()
                 for i in 1 ... 100 {
                     zip(promises[i - 1].future, promises[i].future).always {
                         counter_2 += 1
@@ -636,8 +636,8 @@ class FutureZipTests: XCTestCase {
                 }
                 lock_2.unlock()
             }
+            lock_3.lock()
             dispatchQueue.async {
-                lock_3.lock()
                 for i in 1 ... 100 {
                     zip(promises[i - 1].future, promises[i].future).always {
                         counter_3 += 1
@@ -646,15 +646,14 @@ class FutureZipTests: XCTestCase {
                 lock_3.unlock()
             }
 
+            lock_4.lock()
             dispatchQueue.async {
-                lock_4.lock()
                 for promise in promises {
                     promise.fulfill(with: 0)
                 }
                 lock_4.unlock()
             }
 
-            sleep(1) // make sure that queue locks first
             lock_1.lock()
             lock_2.lock()
             lock_3.lock()
@@ -683,8 +682,8 @@ class FutureZipTests: XCTestCase {
             var counter_2 = 0
             var counter_3 = 0
 
+            lock_1.lock()
             dispatchQueue.async {
-                lock_1.lock()
                 for i in 1 ... 100 {
                     zip(promises[i - 1].future, promises[i].future).always {
                         counter_1 += 1
@@ -692,8 +691,8 @@ class FutureZipTests: XCTestCase {
                 }
                 lock_1.unlock()
             }
+            lock_2.lock()
             dispatchQueue.async {
-                lock_2.lock()
                 for i in 1 ... 100 {
                     zip(promises[i - 1].future, promises[i].future).always {
                         counter_2 += 1
@@ -701,8 +700,8 @@ class FutureZipTests: XCTestCase {
                 }
                 lock_2.unlock()
             }
+            lock_3.lock()
             dispatchQueue.async {
-                lock_3.lock()
                 for i in 1 ... 100 {
                     zip(promises[i - 1].future, promises[i].future).always {
                         counter_3 += 1
@@ -711,15 +710,14 @@ class FutureZipTests: XCTestCase {
                 lock_3.unlock()
             }
 
+            lock_4.lock()
             dispatchQueue.async {
-                lock_4.lock()
                 for promise in promises {
                     promise.break(with: testError)
                 }
                 lock_4.unlock()
             }
 
-            sleep(1) // make sure that queue locks first
             lock_1.lock()
             lock_2.lock()
             lock_3.lock()
@@ -744,47 +742,49 @@ class FutureZipTests: XCTestCase {
             let lock_2: Lock = .init()
             let lock_3: Lock = .init()
             let lock_4: Lock = .init()
+            
             var counter_1 = 0
             var counter_2 = 0
             var counter_3 = 0
-
+            
+            lock_1.lock()
             dispatchQueue.async {
-                lock_1.lock()
                 for i in 1 ... 100 {
-                    zip(promises[i - 1].future, promises[i].future).always {
+                    zip(promises[i - 1].future, promises[i].future)
+                    .always {
                         counter_1 += 1
                     }
                 }
                 lock_1.unlock()
             }
+            lock_2.lock()
             dispatchQueue.async {
-                lock_2.lock()
                 for i in 1 ... 100 {
-                    zip(promises[i - 1].future, promises[i].future).always {
+                    zip(promises[i - 1].future, promises[i].future)
+                    .always {
                         counter_2 += 1
                     }
                 }
                 lock_2.unlock()
             }
+            lock_3.lock()
             dispatchQueue.async {
-                lock_3.lock()
                 for i in 1 ... 100 {
-                    zip(promises[i - 1].future, promises[i].future).always {
+                    zip(promises[i - 1].future, promises[i].future)
+                    .always {
                         counter_3 += 1
                     }
                 }
                 lock_3.unlock()
             }
-
+            lock_4.lock()
             dispatchQueue.async {
-                lock_4.lock()
                 for promise in promises {
                     promise.cancel()
                 }
                 lock_4.unlock()
             }
-
-            sleep(1) // make sure that queue locks first
+            
             lock_1.lock()
             lock_2.lock()
             lock_3.lock()
@@ -813,37 +813,36 @@ class FutureZipTests: XCTestCase {
             var counter_2 = 0
             var counter_3 = 0
 
+            lock_1.lock()
             dispatchQueue.async {
-                lock_1.lock()
                 zip(promises.map { $0.future }).always {
                     counter_1 += 1
                 }
                 lock_1.unlock()
             }
+            lock_2.lock()
             dispatchQueue.async {
-                lock_2.lock()
                 zip(promises.map { $0.future }).always {
                     counter_2 += 1
                 }
                 lock_2.unlock()
             }
+            lock_3.lock()
             dispatchQueue.async {
-                lock_3.lock()
                 zip(promises.map { $0.future }).always {
                     counter_3 += 1
                 }
                 lock_3.unlock()
             }
 
+            lock_4.lock()
             dispatchQueue.async {
-                lock_4.lock()
                 for promise in promises {
                     promise.fulfill(with: 0)
                 }
                 lock_4.unlock()
             }
 
-            sleep(1) // make sure that queue locks first
             lock_1.lock()
             lock_2.lock()
             lock_3.lock()
@@ -872,37 +871,36 @@ class FutureZipTests: XCTestCase {
             var counter_2 = 0
             var counter_3 = 0
 
+            lock_1.lock()
             dispatchQueue.async {
-                lock_1.lock()
                 zip(promises.map { $0.future }).always {
                     counter_1 += 1
                 }
                 lock_1.unlock()
             }
+            lock_2.lock()
             dispatchQueue.async {
-                lock_2.lock()
                 zip(promises.map { $0.future }).always {
                     counter_2 += 1
                 }
                 lock_2.unlock()
             }
+            lock_3.lock()
             dispatchQueue.async {
-                lock_3.lock()
                 zip(promises.map { $0.future }).always {
                     counter_3 += 1
                 }
                 lock_3.unlock()
             }
 
+            lock_4.lock()
             dispatchQueue.async {
-                lock_4.lock()
                 for promise in promises {
                     promise.break(with: testError)
                 }
                 lock_4.unlock()
             }
 
-            sleep(1) // make sure that queue locks first
             lock_1.lock()
             lock_2.lock()
             lock_3.lock()
@@ -931,37 +929,35 @@ class FutureZipTests: XCTestCase {
             var counter_2 = 0
             var counter_3 = 0
 
+            lock_1.lock()
             dispatchQueue.async {
-                lock_1.lock()
                 zip(promises.map { $0.future }).always {
                     counter_1 += 1
                 }
                 lock_1.unlock()
             }
+            lock_2.lock()
             dispatchQueue.async {
-                lock_2.lock()
                 zip(promises.map { $0.future }).always {
                     counter_2 += 1
                 }
                 lock_2.unlock()
             }
+            lock_3.lock()
             dispatchQueue.async {
-                lock_3.lock()
                 zip(promises.map { $0.future }).always {
                     counter_3 += 1
                 }
                 lock_3.unlock()
             }
-
+            lock_4.lock()
             dispatchQueue.async {
-                lock_4.lock()
                 for promise in promises {
                     promise.cancel()
                 }
                 lock_4.unlock()
             }
 
-            sleep(1) // make sure that queue locks first
             lock_1.lock()
             lock_2.lock()
             lock_3.lock()

@@ -20,14 +20,14 @@ import Darwin.POSIX
 
 #if os(Linux)
 @usableFromInline
-fileprivate let nSecMsec: __time_t = 1_000_000
+fileprivate let n_sec_in_m_sec: __time_t = 1_000_000 // nanoseconds in milisecond
 @usableFromInline
-fileprivate let mSecSec: __time_t = 1_000 * nSecMsec
+fileprivate let n_sec_in_sec: __time_t = 1_000 * n_sec_in_m_sec // nanoseconds in second
 #else
 @usableFromInline
-internal let nSecMsec: __darwin_time_t = 1_000_000
+internal let n_sec_in_m_sec: __darwin_time_t = 1_000_000 // nanoseconds in milisecond
 @usableFromInline
-internal let mSecSec: __darwin_time_t = 1_000 * nSecMsec
+internal let n_sec_in_sec: __darwin_time_t = 1_000 * n_sec_in_m_sec // nanoseconds in second
 #endif
 
 /// pthread_mutex api wrapper
@@ -89,22 +89,56 @@ public enum Mutex {
         #if os(Linux)
         var currentTimeout = __time_t(timeout) * mSecSec
         #else
-        var currentTimeout = __darwin_time_t(timeout) * mSecSec
+        var timeoutTimeLeft = __darwin_time_t(timeout) * n_sec_in_sec
         #endif
         
-        var rem = timespec(tv_sec: 0, tv_nsec: 0)
-        var req = timespec(tv_sec: 0, tv_nsec: 0)
-        while pthread_mutex_trylock(pointer) != 0 {
-            if currentTimeout <= 0 {
-                throw Timeout()
-            } else { /* continue waiting */ }
-            let requested = currentTimeout < nSecMsec ? currentTimeout : nSecMsec
-            req.tv_nsec = requested
-            while nanosleep(&req, &rem) == EINTR {
-                req.tv_nsec = rem.tv_nsec
+        var remained: timespec = .init()
+        var requested: timespec = timespecFrom(miliseconds: 100)
+        while timeoutTimeLeft > 0 {
+            switch pthread_mutex_trylock(pointer) {
+                case 0: // success
+                    return
+                case EINVAL: // mutex invalid
+                    return assertionFailure()
+                case EBUSY: // locked
+                    sleepLoop: while true {
+                        switch nanosleep(&requested, &remained) {
+                            case 0: // success
+                                break sleepLoop
+                            case EINTR: // interupt
+                                requested.tv_nsec = remained.tv_nsec
+                            case let errorCode: // unexpected
+                                fatalError("nanosleep error: \(errorCode)")
+                        }
+                    }
+                    timeoutTimeLeft -= (requested.tv_nsec - remained.tv_nsec)
+                    timeoutTimeLeft -= (requested.tv_sec - remained.tv_sec) * n_sec_in_sec
+                case let errorCode: // unexpected
+                    fatalError("mutex error: \(errorCode)")
             }
-            currentTimeout -= (requested - rem.tv_nsec)
         }
+        throw Timeout()
+//        var rem = timespec(tv_sec: 0, tv_nsec: 0)
+//        var req = timespec(tv_sec: 0, tv_nsec: 0)
+//        while pthread_mutex_trylock(pointer) != 0 {
+//            if currentTimeout <= 0 {
+//                throw Timeout()
+//            } else { /* continue waiting */ }
+//            let requested = currentTimeout < nSecMsec ? currentTimeout : nSecMsec
+//            req.tv_nsec = requested
+//            while nanosleep(&req, &rem) == EINTR {
+//                req.tv_nsec = rem.tv_nsec
+//            }
+//            currentTimeout -= (requested - rem.tv_nsec)
+//        }
+    }
+    
+    @inlinable
+    internal static func timespecFrom(miliseconds: UInt) -> timespec {
+        return .init(
+            tv_sec: __darwin_time_t(miliseconds / 1000),
+            tv_nsec: Int(miliseconds % 1000) * n_sec_in_m_sec
+        )
     }
 
     /// Tries to lock on instance of pthread_mutex. Locks if unlocked or passes if locked.

@@ -1685,29 +1685,28 @@ class SignalTests: XCTestCase {
             var counter_2 = 0
             var counter_3 = 0
 
+            lock_1.lock()
             dispatchQueue.async {
-                lock_1.lock()
                 for _ in 0 ..< 100 {
                     self.emitter.values { _ in counter_1 += 1 }
                 }
                 lock_1.unlock()
             }
+            lock_2.lock()
             dispatchQueue.async {
-                lock_2.lock()
                 for _ in 0 ..< 100 {
                     self.emitter.values { _ in counter_2 += 1 }
                 }
                 lock_2.unlock()
             }
+            lock_3.lock()
             dispatchQueue.async {
-                lock_3.lock()
                 for _ in 0 ..< 100 {
                     self.emitter.values { _ in counter_3 += 1 }
                 }
                 lock_3.unlock()
             }
 
-            sleep(1) // make sure that queue locks first
             lock_1.lock()
             lock_2.lock()
             lock_3.lock()

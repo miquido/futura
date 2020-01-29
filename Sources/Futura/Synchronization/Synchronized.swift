@@ -44,9 +44,9 @@ public final class Synchronized<Wrapped> {
         }
     }
     
-    public func synchronized(_ access: (inout Wrapped) throws -> Void) rethrows {
+    public func synchronized<T>(_ access: (inout Wrapped) throws -> T) rethrows -> T {
         Mutex.lock(mtx)
         defer { Mutex.unlock(mtx) }
-        try access(&_wrappedValue)
+        return try access(&_wrappedValue)
     }
 }

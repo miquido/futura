@@ -9,14 +9,16 @@
 /* Begin PBXBuildFile section */
 		4224E6E12264A90700815E20 /* Future+Expectation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4224E6E02264A90700815E20 /* Future+Expectation.swift */; };
 		4224E6E32264C1E800815E20 /* TestExpectation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4224E6E22264C1E800815E20 /* TestExpectation.swift */; };
-		4224E6E52264C85300815E20 /* AtomicFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4224E6E42264C85300815E20 /* AtomicFlag.swift */; };
 		4224E6E92265B8BE00815E20 /* Signal+Expectation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4224E6E82265B8BE00815E20 /* Signal+Expectation.swift */; };
-		4224E6F12265BE5400815E20 /* AtomicFlagTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4224E6F02265BE5400815E20 /* AtomicFlagTests.swift */; };
 		4224E6F32265E7A200815E20 /* XCTestCase+Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4224E6F22265E7A200815E20 /* XCTestCase+Async.swift */; };
 		422DF99223E1CF110091957D /* Synchronized.swift in Sources */ = {isa = PBXBuildFile; fileRef = 422DF99123E1CF110091957D /* Synchronized.swift */; };
 		422DF99523E1D0E10091957D /* SynchronizedPropertyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 422DF99323E1D0C20091957D /* SynchronizedPropertyTests.swift */; };
 		422DF99723E1D5D80091957D /* Lock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 422DF99623E1D5D80091957D /* Lock.swift */; };
 		422DF99923E1D6370091957D /* LockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 422DF99823E1D6370091957D /* LockTests.swift */; };
+		4251536D23E1FED400A112E0 /* RecursiveLockPerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4251536C23E1FED400A112E0 /* RecursiveLockPerformanceTests.swift */; };
+		4251536E23E1FF3500A112E0 /* AtomicFlagTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4224E6F02265BE5400815E20 /* AtomicFlagTests.swift */; };
+		4251536F23E1FF4800A112E0 /* LockPerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_39 /* LockPerformanceTests.swift */; };
+		4251537023E1FFD200A112E0 /* AtomicFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4224E6E42264C85300815E20 /* AtomicFlag.swift */; };
 		42C32F75226603D300C806A4 /* Future+Handlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42C32F74226603D300C806A4 /* Future+Handlers.swift */; };
 		42C32F77226603F200C806A4 /* Future+Transformations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42C32F76226603F200C806A4 /* Future+Transformations.swift */; };
 		42C32F792266040000C806A4 /* Future+Zip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42C32F782266040000C806A4 /* Future+Zip.swift */; };
@@ -25,7 +27,6 @@
 		42C32F802266069400C806A4 /* FuturaDebug.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42C32F7F2266069400C806A4 /* FuturaDebug.swift */; };
 		42C32F822266075D00C806A4 /* Signal+Debug.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42C32F812266075D00C806A4 /* Signal+Debug.swift */; };
 		42C32F8422660FA700C806A4 /* Signal+Handlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42C32F8322660FA700C806A4 /* Signal+Handlers.swift */; };
-		OBJ_108 /* FuturaPerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_39 /* FuturaPerformanceTests.swift */; };
 		OBJ_110 /* FuturaTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Futura::FuturaTest::Product" /* FuturaTest.framework */; };
 		OBJ_111 /* Futura.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Futura::Futura::Product" /* Futura.framework */; };
 		OBJ_119 /* TestWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_36 /* TestWorker.swift */; };
@@ -114,6 +115,7 @@
 		422DF99323E1D0C20091957D /* SynchronizedPropertyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynchronizedPropertyTests.swift; sourceTree = "<group>"; };
 		422DF99623E1D5D80091957D /* Lock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Lock.swift; sourceTree = "<group>"; };
 		422DF99823E1D6370091957D /* LockTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockTests.swift; sourceTree = "<group>"; };
+		4251536C23E1FED400A112E0 /* RecursiveLockPerformanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecursiveLockPerformanceTests.swift; sourceTree = "<group>"; };
 		42C32F74226603D300C806A4 /* Future+Handlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Future+Handlers.swift"; sourceTree = "<group>"; };
 		42C32F76226603F200C806A4 /* Future+Transformations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Future+Transformations.swift"; sourceTree = "<group>"; };
 		42C32F782266040000C806A4 /* Future+Zip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Future+Zip.swift"; sourceTree = "<group>"; };
@@ -149,7 +151,7 @@
 		OBJ_33 /* OperationQueueWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationQueueWorker.swift; sourceTree = "<group>"; };
 		OBJ_34 /* Worker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Worker.swift; sourceTree = "<group>"; };
 		OBJ_36 /* TestWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestWorker.swift; sourceTree = "<group>"; };
-		OBJ_39 /* FuturaPerformanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuturaPerformanceTests.swift; sourceTree = "<group>"; };
+		OBJ_39 /* LockPerformanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockPerformanceTests.swift; sourceTree = "<group>"; };
 		OBJ_41 /* FutureZipTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureZipTests.swift; sourceTree = "<group>"; };
 		OBJ_42 /* PromiseAndFutureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromiseAndFutureTests.swift; sourceTree = "<group>"; };
 		OBJ_43 /* RecursiveLockTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecursiveLockTests.swift; sourceTree = "<group>"; };
@@ -334,7 +336,8 @@
 		OBJ_38 /* FuturaPerformanceTests */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_39 /* FuturaPerformanceTests.swift */,
+				OBJ_39 /* LockPerformanceTests.swift */,
+				4251536C23E1FED400A112E0 /* RecursiveLockPerformanceTests.swift */,
 			);
 			name = FuturaPerformanceTests;
 			path = Tests/FuturaPerformanceTests;
@@ -549,7 +552,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_108 /* FuturaPerformanceTests.swift in Sources */,
+				4251536D23E1FED400A112E0 /* RecursiveLockPerformanceTests.swift in Sources */,
+				4251536F23E1FF4800A112E0 /* LockPerformanceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -559,9 +563,7 @@
 			files = (
 				4224E6E92265B8BE00815E20 /* Signal+Expectation.swift in Sources */,
 				4224E6E12264A90700815E20 /* Future+Expectation.swift in Sources */,
-				4224E6F12265BE5400815E20 /* AtomicFlagTests.swift in Sources */,
 				4224E6E32264C1E800815E20 /* TestExpectation.swift in Sources */,
-				4224E6E52264C85300815E20 /* AtomicFlag.swift in Sources */,
 				4224E6F32265E7A200815E20 /* XCTestCase+Async.swift in Sources */,
 				OBJ_119 /* TestWorker.swift in Sources */,
 			);
@@ -577,6 +579,7 @@
 				OBJ_129 /* RecursiveLockTests.swift in Sources */,
 				OBJ_130 /* SignalTests.swift in Sources */,
 				OBJ_131 /* FuturaTests.swift in Sources */,
+				4251536E23E1FF3500A112E0 /* AtomicFlagTests.swift in Sources */,
 				OBJ_132 /* FutureWorkLog.swift in Sources */,
 				OBJ_133 /* StreamWorkLog.swift in Sources */,
 				422DF99523E1D0E10091957D /* SynchronizedPropertyTests.swift in Sources */,
@@ -599,6 +602,7 @@
 				OBJ_73 /* Signal+FlatMapLatest.swift in Sources */,
 				OBJ_74 /* Signal+Forward.swift in Sources */,
 				42C32F822266075D00C806A4 /* Signal+Debug.swift in Sources */,
+				4251537023E1FFD200A112E0 /* AtomicFlag.swift in Sources */,
 				OBJ_75 /* Signal+FutureFlatMap.swift in Sources */,
 				OBJ_76 /* Signal+Map.swift in Sources */,
 				OBJ_77 /* Signal+Merge.swift in Sources */,

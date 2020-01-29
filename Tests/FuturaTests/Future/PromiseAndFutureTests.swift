@@ -1396,8 +1396,8 @@ class PromiseAndFutureTestsTests: XCTestCase {
             let lock_3: Lock = .init()
             var counter = 0
 
+            lock_1.lock()
             dispatchQueue.async {
-                lock_1.lock()
                 for _ in 0 ..< 100 {
                     future.always {
                         counter += 1
@@ -1405,8 +1405,8 @@ class PromiseAndFutureTestsTests: XCTestCase {
                 }
                 lock_1.unlock()
             }
+            lock_2.lock()
             dispatchQueue.async {
-                lock_2.lock()
                 for _ in 0 ..< 100 {
                     future.always {
                         counter += 1
@@ -1414,8 +1414,8 @@ class PromiseAndFutureTestsTests: XCTestCase {
                 }
                 lock_2.unlock()
             }
+            lock_3.lock()
             dispatchQueue.async {
-                lock_3.lock()
                 for _ in 0 ..< 100 {
                     future.always {
                         counter += 1
@@ -1424,7 +1424,6 @@ class PromiseAndFutureTestsTests: XCTestCase {
                 lock_3.unlock()
             }
 
-            sleep(1) // make sure that queue locks first
             lock_1.lock()
             lock_2.lock()
             lock_3.lock()
@@ -1447,8 +1446,8 @@ class PromiseAndFutureTestsTests: XCTestCase {
             var counter_2 = 0
             var counter_3 = 0
 
+            lock_1.lock()
             dispatchQueue.async {
-                lock_1.lock()
                 for _ in 0 ..< 100 {
                     future
                         .clone()
@@ -1460,8 +1459,8 @@ class PromiseAndFutureTestsTests: XCTestCase {
                 }
                 lock_1.unlock()
             }
+            lock_2.lock()
             dispatchQueue.async {
-                lock_2.lock()
                 for _ in 0 ..< 100 {
                     future
                         .clone()
@@ -1473,8 +1472,8 @@ class PromiseAndFutureTestsTests: XCTestCase {
                 }
                 lock_2.unlock()
             }
+            lock_3.lock()
             dispatchQueue.async {
-                lock_3.lock()
                 for _ in 0 ..< 100 {
                     future
                         .clone()
@@ -1487,7 +1486,6 @@ class PromiseAndFutureTestsTests: XCTestCase {
                 lock_3.unlock()
             }
 
-            sleep(1) // make sure that queue locks first
             lock_1.lock()
             lock_2.lock()
             lock_3.lock()
