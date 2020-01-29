@@ -20,12 +20,18 @@ class PromiseAndFutureTestsTests: XCTestCase {
     var worker: TestWorker = .init()
     var workLog: FutureWorkLog = .init()
     var promise: Promise<Int> = .init()
+    @Synchronized var counter_1 = 0
+    @Synchronized var counter_2 = 0
+    @Synchronized var counter_3 = 0
 
     override func setUp() {
         super.setUp()
         worker = .init()
         workLog = .init()
         promise = .init(executionContext: .explicit(worker))
+        counter_1 = 0
+        counter_2 = 0
+        counter_3 = 0
     }
 
     // MARK: -
@@ -1394,13 +1400,12 @@ class PromiseAndFutureTestsTests: XCTestCase {
             let lock_1: Lock = .init()
             let lock_2: Lock = .init()
             let lock_3: Lock = .init()
-            var counter = 0
 
             lock_1.lock()
             dispatchQueue.async {
                 for _ in 0 ..< 100 {
                     future.always {
-                        counter += 1
+                        self.counter_1 += 1
                     }
                 }
                 lock_1.unlock()
@@ -1409,7 +1414,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
             dispatchQueue.async {
                 for _ in 0 ..< 100 {
                     future.always {
-                        counter += 1
+                        self.counter_1 += 1
                     }
                 }
                 lock_2.unlock()
@@ -1418,7 +1423,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
             dispatchQueue.async {
                 for _ in 0 ..< 100 {
                     future.always {
-                        counter += 1
+                        self.counter_1 += 1
                     }
                 }
                 lock_3.unlock()
@@ -1428,7 +1433,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
             lock_2.lock()
             lock_3.lock()
 
-            XCTAssertEqual(counter, 300, "Calls count not matching expected")
+            XCTAssertEqual(self.counter_1, 300, "Calls count not matching expected")
             complete()
         }
     }
@@ -1442,9 +1447,6 @@ class PromiseAndFutureTestsTests: XCTestCase {
             let lock_1: Lock = .init()
             let lock_2: Lock = .init()
             let lock_3: Lock = .init()
-            var counter_1 = 0
-            var counter_2 = 0
-            var counter_3 = 0
 
             lock_1.lock()
             dispatchQueue.async {
@@ -1455,7 +1457,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
                         .flatMap { .init(succeededWith: $0) }
                         .recover { throw $0 }
                         .catch { throw $0 }
-                        .always { counter_1 += 1 }
+                        .always { self.counter_1 += 1 }
                 }
                 lock_1.unlock()
             }
@@ -1468,7 +1470,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
                         .flatMap { .init(succeededWith: $0) }
                         .recover { throw $0 }
                         .catch { throw $0 }
-                        .always { counter_2 += 1 }
+                        .always { self.counter_2 += 1 }
                 }
                 lock_2.unlock()
             }
@@ -1481,7 +1483,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
                         .flatMap { .init(succeededWith: $0) }
                         .recover { throw $0 }
                         .catch { throw $0 }
-                        .always { counter_3 += 1 }
+                        .always { self.counter_3 += 1 }
                 }
                 lock_3.unlock()
             }
@@ -1490,7 +1492,7 @@ class PromiseAndFutureTestsTests: XCTestCase {
             lock_2.lock()
             lock_3.lock()
 
-            XCTAssertEqual(counter_1 + counter_2 + counter_3, 300, "Calls count not matching expected")
+            XCTAssertEqual(self.counter_1 + self.counter_2 + self.counter_3, 300, "Calls count not matching expected")
             complete()
         }
     }

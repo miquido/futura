@@ -21,6 +21,9 @@ class FutureZipTests: XCTestCase {
     var workLog: FutureWorkLog = .init()
     var promise_1: Promise<Int> = .init()
     var promise_2: Promise<Int> = .init()
+    @Synchronized var counter_1 = 0
+    @Synchronized var counter_2 = 0
+    @Synchronized var counter_3 = 0
 
     override func setUp() {
         super.setUp()
@@ -28,6 +31,9 @@ class FutureZipTests: XCTestCase {
         workLog = .init()
         promise_1 = .init(executionContext: .explicit(worker))
         promise_2 = .init(executionContext: .explicit(worker))
+        counter_1 = 0
+        counter_2 = 0
+        counter_3 = 0
     }
 
     // MARK: -
@@ -614,15 +620,12 @@ class FutureZipTests: XCTestCase {
             let lock_2: Lock = .init()
             let lock_3: Lock = .init()
             let lock_4: Lock = .init()
-            var counter_1 = 0
-            var counter_2 = 0
-            var counter_3 = 0
 
             lock_1.lock()
             dispatchQueue.async {
                 for i in 1 ... 100 {
                     zip(promises[i - 1].future, promises[i].future).always {
-                        counter_1 += 1
+                        self.counter_1 += 1
                     }
                 }
                 lock_1.unlock()
@@ -631,7 +634,7 @@ class FutureZipTests: XCTestCase {
             dispatchQueue.async {
                 for i in 1 ... 100 {
                     zip(promises[i - 1].future, promises[i].future).always {
-                        counter_2 += 1
+                        self.counter_2 += 1
                     }
                 }
                 lock_2.unlock()
@@ -640,7 +643,7 @@ class FutureZipTests: XCTestCase {
             dispatchQueue.async {
                 for i in 1 ... 100 {
                     zip(promises[i - 1].future, promises[i].future).always {
-                        counter_3 += 1
+                        self.counter_3 += 1
                     }
                 }
                 lock_3.unlock()
@@ -659,7 +662,7 @@ class FutureZipTests: XCTestCase {
             lock_3.lock()
             lock_4.lock()
 
-            XCTAssertEqual(counter_1 + counter_2 + counter_3, 300, "Calls count not matching expected")
+            XCTAssertEqual(self.counter_1 + self.counter_2 + self.counter_3, 300, "Calls count not matching expected")
             complete()
         }
     }
@@ -678,15 +681,12 @@ class FutureZipTests: XCTestCase {
             let lock_2: Lock = .init()
             let lock_3: Lock = .init()
             let lock_4: Lock = .init()
-            var counter_1 = 0
-            var counter_2 = 0
-            var counter_3 = 0
 
             lock_1.lock()
             dispatchQueue.async {
                 for i in 1 ... 100 {
                     zip(promises[i - 1].future, promises[i].future).always {
-                        counter_1 += 1
+                        self.counter_1 += 1
                     }
                 }
                 lock_1.unlock()
@@ -695,7 +695,7 @@ class FutureZipTests: XCTestCase {
             dispatchQueue.async {
                 for i in 1 ... 100 {
                     zip(promises[i - 1].future, promises[i].future).always {
-                        counter_2 += 1
+                        self.counter_2 += 1
                     }
                 }
                 lock_2.unlock()
@@ -704,7 +704,7 @@ class FutureZipTests: XCTestCase {
             dispatchQueue.async {
                 for i in 1 ... 100 {
                     zip(promises[i - 1].future, promises[i].future).always {
-                        counter_3 += 1
+                        self.counter_3 += 1
                     }
                 }
                 lock_3.unlock()
@@ -723,7 +723,7 @@ class FutureZipTests: XCTestCase {
             lock_3.lock()
             lock_4.lock()
 
-            XCTAssertEqual(counter_1 + counter_2 + counter_3, 300, "Calls count not matching expected")
+            XCTAssertEqual(self.counter_1 + self.counter_2 + self.counter_3, 300, "Calls count not matching expected")
             complete()
         }
     }
@@ -743,16 +743,12 @@ class FutureZipTests: XCTestCase {
             let lock_3: Lock = .init()
             let lock_4: Lock = .init()
             
-            var counter_1 = 0
-            var counter_2 = 0
-            var counter_3 = 0
-            
             lock_1.lock()
             dispatchQueue.async {
                 for i in 1 ... 100 {
                     zip(promises[i - 1].future, promises[i].future)
                     .always {
-                        counter_1 += 1
+                        self.counter_1 += 1
                     }
                 }
                 lock_1.unlock()
@@ -762,7 +758,7 @@ class FutureZipTests: XCTestCase {
                 for i in 1 ... 100 {
                     zip(promises[i - 1].future, promises[i].future)
                     .always {
-                        counter_2 += 1
+                        self.counter_2 += 1
                     }
                 }
                 lock_2.unlock()
@@ -772,7 +768,7 @@ class FutureZipTests: XCTestCase {
                 for i in 1 ... 100 {
                     zip(promises[i - 1].future, promises[i].future)
                     .always {
-                        counter_3 += 1
+                        self.counter_3 += 1
                     }
                 }
                 lock_3.unlock()
@@ -790,7 +786,7 @@ class FutureZipTests: XCTestCase {
             lock_3.lock()
             lock_4.lock()
 
-            XCTAssertEqual(counter_1 + counter_2 + counter_3, 300, "Calls count not matching expected")
+            XCTAssertEqual(self.counter_1 + self.counter_2 + self.counter_3, 300, "Calls count not matching expected")
             complete()
         }
     }
@@ -809,28 +805,25 @@ class FutureZipTests: XCTestCase {
             let lock_2: Lock = .init()
             let lock_3: Lock = .init()
             let lock_4: Lock = .init()
-            var counter_1 = 0
-            var counter_2 = 0
-            var counter_3 = 0
 
             lock_1.lock()
             dispatchQueue.async {
                 zip(promises.map { $0.future }).always {
-                    counter_1 += 1
+                    self.counter_1 += 1
                 }
                 lock_1.unlock()
             }
             lock_2.lock()
             dispatchQueue.async {
                 zip(promises.map { $0.future }).always {
-                    counter_2 += 1
+                    self.counter_2 += 1
                 }
                 lock_2.unlock()
             }
             lock_3.lock()
             dispatchQueue.async {
                 zip(promises.map { $0.future }).always {
-                    counter_3 += 1
+                    self.counter_3 += 1
                 }
                 lock_3.unlock()
             }
@@ -848,7 +841,7 @@ class FutureZipTests: XCTestCase {
             lock_3.lock()
             lock_4.lock()
 
-            XCTAssertEqual(counter_1 + counter_2 + counter_3, 3, "Calls count not matching expected")
+            XCTAssertEqual(self.counter_1 + self.counter_2 + self.counter_3, 3, "Calls count not matching expected")
             complete()
         }
     }
@@ -867,28 +860,25 @@ class FutureZipTests: XCTestCase {
             let lock_2: Lock = .init()
             let lock_3: Lock = .init()
             let lock_4: Lock = .init()
-            var counter_1 = 0
-            var counter_2 = 0
-            var counter_3 = 0
 
             lock_1.lock()
             dispatchQueue.async {
                 zip(promises.map { $0.future }).always {
-                    counter_1 += 1
+                    self.counter_1 += 1
                 }
                 lock_1.unlock()
             }
             lock_2.lock()
             dispatchQueue.async {
                 zip(promises.map { $0.future }).always {
-                    counter_2 += 1
+                    self.counter_2 += 1
                 }
                 lock_2.unlock()
             }
             lock_3.lock()
             dispatchQueue.async {
                 zip(promises.map { $0.future }).always {
-                    counter_3 += 1
+                    self.counter_3 += 1
                 }
                 lock_3.unlock()
             }
@@ -906,7 +896,7 @@ class FutureZipTests: XCTestCase {
             lock_3.lock()
             lock_4.lock()
 
-            XCTAssertEqual(counter_1 + counter_2 + counter_3, 3, "Calls count not matching expected")
+            XCTAssertEqual(self.counter_1 + self.counter_2 + self.counter_3, 3, "Calls count not matching expected")
             complete()
         }
     }
@@ -925,28 +915,25 @@ class FutureZipTests: XCTestCase {
             let lock_2: Lock = .init()
             let lock_3: Lock = .init()
             let lock_4: Lock = .init()
-            var counter_1 = 0
-            var counter_2 = 0
-            var counter_3 = 0
 
             lock_1.lock()
             dispatchQueue.async {
                 zip(promises.map { $0.future }).always {
-                    counter_1 += 1
+                    self.counter_1 += 1
                 }
                 lock_1.unlock()
             }
             lock_2.lock()
             dispatchQueue.async {
                 zip(promises.map { $0.future }).always {
-                    counter_2 += 1
+                    self.counter_2 += 1
                 }
                 lock_2.unlock()
             }
             lock_3.lock()
             dispatchQueue.async {
                 zip(promises.map { $0.future }).always {
-                    counter_3 += 1
+                    self.counter_3 += 1
                 }
                 lock_3.unlock()
             }
@@ -963,7 +950,7 @@ class FutureZipTests: XCTestCase {
             lock_3.lock()
             lock_4.lock()
 
-            XCTAssertEqual(counter_1 + counter_2 + counter_3, 3, "Calls count not matching expected")
+            XCTAssertEqual(self.counter_1 + self.counter_2 + self.counter_3, 3, "Calls count not matching expected")
             complete()
         }
     }
