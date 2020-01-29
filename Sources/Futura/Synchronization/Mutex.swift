@@ -118,19 +118,6 @@ public enum Mutex {
             }
         }
         throw Timeout()
-//        var rem = timespec(tv_sec: 0, tv_nsec: 0)
-//        var req = timespec(tv_sec: 0, tv_nsec: 0)
-//        while pthread_mutex_trylock(pointer) != 0 {
-//            if currentTimeout <= 0 {
-//                throw Timeout()
-//            } else { /* continue waiting */ }
-//            let requested = currentTimeout < nSecMsec ? currentTimeout : nSecMsec
-//            req.tv_nsec = requested
-//            while nanosleep(&req, &rem) == EINTR {
-//                req.tv_nsec = rem.tv_nsec
-//            }
-//            currentTimeout -= (requested - rem.tv_nsec)
-//        }
     }
     
     @inlinable
