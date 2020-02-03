@@ -1366,6 +1366,99 @@ class SignalTests: XCTestCase {
             .values(testDescription(of: 1)),
         ])
     }
+    
+    // MARK: -
+
+    // MARK: buffer
+    
+    func testShouldHandleValues_WhenBroadcastingValues_WithBuffer() {
+        let buffered = emitter.buffer(1)
+        
+        emitter.emit(0)
+        
+        buffered.logResults(with: workLog)
+        
+        emitter.emit(TestError())
+        emitter.emit(42)
+        
+        XCTAssertEqual(workLog, [
+            .values(testDescription(of: 0)),
+            .errors(testErrorDescription),
+            .values(testDescription(of: 42)),
+        ])
+    }
+    
+    func testShouldRepeatLastTokens_WhenSubscribing_WithNonemptyBuffer() {
+        let buffered = emitter.buffer(2)
+        
+        emitter.emit(42)
+        emitter.emit(TestError())
+        
+        buffered.logResults(with: workLog)
+        
+        XCTAssertEqual(workLog, [
+            .values(testDescription(of: 42)),
+            .errors(testErrorDescription)
+        ])
+    }
+    
+    func testShouldNotRepeatLastTokens_WhenBroadcastingValues_WithEmptyBuffer() {
+        let buffered = emitter.buffer(1)
+        
+        buffered.logResults(with: workLog)
+        
+        XCTAssertEqual(workLog, [])
+    }
+    
+    func testShouldRepeatLastTokens_WhenBroadcastingValues_WithNonfullBuffer() {
+        let buffered = emitter.buffer(5)
+        
+        emitter.emit(42)
+        emitter.emit(17)
+        
+        buffered.logResults(with: workLog)
+        
+        XCTAssertEqual(workLog, [
+            .values(testDescription(of: 42)),
+            .values(testDescription(of: 17)),
+        ])
+    }
+    
+    func testShouldRepeatLastTokens_WhenBroadcastingValues_WithRollingBuffer() {
+        let buffered = emitter.buffer(2)
+        
+        emitter.emit(0)
+        emitter.emit(0)
+        emitter.emit(0)
+        emitter.emit(0)
+        emitter.emit(0)
+        emitter.emit(42)
+        emitter.emit(17)
+        
+        buffered.logResults(with: workLog)
+        
+        XCTAssertEqual(workLog, [
+            .values(testDescription(of: 42)),
+            .values(testDescription(of: 17)),
+        ])
+    }
+    
+    func testShouldRepeatLastTokens_WhenSubscribing_WithNonemptyFinishedBuffer() {
+        let buffered = emitter.buffer(2)
+        
+        emitter.emit(42)
+        emitter.emit(TestError())
+        emitter.end()
+        
+        buffered.logResults(with: workLog)
+        
+        XCTAssertEqual(workLog, [
+            .values(testDescription(of: 42)),
+            .errors(testErrorDescription),
+            .ended,
+            .finished
+        ])
+    }
 
     // MARK: -
 
@@ -1761,5 +1854,117 @@ class SignalTests: XCTestCase {
 
         emitter = nil
         XCTAssertEqual(workLog, [.ended, .finished])
+    }
+    
+    // MARK: -
+
+    // MARK: Receiver
+    
+    func testReceiverShouldHandleTokens_WhenBroadcastingTokens_WithConnectedSignal() {
+        let receiver: Receiver<Int> = .init()
+        receiver.connect(emitter)
+        receiver.signal.logResults(with: workLog)
+        
+        emitter.emit(0)
+        emitter.emit(TestError())
+        emitter.emit(42)
+        
+        
+        XCTAssertEqual(workLog, [
+            .values(testDescription(of: 0)),
+            .errors(testErrorDescription),
+            .values(testDescription(of: 42)),
+        ])
+    }
+    
+    func testReceiverShouldNotHandleTokens_WhenBroadcastingTokens_WithDisconnectedSignal() {
+        let receiver: Receiver<Int> = .init()
+        receiver.connect(emitter)
+        receiver.signal.logResults(with: workLog)
+        receiver.disconnect()
+        
+        emitter.emit(0)
+        emitter.emit(TestError())
+        emitter.emit(42)
+        
+        
+        XCTAssertEqual(workLog, [])
+    }
+    
+    func testReceiverShouldDisconnect_WhenConnectedSignalFinishes() {
+        let receiver: Receiver<Int> = .init()
+        receiver.connect(emitter)
+        receiver.signal.logResults(with: workLog)
+        
+        emitter.emit(42)
+        emitter.end()
+        emitter.emit(0)
+        emitter.emit(TestError())
+
+        XCTAssertEqual(workLog, [
+            .values(testDescription(of: 42))
+        ])
+    }
+    
+    func testReceiverShouldHandleTokens_WhenBroadcastingTokens_WithReconnectedSignal() {
+        let receiver: Receiver<Int> = .init()
+        receiver.connect(emitter)
+        receiver.signal.logResults(with: workLog)
+        
+        emitter.emit(42)
+        receiver.disconnect()
+        emitter.emit(0)
+        receiver.connect(emitter)
+        emitter.emit(TestError())
+
+        XCTAssertEqual(workLog, [
+            .values(testDescription(of: 42)),
+            .errors(testErrorDescription)
+        ])
+    }
+    
+    func testReceiverShouldHandleTokens_WhenBroadcastingTokens_WithConnectedSignalReplaced() {
+        let otherEmitter: Emitter<Int> = .init()
+        let receiver: Receiver<Int> = .init()
+        receiver.connect(otherEmitter)
+        receiver.signal.logResults(with: workLog)
+        receiver.connect(emitter)
+        
+        emitter.emit(42)
+        otherEmitter.emit(0)
+        otherEmitter.emit(TestError())
+        emitter.emit(17)
+
+        XCTAssertEqual(workLog, [
+            .values(testDescription(of: 42)),
+            .values(testDescription(of: 17))
+        ])
+    }
+    
+    func testReceiverShouldEnd_WhenDeallocating_WithoutConnectedSignal() {
+        var receiver: Receiver<Int>! = .init()
+        receiver.signal.logResults(with: workLog)
+        
+        receiver = nil
+
+        XCTAssertEqual(workLog, [
+            .ended,
+            .finished
+        ])
+    }
+    
+    func testReceiverShouldBeDeallocated_WhenDeallocating_WithConnectedSignal() {
+        var receiver: Receiver<Int>! = .init()
+        receiver.connect(emitter)
+        receiver.signal.logResults(with: workLog)
+        
+        receiver = nil
+        
+        emitter.emit(42)
+
+        XCTAssertEqual(workLog, [
+            .ended,
+            .finished
+        ])
     }
 }

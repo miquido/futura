@@ -19,6 +19,8 @@
 		4251536E23E1FF3500A112E0 /* AtomicFlagTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4224E6F02265BE5400815E20 /* AtomicFlagTests.swift */; };
 		4251536F23E1FF4800A112E0 /* LockPerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_39 /* LockPerformanceTests.swift */; };
 		4251537023E1FFD200A112E0 /* AtomicFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4224E6E42264C85300815E20 /* AtomicFlag.swift */; };
+		426A7B7223E8247F008C6A23 /* Signal+Buffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 426A7B7123E8247F008C6A23 /* Signal+Buffer.swift */; };
+		429F673E23E82F6300364D6C /* Receiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 429F673D23E82F6300364D6C /* Receiver.swift */; };
 		42C32F75226603D300C806A4 /* Future+Handlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42C32F74226603D300C806A4 /* Future+Handlers.swift */; };
 		42C32F77226603F200C806A4 /* Future+Transformations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42C32F76226603F200C806A4 /* Future+Transformations.swift */; };
 		42C32F792266040000C806A4 /* Future+Zip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42C32F782266040000C806A4 /* Future+Zip.swift */; };
@@ -118,6 +120,8 @@
 		422DF99623E1D5D80091957D /* Lock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Lock.swift; sourceTree = "<group>"; };
 		422DF99823E1D6370091957D /* LockTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockTests.swift; sourceTree = "<group>"; };
 		4251536C23E1FED400A112E0 /* RecursiveLockPerformanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecursiveLockPerformanceTests.swift; sourceTree = "<group>"; };
+		426A7B7123E8247F008C6A23 /* Signal+Buffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Signal+Buffer.swift"; sourceTree = "<group>"; };
+		429F673D23E82F6300364D6C /* Receiver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Receiver.swift; sourceTree = "<group>"; };
 		42C32F74226603D300C806A4 /* Future+Handlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Future+Handlers.swift"; sourceTree = "<group>"; };
 		42C32F76226603F200C806A4 /* Future+Transformations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Future+Transformations.swift"; sourceTree = "<group>"; };
 		42C32F782266040000C806A4 /* Future+Zip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Future+Zip.swift"; sourceTree = "<group>"; };
@@ -275,10 +279,12 @@
 			isa = PBXGroup;
 			children = (
 				OBJ_13 /* Emitter.swift */,
+				429F673D23E82F6300364D6C /* Receiver.swift */,
 				OBJ_23 /* Signal.swift */,
 				42C32F8322660FA700C806A4 /* Signal+Handlers.swift */,
 				OBJ_14 /* Signal+Catch.swift */,
 				OBJ_15 /* Signal+Filter.swift */,
+				426A7B7123E8247F008C6A23 /* Signal+Buffer.swift */,
 				OBJ_16 /* Signal+FlatMap.swift */,
 				OBJ_17 /* Signal+FlatMapLatest.swift */,
 				OBJ_18 /* Signal+Forward.swift */,
@@ -599,6 +605,7 @@
 			buildActionMask = 0;
 			files = (
 				OBJ_67 /* Future.swift in Sources */,
+				426A7B7223E8247F008C6A23 /* Signal+Buffer.swift in Sources */,
 				OBJ_68 /* Promise.swift in Sources */,
 				42C32F75226603D300C806A4 /* Future+Handlers.swift in Sources */,
 				OBJ_69 /* Emitter.swift in Sources */,
@@ -620,6 +627,7 @@
 				42C32F802266069400C806A4 /* FuturaDebug.swift in Sources */,
 				42C32F7B2266040C00C806A4 /* Future+Debug.swift in Sources */,
 				OBJ_80 /* Subscription.swift in Sources */,
+				429F673E23E82F6300364D6C /* Receiver.swift in Sources */,
 				42C32F77226603F200C806A4 /* Future+Transformations.swift in Sources */,
 				OBJ_81 /* SubscriptionCollector.swift in Sources */,
 				OBJ_82 /* TimedEmitter.swift in Sources */,
