@@ -27,6 +27,8 @@
 		42C32F802266069400C806A4 /* FuturaDebug.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42C32F7F2266069400C806A4 /* FuturaDebug.swift */; };
 		42C32F822266075D00C806A4 /* Signal+Debug.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42C32F812266075D00C806A4 /* Signal+Debug.swift */; };
 		42C32F8422660FA700C806A4 /* Signal+Handlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42C32F8322660FA700C806A4 /* Signal+Handlers.swift */; };
+		42C675CB23E221000075B645 /* Emitting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42C675CA23E221000075B645 /* Emitting.swift */; };
+		42C675CD23E222ED0075B645 /* EmittingPropertyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42C675CC23E222ED0075B645 /* EmittingPropertyTests.swift */; };
 		OBJ_110 /* FuturaTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Futura::FuturaTest::Product" /* FuturaTest.framework */; };
 		OBJ_111 /* Futura.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Futura::Futura::Product" /* Futura.framework */; };
 		OBJ_119 /* TestWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_36 /* TestWorker.swift */; };
@@ -124,6 +126,8 @@
 		42C32F7F2266069400C806A4 /* FuturaDebug.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuturaDebug.swift; sourceTree = "<group>"; };
 		42C32F812266075D00C806A4 /* Signal+Debug.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Signal+Debug.swift"; sourceTree = "<group>"; };
 		42C32F8322660FA700C806A4 /* Signal+Handlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Signal+Handlers.swift"; sourceTree = "<group>"; };
+		42C675CA23E221000075B645 /* Emitting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Emitting.swift; sourceTree = "<group>"; };
+		42C675CC23E222ED0075B645 /* EmittingPropertyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmittingPropertyTests.swift; sourceTree = "<group>"; };
 		"Futura::Futura::Product" /* Futura.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Futura.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Futura::FuturaPerformanceTests::Product" /* FuturaPerformanceTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = FuturaPerformanceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Futura::FuturaTest::Product" /* FuturaTest.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FuturaTest.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -219,6 +223,7 @@
 			isa = PBXGroup;
 			children = (
 				OBJ_44 /* SignalTests.swift */,
+				42C675CC23E222ED0075B645 /* EmittingPropertyTests.swift */,
 			);
 			path = Signal;
 			sourceTree = "<group>";
@@ -285,6 +290,7 @@
 				OBJ_24 /* Subscription.swift */,
 				OBJ_25 /* SubscriptionCollector.swift */,
 				OBJ_26 /* TimedEmitter.swift */,
+				42C675CA23E221000075B645 /* Emitting.swift */,
 			);
 			path = Signal;
 			sourceTree = "<group>";
@@ -580,6 +586,7 @@
 				OBJ_130 /* SignalTests.swift in Sources */,
 				OBJ_131 /* FuturaTests.swift in Sources */,
 				4251536E23E1FF3500A112E0 /* AtomicFlagTests.swift in Sources */,
+				42C675CD23E222ED0075B645 /* EmittingPropertyTests.swift in Sources */,
 				OBJ_132 /* FutureWorkLog.swift in Sources */,
 				OBJ_133 /* StreamWorkLog.swift in Sources */,
 				422DF99523E1D0E10091957D /* SynchronizedPropertyTests.swift in Sources */,
@@ -595,6 +602,7 @@
 				OBJ_68 /* Promise.swift in Sources */,
 				42C32F75226603D300C806A4 /* Future+Handlers.swift in Sources */,
 				OBJ_69 /* Emitter.swift in Sources */,
+				42C675CB23E221000075B645 /* Emitting.swift in Sources */,
 				42C32F8422660FA700C806A4 /* Signal+Handlers.swift in Sources */,
 				OBJ_70 /* Signal+Catch.swift in Sources */,
 				OBJ_71 /* Signal+Filter.swift in Sources */,

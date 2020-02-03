@@ -13,7 +13,7 @@
  limitations under the License. */
 
 /// Emitter is a Signal that allows broadcasting values and errors.
-/// Using Emitter is the only way to pass any information through Signals.
+/// Using Emitter and Emitting property wrapper are only way to pass any information through Signals.
 /// Values and errors are called tokens to call any emission.
 public final class Emitter<Value>: Signal<Value> {
     /// Creates Emitter instance with given type.
