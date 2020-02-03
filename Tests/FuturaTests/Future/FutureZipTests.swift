@@ -21,6 +21,9 @@ class FutureZipTests: XCTestCase {
     var workLog: FutureWorkLog = .init()
     var promise_1: Promise<Int> = .init()
     var promise_2: Promise<Int> = .init()
+    @Synchronized var counter_1 = 0
+    @Synchronized var counter_2 = 0
+    @Synchronized var counter_3 = 0
 
     override func setUp() {
         super.setUp()
@@ -28,6 +31,9 @@ class FutureZipTests: XCTestCase {
         workLog = .init()
         promise_1 = .init(executionContext: .explicit(worker))
         promise_2 = .init(executionContext: .explicit(worker))
+        counter_1 = 0
+        counter_2 = 0
+        counter_3 = 0
     }
 
     // MARK: -
@@ -610,57 +616,53 @@ class FutureZipTests: XCTestCase {
             }
 
             let dispatchQueue: DispatchQueue = DispatchQueue(label: "test", qos: .default, attributes: .concurrent)
-            let lock_1: RecursiveLock = .init()
-            let lock_2: RecursiveLock = .init()
-            let lock_3: RecursiveLock = .init()
-            let lock_4: RecursiveLock = .init()
-            var counter_1 = 0
-            var counter_2 = 0
-            var counter_3 = 0
+            let lock_1: Lock = .init()
+            let lock_2: Lock = .init()
+            let lock_3: Lock = .init()
+            let lock_4: Lock = .init()
 
+            lock_1.lock()
             dispatchQueue.async {
-                lock_1.lock()
                 for i in 1 ... 100 {
                     zip(promises[i - 1].future, promises[i].future).always {
-                        counter_1 += 1
+                        self.counter_1 += 1
                     }
                 }
                 lock_1.unlock()
             }
+            lock_2.lock()
             dispatchQueue.async {
-                lock_2.lock()
                 for i in 1 ... 100 {
                     zip(promises[i - 1].future, promises[i].future).always {
-                        counter_2 += 1
+                        self.counter_2 += 1
                     }
                 }
                 lock_2.unlock()
             }
+            lock_3.lock()
             dispatchQueue.async {
-                lock_3.lock()
                 for i in 1 ... 100 {
                     zip(promises[i - 1].future, promises[i].future).always {
-                        counter_3 += 1
+                        self.counter_3 += 1
                     }
                 }
                 lock_3.unlock()
             }
 
+            lock_4.lock()
             dispatchQueue.async {
-                lock_4.lock()
                 for promise in promises {
                     promise.fulfill(with: 0)
                 }
                 lock_4.unlock()
             }
 
-            sleep(1) // make sure that queue locks first
             lock_1.lock()
             lock_2.lock()
             lock_3.lock()
             lock_4.lock()
 
-            XCTAssertEqual(counter_1 + counter_2 + counter_3, 300, "Calls count not matching expected")
+            XCTAssertEqual(self.counter_1 + self.counter_2 + self.counter_3, 300, "Calls count not matching expected")
             complete()
         }
     }
@@ -675,57 +677,53 @@ class FutureZipTests: XCTestCase {
             }
 
             let dispatchQueue: DispatchQueue = DispatchQueue(label: "test", qos: .default, attributes: .concurrent)
-            let lock_1: RecursiveLock = .init()
-            let lock_2: RecursiveLock = .init()
-            let lock_3: RecursiveLock = .init()
-            let lock_4: RecursiveLock = .init()
-            var counter_1 = 0
-            var counter_2 = 0
-            var counter_3 = 0
+            let lock_1: Lock = .init()
+            let lock_2: Lock = .init()
+            let lock_3: Lock = .init()
+            let lock_4: Lock = .init()
 
+            lock_1.lock()
             dispatchQueue.async {
-                lock_1.lock()
                 for i in 1 ... 100 {
                     zip(promises[i - 1].future, promises[i].future).always {
-                        counter_1 += 1
+                        self.counter_1 += 1
                     }
                 }
                 lock_1.unlock()
             }
+            lock_2.lock()
             dispatchQueue.async {
-                lock_2.lock()
                 for i in 1 ... 100 {
                     zip(promises[i - 1].future, promises[i].future).always {
-                        counter_2 += 1
+                        self.counter_2 += 1
                     }
                 }
                 lock_2.unlock()
             }
+            lock_3.lock()
             dispatchQueue.async {
-                lock_3.lock()
                 for i in 1 ... 100 {
                     zip(promises[i - 1].future, promises[i].future).always {
-                        counter_3 += 1
+                        self.counter_3 += 1
                     }
                 }
                 lock_3.unlock()
             }
 
+            lock_4.lock()
             dispatchQueue.async {
-                lock_4.lock()
                 for promise in promises {
                     promise.break(with: testError)
                 }
                 lock_4.unlock()
             }
 
-            sleep(1) // make sure that queue locks first
             lock_1.lock()
             lock_2.lock()
             lock_3.lock()
             lock_4.lock()
 
-            XCTAssertEqual(counter_1 + counter_2 + counter_3, 300, "Calls count not matching expected")
+            XCTAssertEqual(self.counter_1 + self.counter_2 + self.counter_3, 300, "Calls count not matching expected")
             complete()
         }
     }
@@ -740,57 +738,55 @@ class FutureZipTests: XCTestCase {
             }
 
             let dispatchQueue: DispatchQueue = DispatchQueue(label: "test", qos: .default, attributes: .concurrent)
-            let lock_1: RecursiveLock = .init()
-            let lock_2: RecursiveLock = .init()
-            let lock_3: RecursiveLock = .init()
-            let lock_4: RecursiveLock = .init()
-            var counter_1 = 0
-            var counter_2 = 0
-            var counter_3 = 0
-
+            let lock_1: Lock = .init()
+            let lock_2: Lock = .init()
+            let lock_3: Lock = .init()
+            let lock_4: Lock = .init()
+            
+            lock_1.lock()
             dispatchQueue.async {
-                lock_1.lock()
                 for i in 1 ... 100 {
-                    zip(promises[i - 1].future, promises[i].future).always {
-                        counter_1 += 1
+                    zip(promises[i - 1].future, promises[i].future)
+                    .always {
+                        self.counter_1 += 1
                     }
                 }
                 lock_1.unlock()
             }
+            lock_2.lock()
             dispatchQueue.async {
-                lock_2.lock()
                 for i in 1 ... 100 {
-                    zip(promises[i - 1].future, promises[i].future).always {
-                        counter_2 += 1
+                    zip(promises[i - 1].future, promises[i].future)
+                    .always {
+                        self.counter_2 += 1
                     }
                 }
                 lock_2.unlock()
             }
+            lock_3.lock()
             dispatchQueue.async {
-                lock_3.lock()
                 for i in 1 ... 100 {
-                    zip(promises[i - 1].future, promises[i].future).always {
-                        counter_3 += 1
+                    zip(promises[i - 1].future, promises[i].future)
+                    .always {
+                        self.counter_3 += 1
                     }
                 }
                 lock_3.unlock()
             }
-
+            lock_4.lock()
             dispatchQueue.async {
-                lock_4.lock()
                 for promise in promises {
                     promise.cancel()
                 }
                 lock_4.unlock()
             }
-
-            sleep(1) // make sure that queue locks first
+            
             lock_1.lock()
             lock_2.lock()
             lock_3.lock()
             lock_4.lock()
 
-            XCTAssertEqual(counter_1 + counter_2 + counter_3, 300, "Calls count not matching expected")
+            XCTAssertEqual(self.counter_1 + self.counter_2 + self.counter_3, 300, "Calls count not matching expected")
             complete()
         }
     }
@@ -805,51 +801,47 @@ class FutureZipTests: XCTestCase {
             }
 
             let dispatchQueue: DispatchQueue = DispatchQueue(label: "test", qos: .default, attributes: .concurrent)
-            let lock_1: RecursiveLock = .init()
-            let lock_2: RecursiveLock = .init()
-            let lock_3: RecursiveLock = .init()
-            let lock_4: RecursiveLock = .init()
-            var counter_1 = 0
-            var counter_2 = 0
-            var counter_3 = 0
+            let lock_1: Lock = .init()
+            let lock_2: Lock = .init()
+            let lock_3: Lock = .init()
+            let lock_4: Lock = .init()
 
+            lock_1.lock()
             dispatchQueue.async {
-                lock_1.lock()
                 zip(promises.map { $0.future }).always {
-                    counter_1 += 1
+                    self.counter_1 += 1
                 }
                 lock_1.unlock()
             }
+            lock_2.lock()
             dispatchQueue.async {
-                lock_2.lock()
                 zip(promises.map { $0.future }).always {
-                    counter_2 += 1
+                    self.counter_2 += 1
                 }
                 lock_2.unlock()
             }
+            lock_3.lock()
             dispatchQueue.async {
-                lock_3.lock()
                 zip(promises.map { $0.future }).always {
-                    counter_3 += 1
+                    self.counter_3 += 1
                 }
                 lock_3.unlock()
             }
 
+            lock_4.lock()
             dispatchQueue.async {
-                lock_4.lock()
                 for promise in promises {
                     promise.fulfill(with: 0)
                 }
                 lock_4.unlock()
             }
 
-            sleep(1) // make sure that queue locks first
             lock_1.lock()
             lock_2.lock()
             lock_3.lock()
             lock_4.lock()
 
-            XCTAssertEqual(counter_1 + counter_2 + counter_3, 3, "Calls count not matching expected")
+            XCTAssertEqual(self.counter_1 + self.counter_2 + self.counter_3, 3, "Calls count not matching expected")
             complete()
         }
     }
@@ -864,51 +856,47 @@ class FutureZipTests: XCTestCase {
             }
 
             let dispatchQueue: DispatchQueue = DispatchQueue(label: "test", qos: .default, attributes: .concurrent)
-            let lock_1: RecursiveLock = .init()
-            let lock_2: RecursiveLock = .init()
-            let lock_3: RecursiveLock = .init()
-            let lock_4: RecursiveLock = .init()
-            var counter_1 = 0
-            var counter_2 = 0
-            var counter_3 = 0
+            let lock_1: Lock = .init()
+            let lock_2: Lock = .init()
+            let lock_3: Lock = .init()
+            let lock_4: Lock = .init()
 
+            lock_1.lock()
             dispatchQueue.async {
-                lock_1.lock()
                 zip(promises.map { $0.future }).always {
-                    counter_1 += 1
+                    self.counter_1 += 1
                 }
                 lock_1.unlock()
             }
+            lock_2.lock()
             dispatchQueue.async {
-                lock_2.lock()
                 zip(promises.map { $0.future }).always {
-                    counter_2 += 1
+                    self.counter_2 += 1
                 }
                 lock_2.unlock()
             }
+            lock_3.lock()
             dispatchQueue.async {
-                lock_3.lock()
                 zip(promises.map { $0.future }).always {
-                    counter_3 += 1
+                    self.counter_3 += 1
                 }
                 lock_3.unlock()
             }
 
+            lock_4.lock()
             dispatchQueue.async {
-                lock_4.lock()
                 for promise in promises {
                     promise.break(with: testError)
                 }
                 lock_4.unlock()
             }
 
-            sleep(1) // make sure that queue locks first
             lock_1.lock()
             lock_2.lock()
             lock_3.lock()
             lock_4.lock()
 
-            XCTAssertEqual(counter_1 + counter_2 + counter_3, 3, "Calls count not matching expected")
+            XCTAssertEqual(self.counter_1 + self.counter_2 + self.counter_3, 3, "Calls count not matching expected")
             complete()
         }
     }
@@ -923,51 +911,46 @@ class FutureZipTests: XCTestCase {
             }
 
             let dispatchQueue: DispatchQueue = DispatchQueue(label: "test", qos: .default, attributes: .concurrent)
-            let lock_1: RecursiveLock = .init()
-            let lock_2: RecursiveLock = .init()
-            let lock_3: RecursiveLock = .init()
-            let lock_4: RecursiveLock = .init()
-            var counter_1 = 0
-            var counter_2 = 0
-            var counter_3 = 0
+            let lock_1: Lock = .init()
+            let lock_2: Lock = .init()
+            let lock_3: Lock = .init()
+            let lock_4: Lock = .init()
 
+            lock_1.lock()
             dispatchQueue.async {
-                lock_1.lock()
                 zip(promises.map { $0.future }).always {
-                    counter_1 += 1
+                    self.counter_1 += 1
                 }
                 lock_1.unlock()
             }
+            lock_2.lock()
             dispatchQueue.async {
-                lock_2.lock()
                 zip(promises.map { $0.future }).always {
-                    counter_2 += 1
+                    self.counter_2 += 1
                 }
                 lock_2.unlock()
             }
+            lock_3.lock()
             dispatchQueue.async {
-                lock_3.lock()
                 zip(promises.map { $0.future }).always {
-                    counter_3 += 1
+                    self.counter_3 += 1
                 }
                 lock_3.unlock()
             }
-
+            lock_4.lock()
             dispatchQueue.async {
-                lock_4.lock()
                 for promise in promises {
                     promise.cancel()
                 }
                 lock_4.unlock()
             }
 
-            sleep(1) // make sure that queue locks first
             lock_1.lock()
             lock_2.lock()
             lock_3.lock()
             lock_4.lock()
 
-            XCTAssertEqual(counter_1 + counter_2 + counter_3, 3, "Calls count not matching expected")
+            XCTAssertEqual(self.counter_1 + self.counter_2 + self.counter_3, 3, "Calls count not matching expected")
             complete()
         }
     }

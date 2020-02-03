@@ -1678,36 +1678,35 @@ class SignalTests: XCTestCase {
     func testShouldWorkProperly_WhenAccessingOnManyThreads() {
         asyncTest { complete in
             let dispatchQueue: DispatchQueue = DispatchQueue(label: "test", qos: .default, attributes: .concurrent)
-            let lock_1: RecursiveLock = .init()
-            let lock_2: RecursiveLock = .init()
-            let lock_3: RecursiveLock = .init()
+            let lock_1: Lock = .init()
+            let lock_2: Lock = .init()
+            let lock_3: Lock = .init()
             var counter_1 = 0
             var counter_2 = 0
             var counter_3 = 0
 
+            lock_1.lock()
             dispatchQueue.async {
-                lock_1.lock()
                 for _ in 0 ..< 100 {
                     self.emitter.values { _ in counter_1 += 1 }
                 }
                 lock_1.unlock()
             }
+            lock_2.lock()
             dispatchQueue.async {
-                lock_2.lock()
                 for _ in 0 ..< 100 {
                     self.emitter.values { _ in counter_2 += 1 }
                 }
                 lock_2.unlock()
             }
+            lock_3.lock()
             dispatchQueue.async {
-                lock_3.lock()
                 for _ in 0 ..< 100 {
                     self.emitter.values { _ in counter_3 += 1 }
                 }
                 lock_3.unlock()
             }
 
-            sleep(1) // make sure that queue locks first
             lock_1.lock()
             lock_2.lock()
             lock_3.lock()

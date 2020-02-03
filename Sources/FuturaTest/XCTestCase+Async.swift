@@ -25,7 +25,7 @@ public extension XCTestCase {
     ///
     /// - Parameter timeout: Wait timeout in seconds, default is 3
     /// - Parameter testBody: body pf test that will be executed
-    func asyncTest(timeout: UInt8 = 3,
+    func asyncTest(timeout: UInt8 = 5,
                    file: StaticString = #file,
                    line: UInt = #line,
                    testBody: @escaping (@escaping () -> Void) -> Void) {
@@ -33,8 +33,8 @@ public extension XCTestCase {
         let expectation: TestExpectation = .init(timeout: timeout, file: file, line: line)
         
         testQueue.async {
-            testBody { [weak expectation] in
-                expectation?.fulfill()
+            testBody {
+                expectation.fulfill()
             }
         }
         expectation.waitForExpectation()

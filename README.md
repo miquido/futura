@@ -135,7 +135,7 @@ Worker is a fundamental tool of Futura. It is an abstraction on execution of tas
 
 ### Synchronization
 
-There are two helpers here. Easy to use pthread_mutex wrapper (Mutex) and even easier to use RecursiveLock based on it. Both are used internally to provide fast and reliable synchronization.
+There are some useful helpers here. Easy to use pthread_mutex wrapper (Mutex) and even easier to use Lock and RecursiveLock based on it. All of those are used internally to provide fast and reliable synchronization. There is also property wrapper called Synchronized to make synchronized properties more easily.
 
 ### Atomics
 
