@@ -14,7 +14,7 @@ limitations under the License. */
 
 public extension Signal {
     /// Transforms Signal into new Signal instance with token buffer.
-    /// Repeats all buffered tokens on new subscriptions.
+    /// Repeats all buffered tokens on new subscriptions to this signal.
     ///
     /// - Warning: Buffer will not be propagated. Tokens will be reemitted only
     /// after subscribing directly to buffered signal instance. If you like to make buffer part of
@@ -24,7 +24,7 @@ public extension Signal {
     /// to buffered signal. Otherwise only first handler/transformation in chain will receive buffered values.
     ///
     /// - Warning: Buffer will be applied on new subscriptions on undefined thread.
-    /// In most cases it will be same thread on which subscriptions are added.
+    /// It might be applied immediately when adding new subscription.
     ///
     /// - Parameter size: Size of the buffer
     /// - Returns: New Signal instance which repeats buffered tokens on new subscriptions.
