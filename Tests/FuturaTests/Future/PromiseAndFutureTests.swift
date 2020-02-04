@@ -582,6 +582,26 @@ class PromiseAndFutureTestsTests: XCTestCase {
         XCTAssertEqual(worker.execute(), 4)
         XCTAssertEqual(workLog, [.error(testErrorDescription), .resulted, .always])
     }
+    
+    func testShouldHandleCancel_WhenPrecanceled() {
+        Future<Int>.canceled(executionContext: .explicit(worker))
+            .value { value in
+                self.workLog.log(.value(testDescription(of: value)))
+            }
+            .error { error in
+                self.workLog.log(.error(testDescription(of: error)))
+            }
+            .resulted {
+                self.workLog.log(.resulted)
+            }
+            .always {
+                self.workLog.log(.always)
+            }
+
+        XCTAssert(workLog.isEmpty)
+        XCTAssertEqual(worker.execute(), 4)
+        XCTAssertEqual(workLog, [.always])
+    }
 
     func testShouldHandleCancel_WhenAlreadyCompletedWithCancel() {
         promise.cancel()
