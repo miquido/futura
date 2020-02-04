@@ -159,7 +159,7 @@ Since Futura is open source project you can feel invited to make it even better.
 
 ## License
 
-Copyright 2018-2019 Miquido
+Copyright 2018-2020 Miquido
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
