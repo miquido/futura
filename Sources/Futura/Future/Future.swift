@@ -82,6 +82,9 @@ public extension Future {
     }
     
     /// Creates new precanceled Future.
+    /// - Parameter executionContext: ExecutionContext that will be used for all
+    /// transformations and handlers made on this Future. Default is .undefined.
+    /// - Returns: Precanceled Future.
     static func canceled(executionContext: ExecutionContext = .undefined) -> Future {
         Future(.canceled, executionContext: executionContext)
     }
