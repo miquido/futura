@@ -35,7 +35,7 @@ public final class Future<Value> {
     /// - Parameter executionContext: ExecutionContext that will be used for all
     /// transformations and handlers made on this Future. Default is .undefined.
     public convenience init(succeededWith result: Value, executionContext: ExecutionContext = .undefined) {
-        self.init(with: .success(result), executionContext: executionContext)
+        self.init(.resulted(with: .success(result)), executionContext: executionContext)
     }
 
     /// Creates already finished Future with given error and context.
@@ -44,28 +44,20 @@ public final class Future<Value> {
     /// - Parameter executionContext: ExecutionContext that will be used for all
     /// transformations and handlers made on this Future. Default is .undefined.
     public convenience init(failedWith reason: Error, executionContext: ExecutionContext = .undefined) {
-        self.init(with: .failure(reason), executionContext: executionContext)
+        self.init(.resulted(with: .failure(reason)), executionContext: executionContext)
     }
     
     #if FUTURA_DEBUG
-    internal init(with result: Result<Value, Error>? = nil, executionContext: ExecutionContext, debug: DebugMode = .disabled) {
+    internal init(_ state: State = .waiting, executionContext: ExecutionContext, debug: DebugMode = .disabled) {
         self.executionContext = executionContext
         self.debugMode = debug
-        if let result = result {
-            self.state = .resulted(with: result)
-        } else {
-            self.state = .waiting
-        }
+        self.state = state
     }
     
     #else
-    internal init(with result: Result<Value, Error>? = nil, executionContext: ExecutionContext) {
+    internal init(_ state: State = .waiting, executionContext: ExecutionContext) {
         self.executionContext = executionContext
-        if let result = result {
-            self.state = .resulted(with: result)
-        } else {
-            self.state = .waiting
-        }
+        self.state = state
     }
     #endif
 
@@ -87,6 +79,14 @@ public extension Future {
     /// Cancelation is ignored by predecessors.
     func cancel() {
         become(.canceled)
+    }
+    
+    /// Creates new precanceled Future.
+    /// - Parameter executionContext: ExecutionContext that will be used for all
+    /// transformations and handlers made on this Future. Default is .undefined.
+    /// - Returns: Precanceled Future.
+    static func canceled(executionContext: ExecutionContext = .undefined) -> Future {
+        Future(.canceled, executionContext: executionContext)
     }
 }
 
