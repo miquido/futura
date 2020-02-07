@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
   s.license      = { :type => 'Apache 2.0', :file => 'LICENSE' }
   s.author       = { 'Kacper Kaliński' => 'kacper.kalinski@miquido.com' }
   s.source       = { :git => 'https://github.com/miquido/futura.git', :tag => s.version }
-  s.source_files = 'Sources/Futura/*.swift'
+  s.source_files = 'Sources/Futura/**/*.swift'
   
   s.ios.deployment_target = '10.0'
   s.osx.deployment_target = '10.12'
