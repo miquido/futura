@@ -122,7 +122,7 @@ github "miquido/futura" ~> 2.0
 You can even use CocoaPods, but since this library hasn't been added to the official CocoaPods spec repository you must point to it explicitly.
 
 ```
-pod 'Futura', :git => 'https://github.com/miquido/futura.git', :tag ~> '2.0'
+pod 'Futura', :git => 'https://github.com/miquido/futura.git', :tag => '2.3.1'
 ```
 
 ## What it is exactly?
