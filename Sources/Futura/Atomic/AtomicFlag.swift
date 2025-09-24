@@ -13,6 +13,7 @@
  limitations under the License. */
 
 import libkern
+import os.atomic
 
 public enum AtomicFlag {
     
